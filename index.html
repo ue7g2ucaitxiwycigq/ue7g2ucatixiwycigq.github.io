@@ -3,467 +3,402 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر التحميلات | ألعاب 🔥</title>
-    <!-- أيقونة الموقع ( Favicon ) -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
+    <title>مساعد NVIDIA AI المجاني</title>
     <style>
-        /* reset و تنسيقات عامة */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            background: linear-gradient(135deg, #1e1e2f, #2a2a40);
-            color: #ffffff;
             padding: 20px;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        /* تأثير خلفية متحرك (جزيئات) */
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(255, 100, 100, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 80% 70%, rgba(100, 100, 255, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 40% 80%, rgba(255, 200, 100, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 20%, rgba(100, 255, 100, 0.1) 0%, transparent 20%);
-            pointer-events: none;
-            z-index: 0;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 900px;
             margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* رأس الصفحة */
-        header {
-            text-align: center;
-            margin-bottom: 50px;
-            padding: 40px 20px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            animation: fadeInDown 1s ease-out;
-        }
-
-        header h1 {
-            font-size: 3.5em;
-            margin-bottom: 10px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-
-        header p {
-            font-size: 1.3em;
-            color: #cccccc;
-            letter-spacing: 1px;
-        }
-
-        /* شبكة الألعاب */
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            padding: 20px;
-        }
-
-        /* بطاقة اللعبة */
-        .game-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 30px;
-            padding: 25px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            animation: fadeInUp 0.8s ease-out;
-            animation-fill-mode: both;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .game-card:hover {
-            transform: translateY(-15px) scale(1.02);
-            border-color: rgba(255, 107, 107, 0.5);
-            box-shadow: 0 30px 50px rgba(255, 107, 107, 0.3);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* أيقونة اللعبة */
-        .game-icon {
-            font-size: 5em;
-            text-align: center;
-            margin-bottom: 20px;
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
-        }
-
-        /* عنوان اللعبة */
-        .game-title {
-            font-size: 1.8em;
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-align: center;
-            color: #fff;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-        }
-
-        /* وصف اللعبة */
-        .game-description {
-            color: #b0b0b0;
-            text-align: center;
-            margin-bottom: 20px;
-            line-height: 1.6;
-            font-size: 0.95em;
-        }
-
-        /* معلومات إضافية */
-        .game-meta {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px 0;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 20px;
-            color: #4ecdc4;
-            font-weight: 500;
-        }
-
-        .game-meta span {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* زر التحميل */
-        .download-btn {
-            display: inline-block;
-            width: 100%;
-            padding: 15px 30px;
-            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 1.2em;
-            text-align: center;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
-            position: relative;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
         }
 
-        .download-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
-        }
-
-        .download-btn:active {
-            transform: scale(0.95);
-        }
-
-        .download-btn::before {
-            content: '⬇️';
-            margin-left: 10px;
-            font-size: 1.2em;
-        }
-
-        /* حركات دخول */
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* تأخير ظهور البطاقات */
-        .game-card:nth-child(1) { animation-delay: 0.1s; }
-        .game-card:nth-child(2) { animation-delay: 0.3s; }
-        .game-card:nth-child(3) { animation-delay: 0.5s; }
-        .game-card:nth-child(4) { animation-delay: 0.7s; }
-        .game-card:nth-child(5) { animation-delay: 0.9s; }
-        .game-card:nth-child(6) { animation-delay: 1.1s; }
-
-        /* تذييل الصفحة */
-        footer {
-            text-align: center;
-            margin-top: 60px;
+        .header {
+            background: linear-gradient(135deg, #4a90e2 0%, #7c3aed 100%);
+            color: white;
             padding: 30px;
-            color: #888;
-            border-top: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
         }
 
-        /* تصميم متجاوب */
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .chat-container {
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .messages {
+            min-height: 400px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            justify-content: flex-end;
+        }
+
+        .assistant-message {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            font-size: 1rem;
+            line-height: 1.5;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .user-message .message-content {
+            background: linear-gradient(135deg, #4a90e2 0%, #7c3aed 100%);
+            color: white;
+            border-bottom-left-radius: 5px;
+        }
+
+        .assistant-message .message-content {
+            background: white;
+            color: #333;
+            border-bottom-right-radius: 5px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        textarea {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: none;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #4a90e2;
+        }
+
+        button {
+            padding: 0 30px;
+            background: linear-gradient(135deg, #4a90e2 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .model-info {
+            padding: 15px 30px;
+            background: #f1f3f5;
+            border-top: 1px solid #e0e0e0;
+            font-size: 0.9em;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.85em;
+        }
+
+        .status.online {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .clear-btn {
+            background: #dc3545;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .clear-btn:hover {
+            background: #c82333;
+        }
+
         @media (max-width: 768px) {
-            header h1 {
-                font-size: 2.5em;
+            .header h1 {
+                font-size: 1.8em;
             }
             
-            .games-grid {
-                grid-template-columns: 1fr;
+            .message-content {
+                max-width: 85%;
             }
-        }
-
-        /* شريط البحث (اختياري) */
-        .search-box {
-            width: 100%;
-            max-width: 500px;
-            margin: 30px auto;
-            padding: 15px 25px;
-            border: none;
-            border-radius: 50px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px);
-            color: white;
-            font-size: 1.1em;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .search-box:focus {
-            outline: none;
-            border-color: #ff6b6b;
-            box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
-        }
-
-        .search-box::placeholder {
-            color: #aaa;
+            
+            .input-area {
+                flex-direction: column;
+            }
+            
+            button {
+                padding: 15px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>🎮 منصة تحميل الألعاب</h1>
-            <p> أحدث وأقوى الألعاب بتحميل مباشر وسريع 🔥</p>
-            <p>By Houd </p>
-              
-            <!-- شريط بحث بسيط -->
-            <input type="text" class="search-box" placeholder="🔍 ابحث عن لعبة..." id="searchInput">
-        </header>
+        <div class="header">
+            <h1>🤖 مساعد NVIDIA AI</h1>
+            <p>مدعوم بنموذج Nemotron-3-super-120b</p>
+        </div>
 
-        <main>
-            <div class="games-grid" id="gamesGrid">
-                <!-- البطاقة 1 - PUBG -->
-                <div class="game-card" data-name="pubg">
-                    <div class="game-icon">🪓</div>
-                    <h3 class="game-title">Serious Sam 3 BFE</h3>
-                    <p class="game-description">Serios Sam 3 BFE Download Drive</p>
-                    <div class="game-meta">
-                        <span>📦 3.8 GB</span>
-                        <span>👥 Solo Or Lan</span>
-                        <span>⭐ 4.8</span>
+        <div class="chat-container">
+            <div class="messages" id="messages">
+                <div class="message assistant-message">
+                    <div class="message-content">
+                        👋 مرحباً! أنا مساعد NVIDIA AI. كيف يمكنني مساعدتك اليوم؟
                     </div>
-                    <!-- رابط التحميل (غير فعال حالياً، استبدله برابط درايف) -->
-                    <a href="https://drive.google.com/file/d/1AzFRhIqKsnFxCJMga-9P13d9O8sjHk6a/view?usp=drive_link" class="download-btn" target="_blank">تحميل اللعبة</a>
                 </div>
+            </div>
 
-                <!-- البطاقة 2 - Fortnite -->
-                <div class="game-card" data-name="fortnite">
-                    <div class="game-icon">🪖</div>
-                    <h3 class="game-title">BattleField 3</h3>
-                    <p class="game-description">Battle Field 3 Download Direct</p>
-                    <div class="game-meta">
-                        <span>📦 14 GB</span>
-                        <span>👥 Story</span>
-                        <span>⭐ 4.7</span>
-                    </div>
-                    <a href="https://s3.uptogames.net/utg/Battlefield-3.rar" class="download-btn" target="_blank">تحميل اللعبة</a>
-                </div>
+            <div class="input-area">
+                <textarea 
+                    id="userInput" 
+                    placeholder="اكتب سؤالك هنا..." 
+                    rows="3"
+                    onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
+                ></textarea>
+                <button onclick="sendMessage()" id="sendBtn">إرسال</button>
+            </div>
+        </div>
 
-                <!-- البطاقة 3 - GTA V -->
-                <div class="game-card" data-name="gta">
-                    <div class="game-icon">🔫</div>
-                    <h3 class="game-title">CS Source</h3>
-                    <p class="game-description">CS sorce Download Drive</p>
-                    <div class="game-meta">
-                        <span>📦 1.2 GB</span>
-                        <span>🎮 Solo or Lan</span>
-                        <span>⭐ 5.0</span>
-                    </div>
-                    <a href="https://drive.google.com/file/d/0B-LgLfphl8NVUG42SnZ2WHl0LUU/view?usp=drivesdk&resourcekey=0-0ewv1sIbkMeRJJnIuO6B6Q" class="download-btn" target="_blank">تحميل اللعبة</a>
-                </div>
-
-                <!-- البطاقة 4 - Valorant -->
-                <div class="game-card" data-name="valorant">
-                    <div class="game-icon">🔫</div>
-                    <h3 class="game-title">BattleField 4</h3>
-                    <p class="game-description">Download Battle 4 Direct</p>
-                    <div class="game-meta">
-                        <span>📦 18.5 GB</span>
-                        <span>👥 Solo </span>
-                        <span>⭐ 4.6</span>
-                    </div>
-                    <a href="https://s3.uptogames.net/utg/Battlefield-4.rar" class="download-btn" target="_blank">تحميل اللعبة</a>
-                </div>
-
-                <!-- البطاقة 5 - Minecraft -->
-                <div class="game-card" data-name="minecraft">
-                    <div class="game-icon">⚔️</div>
-                    <h3 class="game-title">Call Of Duty Black Ops 2</h3>
-                    <p class="game-description">Download COD Black OPS 2 Direct</p>
-                    <div class="game-meta">
-                        <span>📦 17 GB</span>
-                        <span>🎮 Solo</span>
-                        <span>⭐ 4.9</span>
-                    </div>
-                    <a href="https://s3.uptogames.net/utg/Call-of-Duty-Black-Ops-2.rar" class="download-btn" target="_blank">تحميل اللعبة</a>
-                </div>
-
-                <!-- البطاقة 6 - FIFA 23 -->
-                <div class="game-card" data-name="fifa">
-                    <div class="game-icon">🏰</div>
-                    <h3 class="game-title">Assassin's Creed 3</h3>
-                    <p class="game-description">Download Assassin's Creed 3 Direct</p>
-                    <div class="game-meta">
-                        <span>📦 5.5 GB</span>
-                        <span>👥 Solo</span>
-                        <span>⭐ 4.5</span>
-                    </div>
-                    <a href="https://s3.uptogames.net/utg/Assassins-Creed-3.rar" class="download-btn" target="_blank">تحميل اللعبة</a>
-                </div>
-
-                <!--7 البطاقة الجديدة -->
-                <div class="game-card" data-name="اسم_اللعبة">
-                    <div class="game-icon">🎮</div>  <!-- أيقونة أو صورة -->
-                    <h3 class="game-title">BattleField 2</h3>
-                    <p class="game-description">Download BattleField 2 Direct </p>
-                    <div class="game-meta">
-                        <span>📦 3 GB </span>
-                        <span>👥 Coop-Lan </span>
-                        <span>⭐ 4.5 </span>
-                    </div>
-                    <a href="https://s1.uptogames.net/utg1/Battlefield-2.rar" class="download-btn" target="_blank">تحميل اللعبة</a>
-                </div>  
-                <!--8 البطاقة الجديدة -->
-                    <div class="game-card" data-name="Desert Storm 2">
-                        <div class="game-icon">🏜️</div>  <!-- أيقونة أو صورة -->
-                        <h3 class="game-title">Desert Storm 2</h3>
-                        <p class="game-description">Download Desert Storm 2 Direct</p>
-                        <div class="game-meta">
-                            <span>📦 600 MB </span>
-                            <span>👥 Story </span>
-                            <span>⭐ 3.7 </span>
-                        </div>
-                        <a href="https://s3.uptogames.net/utg/Conflict-Desert-Storm-2.rar" class="download-btn" target="_blank">تحميل اللعبة</a>
-                    </div>
-
-                <!--  8بطاقة Red Dead Redemption 2 -->
-                    <div class="game-card" data-name="red dead redemption">
-                        <div class="game-icon">🤠</div>
-                        <h3 class="game-title">Red Dead Redemption 2</h3>
-                        <p class="game-description">Note : If the link Don't work just copy it and paste it again will work its a protection problem</p>
-                        <div class="game-meta">
-                            <span>📦 70 GB </span>
-                            <span>🎮 Story </span>
-                            <span>⭐ 5.0</span>
-                        </div>
-                        
-                        <!--  قسم الأجزاء -->
-                        <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
-                            <!-- الجزء الأول -->
-                            <a href="https://s1195sas.storage.yandex.net/rdisk/b69329a02e07a7e47ad863d3cb2c7c83302e63863f6da0f75291cb1c9708d89a/69b4b02b/tsChDyldXys17tYtIuNkhyRFxO82LtFagZDnm4fb7DINPIQB94Ft4nqCkqwhn-lpo6grxxQkvpnL8J5YXpZWng==?uid=1927087343&filename=Red-Dead-Redemption-2.part1.rar&disposition=attachment&hash=&limit=0&content_type=application%2Fx-rar&owner_uid=1927087343&fsize=37044092928&hid=90325fea93cf3beb1bd411b0b61b179c&media_type=compressed&tknv=v3&etag=52eb9876886f19ba9836a3f07246fdae&ts=64cf1551c20c0&s=18cf7659c77030eea00aed887ba198169bbb797e586222911b2361721f21338a&pb=U2FsdGVkX1800GQMRF4eM0v3V_WgSbQEXouj1_b02PEAe-peskG9zHSuc8JADjaRLgfNUvrgKRCbsmQ9dXZmRmzFO0OxhD8HxGwPUllagjY" class="download-btn" target="_blank" style="flex: 1; background: linear-gradient(45deg, #3498db, #2980b9);">
-                                <i class="fas fa-download"></i> تحميل الجزء الأول (35 GB)
-                            </a>
-                            
-                            <!-- الجزء الثاني -->
-                            <a href="https://s1231sas.storage.yandex.net/rdisk/738b9e4a3adf832899959ffe85772e5053d0f70bd1d3ba541b85aa81aea18a18/69b4b06b/tsChDyldXys17tYtIuNkh5eyyNjBaJmu_Mt7av1_ajlkxEUBe1jKB3tX7mmyfmyJIqF_j3KcqnsNaQcgNOVONg==?uid=1927087343&filename=Red-Dead-Redemption-2.part2.rar&disposition=attachment&hash=&limit=0&content_type=application%2Fx-rar&owner_uid=1927087343&fsize=36970191929&hid=4b545d4df415d7913d2b4a3d496b5795&media_type=compressed&tknv=v3&etag=86495d2038a33dfef26dad04a5b52445&ts=64cf158ecb0c0&s=bda897c7b44d725e25d1fc112b3da469389cac9ea7c105b817494ab467edfcde&pb=U2FsdGVkX1-6189h1wtUYPuhrBWXS30zOISbo4m6Ht6WW53YI4MA8OX5KAwATnWVR_Pp8d0F7CpocuvoNf33X8sRTpHVgpMiWI5jCEid9vA" class="download-btn" target="_blank" style="flex: 1; background: linear-gradient(45deg, #e67e22, #d35400);">
-                                <i class="fas fa-download"></i> تحميل الجزء الثاني (35 GB)
-                            </a>
-                        </div>
-                        
-                        <!-- ملاحظة صغيرة -->
-                        <p style="text-align: center; color: #ffaa00; font-size: 0.8em; margin-top: 10px;">
-                            
-                        </p>
-                    </div> 
-
-                   <!--8 البطاقة الجديدة -->
-                    <div class="game-card" data-name="Medal Of Honor 2010">
-                        <div class="game-icon">🎖️</div>  <!-- أيقونة أو صورة -->
-                        <h3 class="game-title">Medal Of Honor 2010</h3>
-                        <p class="game-description">Download Medal Of Honor 2010 Direct</p>
-                        <div class="game-meta">
-                            <span>📦 3.5 GB </span>
-                            <span>👥 Story </span>
-                            <span>⭐ 3.7 </span>
-                        </div>
-                        <a href="https://s3.uptogames.net/utg/Medal-of-Honor-2010.rar" class="download-btn" target="_blank">تحميل اللعبة</a>
-                    </div>
-                        <div class="game-card" data-name="Left 4 Dead 2">
-                        <div class="game-icon">🪦</div>  <!-- أيقونة أو صورة -->
-                        <h3 class="game-title">Left 4 Dead 2</h3>
-                        <p class="game-description">Download Left 4 Dead 2 luncher terabox</p>
-                        <div class="game-meta">
-                            <span>📦  10 GB </span>
-                            <span>👥 Story-Lan </span>
-                            <span>⭐ 3.7 </span>
-                        </div>
-                        <a href="https://1024terabox.com/s/1J55EFkC7BJ_G1mD1GV9uMQ" class="download-btn" target="_blank">تحميل اللعبة</a>
-                    </div>
-
-
-        </main>
-
-        <footer>
-            <p>🔥 جميع الألعاب متاحة للتحميل المباشر | تم التحديث: مارس 2026</p>
-        </footer>
+        <div class="model-info">
+            <div>
+                <strong>النموذج:</strong> NVIDIA / Nemotron-3-super-120b
+            </div>
+            <div class="status online">
+                🟢 متصل
+            </div>
+            <button class="clear-btn" onclick="clearChat()">🗑️ مسح المحادثة</button>
+        </div>
     </div>
 
-    <!-- JavaScript للبحث والتفاعل -->
     <script>
-        // دالة البحث البسيطة
-        const searchInput = document.getElementById('searchInput');
-        const gameCards = document.querySelectorAll('.game-card');
+        // مفتاح API الخاص بك
+        const API_KEY = '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';
+        const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+        
+        // عناصر DOM
+        const messagesDiv = document.getElementById('messages');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
 
-        searchInput.addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase().trim();
+        // سجل المحادثة
+        let conversationHistory = [
+            {
+                role: 'system',
+                content: 'أنت مساعد ذكي ومفيد. اسمك "مساعد NVIDIA AI". تحدث باللغة العربية الفصحى دائماً. كن ودوداً ومحترفاً في ردودك.'
+            }
+        ];
 
-            gameCards.forEach(card => {
-                const gameName = card.querySelector('.game-title').textContent.toLowerCase();
-                const gameDesc = card.querySelector('.game-description').textContent.toLowerCase();
-                
-                if (gameName.includes(searchTerm) || gameDesc.includes(searchTerm)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            
+            if (!message) return;
+
+            // عرض رسالة المستخدم
+            addMessage(message, 'user');
+            
+            // مسح حقل الإدخال
+            userInput.value = '';
+            
+            // تعطيل الزر أثناء التحميل
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'جاري التفكير...';
+
+            try {
+                // إضافة رسالة المستخدم للسجل
+                conversationHistory.push({
+                    role: 'user',
+                    content: message
+                });
+
+                // استدعاء API
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${API_KEY}`,
+                        'Content-Type': 'application/json',
+                        'HTTP-Referer': window.location.href,
+                        'X-Title': 'NVIDIA AI Assistant'
+                    },
+                    body: JSON.stringify({
+                        model: 'nvidia/nemotron-3-super-120b-a12b:free',
+                        messages: conversationHistory,
+                        temperature: 0.7,
+                        max_tokens: 2000,
+                        top_p: 0.9,
+                        frequency_penalty: 0,
+                        presence_penalty: 0
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-            });
+
+                const data = await response.json();
+                
+                if (data.choices && data.choices[0]) {
+                    const aiResponse = data.choices[0].message.content;
+                    
+                    // إضافة رد المساعد للسجل
+                    conversationHistory.push({
+                        role: 'assistant',
+                        content: aiResponse
+                    });
+                    
+                    // عرض رد المساعد
+                    addMessage(aiResponse, 'assistant');
+                } else {
+                    throw new Error('لم يتم الحصول على رد من الذكاء الاصطناعي');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage('❌ عذراً، حدث خطأ في الاتصال. الرجاء المحاولة مرة أخرى.', 'assistant');
+            } finally {
+                // إعادة تفعيل الزر
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'إرسال';
+                
+                // تمرير المحادثة للأسفل
+                scrollToBottom();
+            }
+        }
+
+        function addMessage(content, role) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role === 'user' ? 'user-message' : 'assistant-message'}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            // تحويل النص لعرضه بشكل أفضل (مع الحفاظ على التنسيق)
+            contentDiv.textContent = content;
+            
+            messageDiv.appendChild(contentDiv);
+            messagesDiv.appendChild(messageDiv);
+            
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function clearChat() {
+            if (confirm('هل أنت متأكد من مسح المحادثة؟')) {
+                messagesDiv.innerHTML = '';
+                addMessage('👋 مرحباً! أنا مساعد NVIDIA AI. كيف يمكنني مساعدتك اليوم؟', 'assistant');
+                
+                // إعادة تعيين سجل المحادثة
+                conversationHistory = [
+                    {
+                        role: 'system',
+                        content: 'أنت مساعد ذكي ومفيد. اسمك "مساعد NVIDIA AI". تحدث باللغة العربية الفصحى دائماً. كن ودوداً ومحترفاً في ردودك.'
+                    }
+                ];
+            }
+        }
+
+        // إضافة ميزة الضغط على Enter للإرسال
+        userInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
         });
 
-        // رسالة ترحيبية في الكونسول (للتحقق)
-        console.log('🎮 صفحة تحميل الألعاب جاهزة!');
+        // حفظ المحادثة في localStorage
+        function saveChat() {
+            localStorage.setItem('chatHistory', JSON.stringify(conversationHistory));
+        }
+
+        // تحميل المحادثة المحفوظة
+        function loadChat() {
+            const saved = localStorage.getItem('chatHistory');
+            if (saved) {
+                conversationHistory = JSON.parse(saved);
+                // إعادة عرض الرسائل
+                messagesDiv.innerHTML = '';
+                conversationHistory.forEach(msg => {
+                    if (msg.role !== 'system') {
+                        addMessage(msg.content, msg.role);
+                    }
+                });
+            }
+        }
+
+        // يمكنك تفعيل هذه الميزات إذا أردت
+        // loadChat();
+        // window.addEventListener('beforeunload', saveChat);
     </script>
 </body>
 </html>
