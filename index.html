@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مساعد NVIDIA AI المجاني</title>
+    <title>مساعد NVIDIA AI - نسخة محسنة</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -28,7 +28,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #4a90e2 0%, #7c3aed 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
             color: white;
             padding: 30px;
             text-align: center;
@@ -46,7 +46,7 @@
 
         .chat-container {
             padding: 30px;
-            background: #f8f9fa;
+            background: #f8fafc;
         }
 
         .messages {
@@ -86,19 +86,21 @@
             font-size: 1rem;
             line-height: 1.5;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
 
         .user-message .message-content {
-            background: linear-gradient(135deg, #4a90e2 0%, #7c3aed 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
             color: white;
             border-bottom-left-radius: 5px;
         }
 
         .assistant-message .message-content {
             background: white;
-            color: #333;
+            color: #334155;
             border-bottom-right-radius: 5px;
-            border: 1px solid #e0e0e0;
+            border: 1px solid #e2e8f0;
         }
 
         .input-area {
@@ -113,7 +115,7 @@
         textarea {
             flex: 1;
             padding: 15px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid #e2e8f0;
             border-radius: 10px;
             font-size: 1rem;
             font-family: inherit;
@@ -123,12 +125,12 @@
 
         textarea:focus {
             outline: none;
-            border-color: #4a90e2;
+            border-color: #3b82f6;
         }
 
         button {
             padding: 0 30px;
-            background: linear-gradient(135deg, #4a90e2 0%, #7c3aed 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
             color: white;
             border: none;
             border-radius: 10px;
@@ -138,9 +140,9 @@
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        button:hover {
+        button:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
         }
 
         button:disabled {
@@ -151,10 +153,10 @@
 
         .model-info {
             padding: 15px 30px;
-            background: #f1f3f5;
-            border-top: 1px solid #e0e0e0;
+            background: #f1f5f9;
+            border-top: 1px solid #e2e8f0;
             font-size: 0.9em;
-            color: #666;
+            color: #475569;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -167,19 +169,31 @@
         }
 
         .status.online {
-            background: #d4edda;
-            color: #155724;
+            background: #dcfce7;
+            color: #166534;
         }
 
         .clear-btn {
-            background: #dc3545;
+            background: #ef4444;
             padding: 8px 15px;
             border-radius: 5px;
             cursor: pointer;
+            border: none;
+            color: white;
+            font-size: 0.9em;
         }
 
         .clear-btn:hover {
-            background: #c82333;
+            background: #dc2626;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: none;
         }
 
         @media (max-width: 768px) {
@@ -209,6 +223,8 @@
         </div>
 
         <div class="chat-container">
+            <div id="errorDisplay" class="error-message"></div>
+            
             <div class="messages" id="messages">
                 <div class="message assistant-message">
                     <div class="message-content">
@@ -222,7 +238,6 @@
                     id="userInput" 
                     placeholder="اكتب سؤالك هنا..." 
                     rows="3"
-                    onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
                 ></textarea>
                 <button onclick="sendMessage()" id="sendBtn">إرسال</button>
             </div>
@@ -240,14 +255,15 @@
     </div>
 
     <script>
-        // مفتاح API الخاص بك
-        const API_KEY = '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';
+        // مفتاح API الجديد
+        const API_KEY = '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';
         const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
         
         // عناصر DOM
         const messagesDiv = document.getElementById('messages');
         const userInput = document.getElementById('userInput');
         const sendBtn = document.getElementById('sendBtn');
+        const errorDisplay = document.getElementById('errorDisplay');
 
         // سجل المحادثة
         let conversationHistory = [
@@ -262,6 +278,9 @@
             
             if (!message) return;
 
+            // إخفاء أي أخطاء سابقة
+            hideError();
+
             // عرض رسالة المستخدم
             addMessage(message, 'user');
             
@@ -269,8 +288,7 @@
             userInput.value = '';
             
             // تعطيل الزر أثناء التحميل
-            sendBtn.disabled = true;
-            sendBtn.textContent = 'جاري التفكير...';
+            setLoadingState(true);
 
             try {
                 // إضافة رسالة المستخدم للسجل
@@ -278,6 +296,8 @@
                     role: 'user',
                     content: message
                 });
+
+                console.log('جاري إرسال الطلب...');
 
                 // استدعاء API
                 const response = await fetch(API_URL, {
@@ -292,20 +312,23 @@
                         model: 'nvidia/nemotron-3-super-120b-a12b:free',
                         messages: conversationHistory,
                         temperature: 0.7,
-                        max_tokens: 2000,
-                        top_p: 0.9,
-                        frequency_penalty: 0,
-                        presence_penalty: 0
+                        max_tokens: 2000
                     })
                 });
 
+                console.log('حالة الاستجابة:', response.status);
+
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorData = await response.text();
+                    console.error('خطأ من السيرفر:', errorData);
+                    throw new Error(`فشل الاتصال (${response.status})`);
                 }
 
                 const data = await response.json();
-                
-                if (data.choices && data.choices[0]) {
+                console.log('البيانات المستلمة:', data);
+
+                // التحقق من وجود الرد
+                if (data.choices && data.choices[0] && data.choices[0].message) {
                     const aiResponse = data.choices[0].message.content;
                     
                     // إضافة رد المساعد للسجل
@@ -317,18 +340,17 @@
                     // عرض رد المساعد
                     addMessage(aiResponse, 'assistant');
                 } else {
-                    throw new Error('لم يتم الحصول على رد من الذكاء الاصطناعي');
+                    console.error('هيكل البيانات غير متوقع:', data);
+                    throw new Error('تنسيق الرد غير صحيح');
                 }
 
             } catch (error) {
-                console.error('Error:', error);
+                console.error('خطأ مفصل:', error);
+                showError('حدث خطأ: ' + error.message);
                 addMessage('❌ عذراً، حدث خطأ في الاتصال. الرجاء المحاولة مرة أخرى.', 'assistant');
             } finally {
                 // إعادة تفعيل الزر
-                sendBtn.disabled = false;
-                sendBtn.textContent = 'إرسال';
-                
-                // تمرير المحادثة للأسفل
+                setLoadingState(false);
                 scrollToBottom();
             }
         }
@@ -340,7 +362,7 @@
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
             
-            // تحويل النص لعرضه بشكل أفضل (مع الحفاظ على التنسيق)
+            // معالجة النص
             contentDiv.textContent = content;
             
             messageDiv.appendChild(contentDiv);
@@ -353,12 +375,27 @@
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
 
+        function setLoadingState(isLoading) {
+            sendBtn.disabled = isLoading;
+            sendBtn.textContent = isLoading ? 'جاري التفكير...' : 'إرسال';
+            userInput.disabled = isLoading;
+        }
+
+        function showError(message) {
+            errorDisplay.textContent = message;
+            errorDisplay.style.display = 'block';
+            setTimeout(hideError, 5000);
+        }
+
+        function hideError() {
+            errorDisplay.style.display = 'none';
+        }
+
         function clearChat() {
             if (confirm('هل أنت متأكد من مسح المحادثة؟')) {
                 messagesDiv.innerHTML = '';
                 addMessage('👋 مرحباً! أنا مساعد NVIDIA AI. كيف يمكنني مساعدتك اليوم؟', 'assistant');
                 
-                // إعادة تعيين سجل المحادثة
                 conversationHistory = [
                     {
                         role: 'system',
@@ -368,7 +405,7 @@
             }
         }
 
-        // إضافة ميزة الضغط على Enter للإرسال
+        // إضافة ميزة Enter للإرسال
         userInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -376,29 +413,38 @@
             }
         });
 
-        // حفظ المحادثة في localStorage
-        function saveChat() {
-            localStorage.setItem('chatHistory', JSON.stringify(conversationHistory));
-        }
-
-        // تحميل المحادثة المحفوظة
-        function loadChat() {
-            const saved = localStorage.getItem('chatHistory');
-            if (saved) {
-                conversationHistory = JSON.parse(saved);
-                // إعادة عرض الرسائل
-                messagesDiv.innerHTML = '';
-                conversationHistory.forEach(msg => {
-                    if (msg.role !== 'system') {
-                        addMessage(msg.content, msg.role);
-                    }
+        // اختبار الاتصال عند تحميل الصفحة
+        async function testConnection() {
+            try {
+                console.log('اختبار الاتصال بمفتاح API...');
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${API_KEY}`,
+                        'Content-Type': 'application/json',
+                        'HTTP-Referer': window.location.href
+                    },
+                    body: JSON.stringify({
+                        model: 'nvidia/nemotron-3-super-120b-a12b:free',
+                        messages: [{ role: 'user', content: 'test' }],
+                        max_tokens: 5
+                    })
                 });
+                
+                console.log('نتيجة اختبار الاتصال:', response.status);
+                
+                if (response.ok) {
+                    console.log('✅ الاتصال ناجح!');
+                } else {
+                    console.log('❌ فشل الاتصال:', response.status);
+                }
+            } catch (error) {
+                console.error('خطأ في اختبار الاتصال:', error);
             }
         }
 
-        // يمكنك تفعيل هذه الميزات إذا أردت
-        // loadChat();
-        // window.addEventListener('beforeunload', saveChat);
+        // تشغيل اختبار الاتصال عند تحميل الصفحة
+        testConnection();
     </script>
 </body>
 </html>
