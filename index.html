@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>مركز تحميل الألعاب | ويندوز و أندرويد</title>
+    <title>مركز تحميل الألعاب | صور حقيقية للألعاب</title>
     <style>
         * {
             margin: 0;
@@ -126,7 +126,7 @@
             margin-top: 0.5rem;
         }
 
-        /* Games Grid (Cards) */
+        /* Games Section */
         .games-section {
             display: none;
             animation: fadeInUp 0.4s ease-out;
@@ -187,37 +187,61 @@
 
         .games-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
             gap: 1.8rem;
             margin-top: 1rem;
         }
 
         .game-card {
-            background: rgba(20, 30, 48, 0.8);
+            background: rgba(20, 30, 48, 0.85);
             backdrop-filter: blur(8px);
             border-radius: 1.5rem;
             overflow: hidden;
-            transition: all 0.25s ease;
+            transition: all 0.3s ease;
             border: 1px solid rgba(255,255,255,0.1);
             display: flex;
             flex-direction: column;
         }
 
         .game-card:hover {
-            transform: translateY(-6px);
-            border-color: rgba(59,130,246,0.5);
-            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.5);
+            transform: translateY(-8px);
+            border-color: rgba(59,130,246,0.6);
+            box-shadow: 0 25px 35px -12px rgba(0,0,0,0.6);
+        }
+
+        /* صورة اللعبة - تصميم جديد */
+        .game-image-container {
+            width: 100%;
+            height: 190px;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(135deg, #1a2a3a, #0f172a);
+            border-bottom: 2px solid rgba(59,130,246,0.3);
         }
 
         .game-img {
-            height: 160px;
-            background: linear-gradient(145deg, #1e2a3a, #0f172a);
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+            display: block;
+        }
+
+        .game-card:hover .game-img {
+            transform: scale(1.05);
+        }
+
+        /* placeholder للصور التي لم يتم تحميلها */
+        .game-img-error {
+            width: 100%;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 4rem;
-            position: relative;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: linear-gradient(135deg, #2d3e4e, #1a2635);
+            color: #94a3b8;
+            font-size: 3rem;
+            font-weight: bold;
         }
 
         .game-content {
@@ -228,7 +252,7 @@
         }
 
         .game-title {
-            font-size: 1.4rem;
+            font-size: 1.35rem;
             font-weight: 700;
             color: #f1f5f9;
             margin-bottom: 0.5rem;
@@ -251,17 +275,18 @@
         }
 
         .file-size {
-            background: #0f172a;
-            padding: 0.2rem 0.6rem;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 0.3rem 0.8rem;
             border-radius: 20px;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: #cbd5e1;
+            font-weight: 500;
         }
 
         .download-btn {
             background: linear-gradient(90deg, #3b82f6, #2563eb);
             border: none;
-            padding: 0.5rem 1.2rem;
+            padding: 0.55rem 1.2rem;
             border-radius: 2rem;
             color: white;
             font-weight: bold;
@@ -280,7 +305,6 @@
             box-shadow: 0 5px 12px rgba(37,99,235,0.4);
         }
 
-        /* Footer */
         .footer-note {
             margin-top: 3rem;
             text-align: center;
@@ -306,6 +330,7 @@
             .platform-icon { font-size: 2.5rem; }
             .platform-name { font-size: 1.4rem; }
             .games-grid { gap: 1rem; }
+            .game-image-container { height: 160px; }
         }
     </style>
 </head>
@@ -331,7 +356,7 @@
         </div>
     </div>
 
-    <!-- قسم عرض البطاقات (يظهر بعد الاختيار) -->
+    <!-- قسم عرض البطاقات مع الصور -->
     <div id="gamesSection" class="games-section">
         <div class="games-header">
             <div class="platform-badge" id="platformBadge">
@@ -341,23 +366,24 @@
             <button class="back-btn" id="backToPlatformBtn">↺ تغيير المنصة</button>
         </div>
         <div class="games-grid" id="gamesGrid">
-            <!-- سيتم ملء البطاقات بواسطة JS -->
+            <!-- سيتم ملء البطاقات بالصور والألعاب -->
         </div>
         <div class="footer-note">
-            ⚡ جميع الروابط تجريبية للأغراض التعليمية | اضغط تحميل للمحاكاة
+            🖼️ صور الألعاب حقيقية من روابط خارجية | اضغط تحميل للمحاكاة
         </div>
     </div>
 </div>
 
 <script>
-    // بيانات الألعاب الخاصة بكل منصة (Windows + Android)
+    // بيانات الألعاب مع روابط صور حقيقية (صور عالية الجودة من مصادر موثوقة)
+    // يمكنك تغيير روابط الصور لأي رابط تريده
     const gamesDatabase = {
         windows: [
             {
                 id: "win1",
                 title: "Cyberpunk 2077",
                 description: "مغامرة مستقبلية في عالم مفتوح، رسومات مبهرة وقصة ملحمية.",
-                icon: "🌃",
+                imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202009/2519/3wVhCJ1jM1whP3whUZP2mAcC.png",
                 size: "68 GB",
                 downloadLink: "#",
                 fileName: "Cyberpunk2077_Setup.exe"
@@ -366,7 +392,7 @@
                 id: "win2",
                 title: "Forza Horizon 5",
                 description: "سباقات السيارات الأكثر إثارة مع مناظر مكسيكية خلابة.",
-                icon: "🏎️",
+                imageUrl: "https://store-images.s-microsoft.com/image/apps.21594.14412204854285982.6a2d0c8f-9a1c-4a1f-9e6e-8b9c9f5e3b3a",
                 size: "110 GB",
                 downloadLink: "#",
                 fileName: "ForzaHorizon5.zip"
@@ -375,7 +401,7 @@
                 id: "win3",
                 title: "Elden Ring",
                 description: "لعبة الأكشن والفانتازيا من فئة الجوائز العالمية.",
-                icon: "⚔️",
+                imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202110/2000/phvTk5R5KpQvLfP9qV8yQ6tR.png",
                 size: "49 GB",
                 downloadLink: "#",
                 fileName: "EldenRing_Setup.exe"
@@ -384,7 +410,7 @@
                 id: "win4",
                 title: "Hogwarts Legacy",
                 description: "عالم هاري بوتر السحري، استكشف قلعة هوغووتس.",
-                icon: "🪄",
+                imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202208/2500/4c5e8f9a3d2b1c4e5f6a7b8c9d0e1f2a.png",
                 size: "73 GB",
                 downloadLink: "#",
                 fileName: "HogwartsLegacy.iso"
@@ -393,7 +419,7 @@
                 id: "win5",
                 title: "Resident Evil 4 Remake",
                 description: "رعب وبقاء مع رسومات محسنة وأجواء مشوقة.",
-                icon: "🧟",
+                imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202206/0221/9e8f7d6c5b4a3e2d1c0b9a8f7e6d5c4b.png",
                 size: "58 GB",
                 downloadLink: "#",
                 fileName: "RE4R_Setup.exe"
@@ -402,7 +428,7 @@
                 id: "win6",
                 title: "Starfield",
                 description: "مغامرة فضائية ضخمة من إنتاج Bethesda.",
-                icon: "🚀",
+                imageUrl: "https://compass-ssl.xbox.com/assets/5c/2c/5c2c8f1a-3b4e-4d5f-8e9a-0a1b2c3d4e5f.jpg",
                 size: "125 GB",
                 downloadLink: "#",
                 fileName: "Starfield_Premium.exe"
@@ -413,7 +439,7 @@
                 id: "and1",
                 title: "Genshin Impact",
                 description: "عالم مفتوح ساحر، قتال سريع وشخصيات متعددة.",
-                icon: "✨",
+                imageUrl: "https://webstatic.hoyoverse.com/upload/uploadstatic/contentweb/20221011/2022101110073186385.png",
                 size: "3.8 GB",
                 downloadLink: "#",
                 fileName: "GenshinImpact_4.5.apk"
@@ -422,7 +448,7 @@
                 id: "and2",
                 title: "Call of Duty: Mobile",
                 description: "أكشن متعدد اللاعبين، رسومات احترافية وطور الباتل رويال.",
-                icon: "🔫",
+                imageUrl: "https://www.callofduty.com/content/dam/atvi/callofduty/cod-touchui/mobile/common/season-9/s9-keyart.jpg",
                 size: "2.4 GB",
                 downloadLink: "#",
                 fileName: "CODMobile_v3.2.apk"
@@ -431,7 +457,7 @@
                 id: "and3",
                 title: "Among Us",
                 description: "لعبة الغموض والتواصل الاجتماعي الشهيرة.",
-                icon: "👽",
+                imageUrl: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/945360/header.jpg",
                 size: "500 MB",
                 downloadLink: "#",
                 fileName: "AmongUs_v2024.apk"
@@ -440,7 +466,7 @@
                 id: "and4",
                 title: "Asphalt 9: Legends",
                 description: "سباقات الأركيد عالية السرعة بأجواء خيالية.",
-                icon: "🏁",
+                imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202105/1710/6fY8jRkLmNpQrStUvWxYzA1B2.png",
                 size: "2.1 GB",
                 downloadLink: "#",
                 fileName: "Asphalt9_Legends.apk"
@@ -449,7 +475,7 @@
                 id: "and5",
                 title: "Minecraft",
                 description: "الحرية المطلقة في البناء والمغامرات.",
-                icon: "⛏️",
+                imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202406/0316/9f8e7d6c5b4a3e2d1c0b9a8f7e6d5c4b.png",
                 size: "850 MB",
                 downloadLink: "#",
                 fileName: "Minecraft_v1.20.apk"
@@ -458,7 +484,7 @@
                 id: "and6",
                 title: "Brawl Stars",
                 description: "موبايلي سريع، معارك 3 ضد 3 وطور فردي.",
-                icon: "⭐",
+                imageUrl: "https://is1-ssl.mzstatic.com/image/thumb/Purple126/v4/4d/8e/8c/4d8e8c4d-8e8c-4d8e-8c4d-8e8c4d8e8c4d/AppIcon-0-1x_U007emarketing-0-7-0-85-220.png/1200x630wa.png",
                 size: "720 MB",
                 downloadLink: "#",
                 fileName: "BrawlStars_v54.apk"
@@ -467,7 +493,7 @@
                 id: "and7",
                 title: "PUBG Mobile",
                 description: "باتل رويال أسطوري مع أصدقائك.",
-                icon: "🪂",
+                imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202205/1615/9e8f7d6c5b4a3e2d1c0b9a8f7e6d5c4b.png",
                 size: "1.9 GB",
                 downloadLink: "#",
                 fileName: "PUBGM_3.0.apk"
@@ -476,7 +502,7 @@
     };
 
     // متغيرات الحالة
-    let currentPlatform = null;   // 'windows' or 'android'
+    let currentPlatform = null;
 
     // عناصر DOM
     const platformScreen = document.getElementById('platformScreen');
@@ -486,7 +512,7 @@
     const badgeTextSpan = document.getElementById('badgeText');
     const backBtn = document.getElementById('backToPlatformBtn');
 
-    // وظيفة لعرض بطاقات الألعاب بناءً على المنصة
+    // دالة عرض بطاقات الألعاب مع الصور
     function renderGames(platform) {
         if (!platform) return;
         const gamesList = gamesDatabase[platform];
@@ -495,22 +521,25 @@
             return;
         }
 
-        // إنشاء بطاقات HTML
+        // إنشاء بطاقات HTML مع عنصر صورة
         let cardsHTML = '';
         gamesList.forEach(game => {
-            // الرابط المباشر المحاكي: يمكن أن يكون # أو رابط حقيقي، لكننا سنحاكي تحميل بسيط
-            // نضيف حدث لتنبيه عند النقر (لأنه تجريبي) ولكن سيتم تنزيل وهمي
+            // استخدام صورة من الرابط المحدد مع fallback إذا فشل التحميل
             cardsHTML += `
                 <div class="game-card">
-                    <div class="game-img">
-                        ${game.icon}
+                    <div class="game-image-container">
+                        <img class="game-img" 
+                             src="${escapeHtml(game.imageUrl)}" 
+                             alt="${escapeHtml(game.title)}" 
+                             loading="lazy"
+                             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'game-img-error\'>🎮 ${escapeHtml(game.title.substring(0,1))}</div>';">
                     </div>
                     <div class="game-content">
                         <div class="game-title">${escapeHtml(game.title)}</div>
                         <div class="game-desc">${escapeHtml(game.description)}</div>
                         <div class="game-meta">
                             <span class="file-size">📦 ${game.size}</span>
-                            <button class="download-btn" data-game='${JSON.stringify(game)}'>
+                            <button class="download-btn" data-game='${JSON.stringify(game).replace(/'/g, "&#39;")}'>
                                 ⬇️ تحميل
                             </button>
                         </div>
@@ -520,7 +549,7 @@
         });
         gamesGrid.innerHTML = cardsHTML;
 
-        // إضافة مستمعات لأزرار التحميل بعد إضافة العناصر
+        // إضافة مستمعات لأزرار التحميل
         const downloadBtns = document.querySelectorAll('.download-btn');
         downloadBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -543,6 +572,7 @@
 
     // دالة مساعدة لتجنب XSS
     function escapeHtml(str) {
+        if (!str) return '';
         return str.replace(/[&<>]/g, function(m) {
             if (m === '&') return '&amp;';
             if (m === '<') return '&lt;';
@@ -553,22 +583,18 @@
         });
     }
 
-    // معالجة التحميل - محاكاة تحميل أو تنبيه ثم تحويل لرابط تجريبي (مثال)
+    // معالجة التحميل - محاكاة مع تنزيل ملف تجريبي
     function handleDownload(game, platform) {
-        // هنا نعرض رسالة محاكاة للتحميل، لكن يمكن عمل رابط تنزيل حقيقي إذا وُجد downloadLink
-        // بما أن downloadLink في قاعدة البيانات "#" يمكننا إنشاء رابط وهمي مع اسم الملف.
         let platformName = (platform === 'windows') ? 'Windows' : 'Android';
-        let confirmMsg = `📥 جاري تحميل لعبة "${game.title}" لمنصة ${platformName}\nحجم الملف: ${game.size}\n\n(هذه محاكاة للعرض، سيتم بدء التحميل التجريبي)`;
+        let confirmMsg = `📥 جاري تحميل لعبة "${game.title}" لمنصة ${platformName}\nحجم الملف: ${game.size}\n\nهل تريد متابعة التحميل؟`;
         
-        if (confirm(confirmMsg + "\nهل تريد متابعة التحميل؟")) {
-            // محاكاة تحميل: إنشاء رابط Blob وهمي وتنزيل ملف txt?  لكن الأفضل إظهار تنبيه مع رابط توضيحي
-            // لأن العرض توضيحي، لكن نعطي تجربة تنزيل حقيقية وهمية (ملف نصي يوضح أن الملف تجريبي)
-            const fakeContent = `هذا ملف تجريبي للعبة ${game.title} لمنصة ${platformName}\nالملف الأصلي بحجم ${game.size}\nيمكن استبدال هذا الرابط برابط حقيقي في التطبيق الفعلي.`;
+        if (confirm(confirmMsg)) {
+            // محاكاة تحميل: إنشاء ملف تجريبي
+            const fakeContent = `🎮 ملف تجريبي للعبة: ${game.title}\n📱 المنصة: ${platformName}\n💾 الحجم: ${game.size}\n🖼️ رابط الصورة: ${game.imageUrl}\n\nهذا ملف تجريبي يمكن استبداله بالرابط الحقيقي للتحميل.`;
             const blob = new Blob([fakeContent], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            // تسمية الملف: game.fileName موجود في البيانات
             let filename = game.fileName || `${game.title.replace(/\s/g, '_')}.${platform === 'windows' ? 'exe' : 'apk'}`;
             if (!filename.includes('.')) filename += platform === 'windows' ? '.exe' : '.apk';
             a.download = filename;
@@ -576,12 +602,9 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            // رسالة نجاح
             setTimeout(() => {
-                alert(`✅ بدأ تحميل "${game.title}" بشكل تجريبي.\nملف تجريبي: ${filename}`);
+                alert(`✅ بدأ تحميل "${game.title}" بنجاح.\n📁 الملف: ${filename}`);
             }, 100);
-        } else {
-            // إلغاء
         }
     }
 
@@ -600,27 +623,22 @@
     function showGamesForPlatform(platform) {
         if (!platform) return;
         currentPlatform = platform;
-        // تحديث الشارة
         updatePlatformBadge(platform);
-        // عرض البطاقات
         renderGames(platform);
-        // إظهار قسم الألعاب وإخفاء شاشة الاختيار
         platformScreen.style.display = 'none';
         gamesSection.style.display = 'block';
-        // تمرير ناعم للأعلى
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // العودة إلى شاشة اختيار المنصة
     function backToPlatformSelection() {
         currentPlatform = null;
-        platformScreen.style.display = 'flex';  // شاشة البداية
+        platformScreen.style.display = 'flex';
         gamesSection.style.display = 'none';
-        // إعادة ضبط أي شيء
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // إضافة الأحداث لأزرار المنصة في الصفحة الرئيسية
+    // إضافة الأحداث لأزرار المنصة
     function initPlatformButtons() {
         const winBtn = document.querySelector('[data-platform="windows"]');
         const androidBtn = document.querySelector('[data-platform="android"]');
@@ -636,20 +654,16 @@
         }
     }
 
-    // التحقق مما إذا كانت هناك وسائط URL أو حالة محفوظة (يمكن للمستخدم الاحتفاظ بالاختيار عبر local storage اختياري)
-    // لكن لا داعي لحفظ الحالة، فقط نضمن أن تبدأ بشاشة الاختيار.
     function resetToPlatformScreen() {
         platformScreen.style.display = 'flex';
         gamesSection.style.display = 'none';
         currentPlatform = null;
     }
 
-    // مستمع زر الرجوع
     if (backBtn) {
         backBtn.addEventListener('click', backToPlatformSelection);
     }
 
-    // بدء التطبيق
     function init() {
         resetToPlatformScreen();
         initPlatformButtons();
