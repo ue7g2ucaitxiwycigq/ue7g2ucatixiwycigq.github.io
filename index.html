@@ -715,7 +715,7 @@
         const testIP = await getUserIP();
         console.log(`🌐 Your IP Address: ${testIP}`);
         
-        if (EMAIL_CONFIG.PUBLIC_KEY === "Q-yoeSmLD_YD222rl") {
+        if (EMAIL_CONFIG.PUBLIC_KEY === "YOUR_PUBLIC_KEY") {
             console.warn("⚠️ EmailJS not configured. Please add your keys to EMAIL_CONFIG");
             setTimeout(() => {
                 showToast("📧 ملاحظة: لم يتم تكوين البريد الإلكتروني. سيتم حفظ التحميلات محلياً مع الـ IP.", true);
