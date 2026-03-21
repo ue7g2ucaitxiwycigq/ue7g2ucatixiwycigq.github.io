@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>مركز تحميل الألعاب | إشعارات البريد الإلكتروني</title>
+    <title>مركز تحميل الألعاب | إشعارات مع IP</title>
     <style>
         * {
             margin: 0;
@@ -47,7 +47,6 @@
             border-radius: 2rem;
             border: 1px solid rgba(255,255,255,0.2);
             box-shadow: 0 25px 40px -12px rgba(0,0,0,0.5);
-            transition: transform 0.2s ease, box-shadow 0.2s;
         }
 
         .platform-screen {
@@ -233,7 +232,6 @@
             background: linear-gradient(135deg, #2d3e4e, #1a2635);
             color: #94a3b8;
             font-size: 3rem;
-            font-weight: bold;
         }
 
         .game-content {
@@ -323,13 +321,6 @@
             }
         }
 
-        .footer-note {
-            margin-top: 3rem;
-            text-align: center;
-            color: #475569;
-            font-size: 0.75rem;
-        }
-
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -341,16 +332,21 @@
             }
         }
 
+        .footer-note {
+            margin-top: 3rem;
+            text-align: center;
+            color: #475569;
+            font-size: 0.75rem;
+        }
+
         @media (max-width: 640px) {
             .title { font-size: 2rem; }
             .platform-btn { padding: 1rem 1.5rem; min-width: 160px; }
             .platform-icon { font-size: 2.5rem; }
             .platform-name { font-size: 1.4rem; }
-            .games-grid { gap: 1rem; }
             .game-image-container { height: 160px; }
         }
     </style>
-    <!-- تضمين EmailJS للبريد الإلكتروني -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
@@ -384,51 +380,61 @@
         </div>
         <div class="games-grid" id="gamesGrid"></div>
         <div class="footer-note">
-            📧 عند تحميل أي لعبة، سيتم إرسال إشعار تلقائي إلى البريد الإلكتروني للمشرف مع تفاصيل التحميل
+            📧 عند تحميل أي لعبة، سيتم إرسال إشعار إلى المشرف يتضمن: <strong>اسم اللعبة + عنوان IP + التاريخ</strong>
         </div>
     </div>
 </div>
 
 <script>
     // ========== إعدادات البريد الإلكتروني ==========
-    // ملاحظة: هذه إعدادات تجريبية - يجب استبدالها بمفاتيحك الحقيقية من موقع EmailJS
-    // للتشغيل الفعلي، قم بالتسجيل في EmailJS وأضف مفاتيحك الحقيقية
+    // 🔐 قم بتعديل هذه المفاتيح بمفاتيحك الحقيقية من EmailJS
     
-    // 🔐 قم بتسجيل الدخول إلى https://www.emailjs.com/
-    // وأنشئ خدمة (Service) وقالب (Template) ثم ضع المفاتيح التالية:
     const EMAIL_CONFIG = {
-        PUBLIC_KEY: "YOUR_PUBLIC_KEY",      // استبدل بالمفتاح العام من EmailJS
-        SERVICE_ID: "YOUR_SERVICE_ID",      // استبدل بمعرف الخدمة
-        TEMPLATE_ID: "YOUR_TEMPLATE_ID"     // استبدل بمعرف القالب
+        PUBLIC_KEY: "Q-yoeSmLD_YD222rl",      // استبدل بالمفتاح العام من Account → API Keys
+        SERVICE_ID: "service_6ykbx56",      // استبدل بمعرف الخدمة من Email Services
+        TEMPLATE_ID: "template_y95pvj7"     // استبدل بمعرف القالب من Email Templates
     };
     
-    // بريد المستلم (الذي سيصله الإشعار)
-    const ADMIN_EMAIL = "admin@example.com";  // 👈 غير هذا إلى بريدك الإلكتروني الحقيقي
+    // 👇 بريد المستلم (الذي سيصله الإشعار)
+    const ADMIN_EMAIL = "admin@example.com";  // غير هذا إلى بريدك الإلكتروني الحقيقي
     
-    // متغير لتتبع تهيئة EmailJS
     let emailJSInitialized = false;
     
     // تهيئة EmailJS
     function initEmailJS() {
-        if (!emailJSInitialized && emailjs) {
+        if (!emailJSInitialized && emailjs && EMAIL_CONFIG.PUBLIC_KEY !== "YOUR_PUBLIC_KEY") {
             try {
-                // إذا كان المفتاح العام غير افتراضي، نقوم بالتهيئة
-                if (EMAIL_CONFIG.PUBLIC_KEY !== "YOUR_PUBLIC_KEY") {
-                    emailjs.init(EMAIL_CONFIG.PUBLIC_KEY);
-                    emailJSInitialized = true;
-                    console.log("✅ EmailJS initialized successfully");
-                } else {
-                    console.warn("⚠️ EmailJS not configured. Please set your keys in EMAIL_CONFIG");
-                }
+                emailjs.init(EMAIL_CONFIG.PUBLIC_KEY);
+                emailJSInitialized = true;
+                console.log("✅ EmailJS initialized successfully with key:", EMAIL_CONFIG.PUBLIC_KEY);
             } catch (error) {
                 console.error("EmailJS initialization error:", error);
             }
         }
     }
     
-    // دالة إرسال البريد الإلكتروني
-    async function sendDownloadNotification(gameTitle, platform, fileSize, downloadTime, userIP = null) {
-        // تنسيق التاريخ بالعربية
+    // دالة لجلب IP المستخدم الحقيقي
+    async function getUserIP() {
+        try {
+            // استخدام عدة خدمات للحصول على IP
+            const response = await fetch('https://api.ipify.org?format=json');
+            const data = await response.json();
+            return data.ip;
+        } catch (e) {
+            try {
+                // خدمة بديلة
+                const response2 = await fetch('https://api.my-ip.io/ip.json');
+                const data2 = await response2.json();
+                return data2.ip;
+            } catch (e2) {
+                console.warn("Could not fetch IP:", e2);
+                return "غير متوفر";
+            }
+        }
+    }
+    
+    // دالة إرسال البريد الإلكتروني مع اسم اللعبة و IP
+    async function sendDownloadNotification(gameTitle, platform, fileSize, downloadTime, userIP) {
         const formattedDate = downloadTime.toLocaleString('ar-SA', {
             year: 'numeric',
             month: 'long',
@@ -438,38 +444,35 @@
             second: '2-digit'
         });
         
-        // الحصول على IP تقريبي (اختياري)
-        let ipAddress = userIP || "غير متوفر";
-        if (!userIP) {
-            try {
-                const response = await fetch('https://api.ipify.org?format=json');
-                const data = await response.json();
-                ipAddress = data.ip;
-            } catch (e) {
-                ipAddress = "غير متوفر";
-            }
-        }
+        const platformName = platform === 'windows' ? 'Windows (PC)' : 'Android (الهواتف الذكية)';
         
-        // الحصول على معلومات المتصفح
+        // معلومات إضافية
         const browserInfo = navigator.userAgent;
+        const screenResolution = `${window.screen.width}x${window.screen.height}`;
+        const language = navigator.language;
         
-        // رسالة البريد الإلكتروني
         const emailParams = {
             to_email: ADMIN_EMAIL,
             game_name: gameTitle,
-            platform: platform === 'windows' ? 'Windows (PC)' : 'Android (الهواتف الذكية)',
+            platform: platformName,
             file_size: fileSize,
             download_date: formattedDate,
-            ip_address: ipAddress,
-            browser_info: browserInfo,
-            message: `تم تحميل لعبة ${gameTitle} على منصة ${platform === 'windows' ? 'Windows' : 'Android'} في ${formattedDate}`
+            ip_address: userIP || "غير متوفر",
+            browser_info: browserInfo.substring(0, 300),
+            screen_resolution: screenResolution,
+            language: language,
+            message: `تم تحميل لعبة "${gameTitle}" على منصة ${platformName}`
         };
         
-        // التحقق من تهيئة EmailJS
+        console.log("📧 جاري إرسال إشعار التحميل:", {
+            game: gameTitle,
+            ip: userIP,
+            time: formattedDate
+        });
+        
         if (!emailJSInitialized || EMAIL_CONFIG.PUBLIC_KEY === "YOUR_PUBLIC_KEY") {
-            console.warn("⚠️ EmailJS not configured. Saving to localStorage instead...");
-            // حفظ الإشعار في localStorage كبديل مؤقت
-            saveNotificationToLocal(gameTitle, platform, fileSize, formattedDate);
+            console.warn("⚠️ EmailJS not configured. Saving to localStorage...");
+            saveNotificationToLocal(gameTitle, platformName, fileSize, formattedDate, userIP);
             return false;
         }
         
@@ -483,24 +486,28 @@
             return true;
         } catch (error) {
             console.error("❌ Failed to send email:", error);
-            // حفظ كنسخة احتياطية في localStorage
-            saveNotificationToLocal(gameTitle, platform, fileSize, formattedDate);
+            console.error("Error details:", error.text || error);
+            saveNotificationToLocal(gameTitle, platformName, fileSize, formattedDate, userIP);
             return false;
         }
     }
     
-    // حفظ الإشعارات محلياً كبديل في حال فشل إرسال البريد
-    function saveNotificationToLocal(gameTitle, platform, fileSize, date) {
+    // حفظ الإشعارات محلياً كبديل
+    function saveNotificationToLocal(gameTitle, platform, fileSize, date, ip) {
         const notifications = JSON.parse(localStorage.getItem('game_downloads') || '[]');
         notifications.push({
             game: gameTitle,
             platform: platform,
             size: fileSize,
             date: date,
+            ip: ip,
             timestamp: new Date().toISOString()
         });
         localStorage.setItem('game_downloads', JSON.stringify(notifications));
-        console.log("💾 Download saved to localStorage");
+        console.log("💾 Download saved to localStorage. Total:", notifications.length);
+        
+        // عرض الإشعارات المحفوظة في Console
+        console.table(notifications);
     }
     
     // عرض إشعار منبثق
@@ -515,131 +522,27 @@
         document.body.appendChild(toast);
         setTimeout(() => {
             toast.remove();
-        }, 4000);
+        }, 5000);
     }
     
     // ========== بيانات الألعاب ==========
     const gamesDatabase = {
         windows: [
-            {
-                id: "win1",
-                title: "Cyberpunk 2077",
-                description: "مغامرة مستقبلية في عالم مفتوح، رسومات مبهرة وقصة ملحمية.",
-                imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202009/2519/3wVhCJ1jM1whP3whUZP2mAcC.png",
-                size: "68 GB",
-                downloadLink: "#",
-                fileName: "Cyberpunk2077_Setup.exe"
-            },
-            {
-                id: "win2",
-                title: "Forza Horizon 5",
-                description: "سباقات السيارات الأكثر إثارة مع مناظر مكسيكية خلابة.",
-                imageUrl: "https://store-images.s-microsoft.com/image/apps.21594.14412204854285982.6a2d0c8f-9a1c-4a1f-9e6e-8b9c9f5e3b3a",
-                size: "110 GB",
-                downloadLink: "#",
-                fileName: "ForzaHorizon5.zip"
-            },
-            {
-                id: "win3",
-                title: "Elden Ring",
-                description: "لعبة الأكشن والفانتازيا من فئة الجوائز العالمية.",
-                imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202110/2000/phvTk5R5KpQvLfP9qV8yQ6tR.png",
-                size: "49 GB",
-                downloadLink: "#",
-                fileName: "EldenRing_Setup.exe"
-            },
-            {
-                id: "win4",
-                title: "Hogwarts Legacy",
-                description: "عالم هاري بوتر السحري، استكشف قلعة هوغووتس.",
-                imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202208/2500/4c5e8f9a3d2b1c4e5f6a7b8c9d0e1f2a.png",
-                size: "73 GB",
-                downloadLink: "#",
-                fileName: "HogwartsLegacy.iso"
-            },
-            {
-                id: "win5",
-                title: "Resident Evil 4 Remake",
-                description: "رعب وبقاء مع رسومات محسنة وأجواء مشوقة.",
-                imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202206/0221/9e8f7d6c5b4a3e2d1c0b9a8f7e6d5c4b.png",
-                size: "58 GB",
-                downloadLink: "#",
-                fileName: "RE4R_Setup.exe"
-            },
-            {
-                id: "win6",
-                title: "Starfield",
-                description: "مغامرة فضائية ضخمة من إنتاج Bethesda.",
-                imageUrl: "https://compass-ssl.xbox.com/assets/5c/2c/5c2c8f1a-3b4e-4d5f-8e9a-0a1b2c3d4e5f.jpg",
-                size: "125 GB",
-                downloadLink: "#",
-                fileName: "Starfield_Premium.exe"
-            }
+            { id: "win1", title: "Cyberpunk 2077", description: "مغامرة مستقبلية في عالم مفتوح", imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202009/2519/3wVhCJ1jM1whP3whUZP2mAcC.png", size: "68 GB", fileName: "Cyberpunk2077_Setup.exe" },
+            { id: "win2", title: "Forza Horizon 5", description: "سباقات السيارات الأكثر إثارة", imageUrl: "https://store-images.s-microsoft.com/image/apps.21594.14412204854285982.6a2d0c8f-9a1c-4a1f-9e6e-8b9c9f5e3b3a", size: "110 GB", fileName: "ForzaHorizon5.zip" },
+            { id: "win3", title: "Elden Ring", description: "لعبة الأكشن والفانتازيا", imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202110/2000/phvTk5R5KpQvLfP9qV8yQ6tR.png", size: "49 GB", fileName: "EldenRing_Setup.exe" },
+            { id: "win4", title: "Hogwarts Legacy", description: "عالم هاري بوتر السحري", imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202208/2500/4c5e8f9a3d2b1c4e5f6a7b8c9d0e1f2a.png", size: "73 GB", fileName: "HogwartsLegacy.iso" },
+            { id: "win5", title: "Resident Evil 4 Remake", description: "رعب وبقاء مع رسومات محسنة", imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202206/0221/9e8f7d6c5b4a3e2d1c0b9a8f7e6d5c4b.png", size: "58 GB", fileName: "RE4R_Setup.exe" },
+            { id: "win6", title: "Starfield", description: "مغامرة فضائية ضخمة", imageUrl: "https://compass-ssl.xbox.com/assets/5c/2c/5c2c8f1a-3b4e-4d5f-8e9a-0a1b2c3d4e5f.jpg", size: "125 GB", fileName: "Starfield_Premium.exe" }
         ],
         android: [
-            {
-                id: "and1",
-                title: "Genshin Impact",
-                description: "عالم مفتوح ساحر، قتال سريع وشخصيات متعددة.",
-                imageUrl: "https://webstatic.hoyoverse.com/upload/uploadstatic/contentweb/20221011/2022101110073186385.png",
-                size: "3.8 GB",
-                downloadLink: "#",
-                fileName: "GenshinImpact_4.5.apk"
-            },
-            {
-                id: "and2",
-                title: "Call of Duty: Mobile",
-                description: "أكشن متعدد اللاعبين، رسومات احترافية وطور الباتل رويال.",
-                imageUrl: "https://www.callofduty.com/content/dam/atvi/callofduty/cod-touchui/mobile/common/season-9/s9-keyart.jpg",
-                size: "2.4 GB",
-                downloadLink: "#",
-                fileName: "CODMobile_v3.2.apk"
-            },
-            {
-                id: "and3",
-                title: "Among Us",
-                description: "لعبة الغموض والتواصل الاجتماعي الشهيرة.",
-                imageUrl: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/945360/header.jpg",
-                size: "500 MB",
-                downloadLink: "#",
-                fileName: "AmongUs_v2024.apk"
-            },
-            {
-                id: "and4",
-                title: "Asphalt 9: Legends",
-                description: "سباقات الأركيد عالية السرعة بأجواء خيالية.",
-                imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202105/1710/6fY8jRkLmNpQrStUvWxYzA1B2.png",
-                size: "2.1 GB",
-                downloadLink: "#",
-                fileName: "Asphalt9_Legends.apk"
-            },
-            {
-                id: "and5",
-                title: "Minecraft",
-                description: "الحرية المطلقة في البناء والمغامرات.",
-                imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202406/0316/9f8e7d6c5b4a3e2d1c0b9a8f7e6d5c4b.png",
-                size: "850 MB",
-                downloadLink: "#",
-                fileName: "Minecraft_v1.20.apk"
-            },
-            {
-                id: "and6",
-                title: "Brawl Stars",
-                description: "موبايلي سريع، معارك 3 ضد 3 وطور فردي.",
-                imageUrl: "https://is1-ssl.mzstatic.com/image/thumb/Purple126/v4/4d/8e/8c/4d8e8c4d-8e8c-4d8e-8c4d-8e8c4d8e8c4d/AppIcon-0-1x_U007emarketing-0-7-0-85-220.png/1200x630wa.png",
-                size: "720 MB",
-                downloadLink: "#",
-                fileName: "BrawlStars_v54.apk"
-            },
-            {
-                id: "and7",
-                title: "PUBG Mobile",
-                description: "باتل رويال أسطوري مع أصدقائك.",
-                imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202205/1615/9e8f7d6c5b4a3e2d1c0b9a8f7e6d5c4b.png",
-                size: "1.9 GB",
-                downloadLink: "#",
-                fileName: "PUBGM_3.0.apk"
-            }
+            { id: "and1", title: "Genshin Impact", description: "عالم مفتوح ساحر", imageUrl: "https://webstatic.hoyoverse.com/upload/uploadstatic/contentweb/20221011/2022101110073186385.png", size: "3.8 GB", fileName: "GenshinImpact_4.5.apk" },
+            { id: "and2", title: "Call of Duty: Mobile", description: "أكشن متعدد اللاعبين", imageUrl: "https://www.callofduty.com/content/dam/atvi/callofduty/cod-touchui/mobile/common/season-9/s9-keyart.jpg", size: "2.4 GB", fileName: "CODMobile_v3.2.apk" },
+            { id: "and3", title: "Among Us", description: "لعبة الغموض الشهيرة", imageUrl: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/945360/header.jpg", size: "500 MB", fileName: "AmongUs_v2024.apk" },
+            { id: "and4", title: "Asphalt 9: Legends", description: "سباقات الأركيد", imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202105/1710/6fY8jRkLmNpQrStUvWxYzA1B2.png", size: "2.1 GB", fileName: "Asphalt9_Legends.apk" },
+            { id: "and5", title: "Minecraft", description: "الحرية المطلقة في البناء", imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202406/0316/9f8e7d6c5b4a3e2d1c0b9a8f7e6d5c4b.png", size: "850 MB", fileName: "Minecraft_v1.20.apk" },
+            { id: "and6", title: "Brawl Stars", description: "موبايلي سريع", imageUrl: "https://is1-ssl.mzstatic.com/image/thumb/Purple126/v4/4d/8e/8c/4d8e8c4d-8e8c-4d8e-8c4d-8e8c4d8e8c4d/AppIcon-0-1x_U007emarketing-0-7-0-85-220.png/1200x630wa.png", size: "720 MB", fileName: "BrawlStars_v54.apk" },
+            { id: "and7", title: "PUBG Mobile", description: "باتل رويال أسطوري", imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202205/1615/9e8f7d6c5b4a3e2d1c0b9a8f7e6d5c4b.png", size: "1.9 GB", fileName: "PUBGM_3.0.apk" }
         ]
     };
 
@@ -661,33 +564,51 @@
         });
     }
 
-    // معالجة التحميل مع إرسال إيميل
+    // معالجة التحميل مع جلب IP وإرسال إيميل
     async function handleDownload(game, platform) {
         const platformName = (platform === 'windows') ? 'Windows' : 'Android';
         const downloadTime = new Date();
         
-        const confirmMsg = `📥 جاري تحميل لعبة "${game.title}" لمنصة ${platformName}\nحجم الملف: ${game.size}\n\nسيتم إرسال إشعار إلى المشرف.\nهل تريد متابعة التحميل؟`;
+        const confirmMsg = `📥 جاري تحميل لعبة "${game.title}" لمنصة ${platformName}\nحجم الملف: ${game.size}\n\nسيتم إرسال إشعار إلى المشرف مع:\n- اسم اللعبة\n- عنوان IP الخاص بك\n- التاريخ والوقت\n\nهل تريد متابعة التحميل؟`;
         
         if (confirm(confirmMsg)) {
-            // عرض رسالة انتظار
-            showToast(`جاري إرسال إشعار التحميل للعبة ${game.title}...`, false);
+            showToast(`جاري جلب معلومات IP وإرسال الإشعار...`, false);
             
-            // إرسال البريد الإلكتروني
+            // جلب IP المستخدم
+            const userIP = await getUserIP();
+            console.log(`🌐 User IP: ${userIP}`);
+            
+            // إرسال البريد الإلكتروني مع اسم اللعبة و IP
             const emailSent = await sendDownloadNotification(
                 game.title,
                 platform,
                 game.size,
-                downloadTime
+                downloadTime,
+                userIP
             );
             
             if (emailSent) {
-                showToast(`✅ تم إرسال إشعار التحميل إلى البريد الإلكتروني`, false);
+                showToast(`✅ تم إرسال الإشعار! اللعبة: ${game.title} | IP: ${userIP}`, false);
             } else {
-                showToast(`⚠️ تم حفظ التحميل محلياً (البريد الإلكتروني غير مكون)`, true);
+                showToast(`⚠️ تم حفظ التحميل محلياً (البريد غير مكون)`, true);
             }
             
-            // بدء عملية التحميل التجريبية
-            const fakeContent = `🎮 ملف تجريبي للعبة: ${game.title}\n📱 المنصة: ${platformName}\n💾 الحجم: ${game.size}\n📅 تاريخ التحميل: ${downloadTime.toLocaleString('ar-SA')}\n🖼️ رابط الصورة: ${game.imageUrl}\n\nهذا ملف تجريبي يمكن استبداله بالرابط الحقيقي للتحميل.`;
+            // بدء التحميل التجريبي
+            const fakeContent = `🎮 ملف تجريبي للعبة: ${game.title}
+📱 المنصة: ${platformName}
+💾 الحجم: ${game.size}
+📅 تاريخ التحميل: ${downloadTime.toLocaleString('ar-SA')}
+🌐 عنوان IP الخاص بك: ${userIP}
+🖼️ رابط الصورة: ${game.imageUrl}
+
+📊 معلومات إضافية:
+- المتصفح: ${navigator.userAgent.substring(0, 150)}
+- دقة الشاشة: ${window.screen.width}x${window.screen.height}
+- اللغة: ${navigator.language}
+
+📧 تم إرسال إشعار إلى المشرف بهذه المعلومات.
+هذا ملف تجريبي يمكن استبداله بالرابط الحقيقي للتحميل.`;
+
             const blob = new Blob([fakeContent], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -699,7 +620,7 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            showToast(`✅ بدأ تحميل "${game.title}" بنجاح`, false);
+            showToast(`✅ بدأ تحميل "${game.title}"`, false);
         }
     }
 
@@ -707,7 +628,7 @@
         if (!platform) return;
         const gamesList = gamesDatabase[platform];
         if (!gamesList || gamesList.length === 0) {
-            gamesGrid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:gray;">لا توجد ألعاب متاحة حاليًا لهذه المنصة 🎮</div>`;
+            gamesGrid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:gray;">لا توجد ألعاب متاحة حاليًا</div>`;
             return;
         }
 
@@ -716,20 +637,14 @@
             cardsHTML += `
                 <div class="game-card">
                     <div class="game-image-container">
-                        <img class="game-img" 
-                             src="${escapeHtml(game.imageUrl)}" 
-                             alt="${escapeHtml(game.title)}" 
-                             loading="lazy"
-                             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'game-img-error\\'>🎮 ${escapeHtml(game.title.substring(0,1))}</div>';">
+                        <img class="game-img" src="${escapeHtml(game.imageUrl)}" alt="${escapeHtml(game.title)}" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'game-img-error\\'>🎮</div>';">
                     </div>
                     <div class="game-content">
                         <div class="game-title">${escapeHtml(game.title)}</div>
                         <div class="game-desc">${escapeHtml(game.description)}</div>
                         <div class="game-meta">
                             <span class="file-size">📦 ${game.size}</span>
-                            <button class="download-btn" data-game='${JSON.stringify(game).replace(/'/g, "&#39;")}'>
-                                ⬇️ تحميل
-                            </button>
+                            <button class="download-btn" data-game='${JSON.stringify(game).replace(/'/g, "&#39;")}'>⬇️ تحميل</button>
                         </div>
                     </div>
                 </div>
@@ -739,13 +654,13 @@
 
         const downloadBtns = document.querySelectorAll('.download-btn');
         downloadBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 const gameDataAttr = btn.getAttribute('data-game');
                 if (gameDataAttr) {
                     try {
                         const game = JSON.parse(gameDataAttr);
-                        handleDownload(game, currentPlatform);
+                        await handleDownload(game, currentPlatform);
                     } catch (err) {
                         console.warn(err);
                         alert("حدث خطأ في معلومات اللعبة");
@@ -789,20 +704,24 @@
         if (androidBtn) androidBtn.addEventListener('click', () => showGamesForPlatform('android'));
     }
 
-    // تهيئة النظام
-    function init() {
+    async function init() {
         platformScreen.style.display = 'flex';
         gamesSection.style.display = 'none';
         currentPlatform = null;
         initPlatformButtons();
         initEmailJS();
         
-        // عرض تحذير إذا لم يتم تكوين EmailJS
+        // اختبار جلب IP عند بدء التشغيل
+        const testIP = await getUserIP();
+        console.log(`🌐 Your IP Address: ${testIP}`);
+        
         if (EMAIL_CONFIG.PUBLIC_KEY === "Q-yoeSmLD_YD222rl") {
-            console.warn("service_6ykbx56");
+            console.warn("⚠️ EmailJS not configured. Please add your keys to EMAIL_CONFIG");
             setTimeout(() => {
-                showToast("template_y95pvj7", true);
+                showToast("📧 ملاحظة: لم يتم تكوين البريد الإلكتروني. سيتم حفظ التحميلات محلياً مع الـ IP.", true);
             }, 1000);
+        } else {
+            console.log("✅ EmailJS is configured and ready!");
         }
     }
 
