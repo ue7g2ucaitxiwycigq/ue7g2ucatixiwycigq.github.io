@@ -1,635 +1,81 @@
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>مركز تحميل الألعاب | عداد التحميلات</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', 'Tahoma', 'Cairo', system-ui, -apple-system, sans-serif;
-        }
-
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 1.5rem;
-            position: relative;
-        }
-
-        /* خلفية متحركة زاهية */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0) 60%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1300px;
-            margin: 0 auto;
-            z-index: 2;
-            position: relative;
-        }
-
-        /* Card style - ألوان زاهية */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 2rem;
-            border: none;
-            box-shadow: 0 25px 40px -12px rgba(0,0,0,0.3);
-            transition: transform 0.2s ease;
-        }
-
-        /* Platform selection screen */
-        .platform-screen {
-            min-height: 70vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 2rem;
-        }
-
-        .title {
-            font-size: 3rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 1rem;
-        }
-
-        .subtitle {
-            color: #4a5568;
-            font-size: 1.2rem;
-            margin-bottom: 3rem;
-            max-width: 600px;
-        }
-
-        .platform-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 1rem;
-        }
-
-        .platform-btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            padding: 1.5rem 3rem;
-            border-radius: 2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            min-width: 220px;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
-        }
-
-        .platform-btn:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.3);
-        }
-
-        .platform-icon {
-            font-size: 3.5rem;
-            display: block;
-            margin-bottom: 0.75rem;
-        }
-
-        .platform-name {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: white;
-        }
-
-        .platform-desc {
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.9);
-            margin-top: 0.5rem;
-        }
-
-        /* Games Section */
-        .games-section {
-            display: none;
-            animation: fadeInUp 0.4s ease-out;
-        }
-
-        .games-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            background: rgba(255,255,255,0.9);
-            padding: 1rem 1.8rem;
-            border-radius: 2rem;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .platform-badge {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            padding: 0.6rem 1.4rem;
-            border-radius: 3rem;
-            color: white;
-        }
-
-        .badge-icon {
-            font-size: 1.8rem;
-        }
-
-        .badge-text {
-            font-size: 1.4rem;
-            font-weight: bold;
-        }
-
-        .back-btn {
-            background: #ff6b6b;
-            border: none;
-            color: white;
-            padding: 0.7rem 1.5rem;
-            border-radius: 2rem;
-            font-size: 1rem;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .back-btn:hover {
-            background: #ff5252;
-            transform: scale(0.97);
-        }
-
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 1rem;
-        }
-
-        .game-card {
-            background: white;
-            border-radius: 1.5rem;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .game-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 25px 35px -12px rgba(0,0,0,0.2);
-        }
-
-        .game-image-container {
-            width: 100%;
-            height: 180px;
-            overflow: hidden;
-            position: relative;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-        }
-
-        .game-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.4s ease;
-            display: block;
-        }
-
-        .game-card:hover .game-img {
-            transform: scale(1.05);
-        }
-
-        .game-img-error {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            font-size: 4rem;
-        }
-
-        .game-content {
-            padding: 1.2rem;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .game-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #2d3748;
-            margin-bottom: 0.5rem;
-        }
-
-        .game-desc {
-            color: #718096;
-            font-size: 0.85rem;
-            margin-bottom: 1rem;
-            line-height: 1.4;
-        }
-
-        .game-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: auto;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .file-size {
-            background: #edf2f7;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            color: #4a5568;
-            font-weight: 500;
-        }
-
-        /* عداد التحميلات */
-        .download-counter {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: #fef3c7;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            color: #d97706;
-        }
-
-        .download-counter span {
-            font-size: 1rem;
-            font-weight: bold;
-            color: #f59e0b;
-        }
-
-        .download-btn {
-            background: linear-gradient(135deg, #10b981, #059669);
-            border: none;
-            padding: 0.55rem 1.2rem;
-            border-radius: 2rem;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 0.8rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .download-btn:hover {
-            background: linear-gradient(135deg, #059669, #047857);
-            transform: scale(1.02);
-            box-shadow: 0 5px 12px rgba(16,185,129,0.4);
-        }
-
-        .toast-notification {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #10b981;
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
-            z-index: 1000;
-            animation: slideIn 0.3s ease-out;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .footer-note {
-            margin-top: 3rem;
-            text-align: center;
-            color: rgba(255,255,255,0.8);
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        @media (max-width: 640px) {
-            .title { font-size: 2rem; }
-            .platform-btn { padding: 1rem 1.5rem; min-width: 160px; }
-            .platform-icon { font-size: 2.5rem; }
-            .platform-name { font-size: 1.4rem; }
-            .game-image-container { height: 150px; }
-        }
-    </style>
-</head>
-<body>
-<div class="container">
-    <div id="platformScreen" class="glass-card platform-screen">
-        <div>
-            <h1 class="title">🎮 مكتبة الألعاب</h1>
-            <p class="subtitle">اختر منصتك لتبدأ رحلة التحميل</p>
-            <div class="platform-buttons">
-                <div class="platform-btn" data-platform="windows">
-                    <span class="platform-icon">🪟</span>
-                    <div class="platform-name">Windows</div>
-                    <div class="platform-desc">PC - ألعاب ويندوز</div>
-                </div>
-                <div class="platform-btn" data-platform="android">
-                    <span class="platform-icon">🤖</span>
-                    <div class="platform-name">Android</div>
-                    <div class="platform-desc">هواتف و تابلت</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="gamesSection" class="games-section">
-        <div class="games-header">
-            <div class="platform-badge" id="platformBadge">
-                <span class="badge-icon" id="badgeIcon">🪟</span>
-                <span class="badge-text" id="badgeText">Windows</span>
-            </div>
-            <button class="back-btn" id="backToPlatformBtn">↺ تغيير المنصة</button>
-        </div>
-        <div class="games-grid" id="gamesGrid"></div>
-        <div class="footer-note">
-            📊 عداد التحميلات يتحد تلقائياً مع كل تحميل | تم حفظ التحميلات في المتصفح
-        </div>
-    </div>
-</div>
-
 <script>
-    // ========== بيانات الألعاب ==========
-    const gamesDatabase = {
-        windows: [
-            { id: "win1", title: "Cyberpunk 2077", description: "مغامرة مستقبلية في عالم مفتوح، رسومات مبهرة وقصة ملحمية.", imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202009/2519/3wVhCJ1jM1whP3whUZP2mAcC.png", size: "68 GB", fileName: "Cyberpunk2077_Setup.exe" },
-            { id: "win2", title: "Forza Horizon 5", description: "سباقات السيارات الأكثر إثارة مع مناظر مكسيكية خلابة.", imageUrl: "https://store-images.s-microsoft.com/image/apps.21594.14412204854285982.6a2d0c8f-9a1c-4a1f-9e6e-8b9c9f5e3b3a", size: "110 GB", fileName: "ForzaHorizon5.zip" },
-            { id: "win3", title: "Elden Ring", description: "لعبة الأكشن والفانتازيا من فئة الجوائز العالمية.", imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202110/2000/phvTk5R5KpQvLfP9qV8yQ6tR.png", size: "49 GB", fileName: "EldenRing_Setup.exe" },
-            { id: "win4", title: "Hogwarts Legacy", description: "عالم هاري بوتر السحري، استكشف قلعة هوغووتس.", imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202208/2500/4c5e8f9a3d2b1c4e5f6a7b8c9d0e1f2a.png", size: "73 GB", fileName: "HogwartsLegacy.iso" },
-            { id: "win5", title: "Resident Evil 4 Remake", description: "رعب وبقاء مع رسومات محسنة وأجواء مشوقة.", imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202206/0221/9e8f7d6c5b4a3e2d1c0b9a8f7e6d5c4b.png", size: "58 GB", fileName: "RE4R_Setup.exe" },
-            { id: "win6", title: "Starfield", description: "مغامرة فضائية ضخمة من إنتاج Bethesda.", imageUrl: "https://compass-ssl.xbox.com/assets/5c/2c/5c2c8f1a-3b4e-4d5f-8e9a-0a1b2c3d4e5f.jpg", size: "125 GB", fileName: "Starfield_Premium.exe" }
-        ],
-        android: [
-            { id: "and1", title: "Genshin Impact", description: "عالم مفتوح ساحر، قتال سريع وشخصيات متعددة.", imageUrl: "https://webstatic.hoyoverse.com/upload/uploadstatic/contentweb/20221011/2022101110073186385.png", size: "3.8 GB", fileName: "GenshinImpact_4.5.apk" },
-            { id: "and2", title: "Call of Duty: Mobile", description: "أكشن متعدد اللاعبين، رسومات احترافية وطور الباتل رويال.", imageUrl: "https://www.callofduty.com/content/dam/atvi/callofduty/cod-touchui/mobile/common/season-9/s9-keyart.jpg", size: "2.4 GB", fileName: "CODMobile_v3.2.apk" },
-            { id: "and3", title: "Among Us", description: "لعبة الغموض والتواصل الاجتماعي الشهيرة.", imageUrl: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/945360/header.jpg", size: "500 MB", fileName: "AmongUs_v2024.apk" },
-            { id: "and4", title: "Asphalt 9: Legends", description: "سباقات الأركيد عالية السرعة بأجواء خيالية.", imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202105/1710/6fY8jRkLmNpQrStUvWxYzA1B2.png", size: "2.1 GB", fileName: "Asphalt9_Legends.apk" },
-            { id: "and5", title: "Minecraft", description: "الحرية المطلقة في البناء والمغامرات.", imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202406/0316/9f8e7d6c5b4a3e2d1c0b9a8f7e6d5c4b.png", size: "850 MB", fileName: "Minecraft_v1.20.apk" },
-            { id: "and6", title: "Brawl Stars", description: "موبايلي سريع، معارك 3 ضد 3 وطور فردي.", imageUrl: "https://is1-ssl.mzstatic.com/image/thumb/Purple126/v4/4d/8e/8c/4d8e8c4d-8e8c-4d8e-8c4d-8e8c4d8e8c4d/AppIcon-0-1x_U007emarketing-0-7-0-85-220.png/1200x630wa.png", size: "720 MB", fileName: "BrawlStars_v54.apk" },
-            { id: "and7", title: "PUBG Mobile", description: "باتل رويال أسطوري مع أصدقائك.", imageUrl: "https://image.api.playstation.com/vulcan/ap/rnd/202205/1615/9e8f7d6c5b4a3e2d1c0b9a8f7e6d5c4b.png", size: "1.9 GB", fileName: "PUBGM_3.0.apk" }
-        ]
-    };
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
-    // مفتاح التخزين للتحميلات
-    const STORAGE_KEY = 'game_download_counts';
+let car = {
+  x: 180,
+  y: 500,
+  width: 40,
+  height: 80,
+  speed: 5
+};
 
-    // تحميل البيانات المحفوظة
-    function loadDownloadCounts() {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            return JSON.parse(saved);
-        }
-        return {};
+let obstacles = [];
+let score = 0;
+let gameOver = false;
+
+// Controls
+let keys = {};
+document.addEventListener("keydown", e => keys[e.key.toLowerCase()] = true);
+document.addEventListener("keyup", e => keys[e.key.toLowerCase()] = false);
+
+// Create obstacles
+function spawnObstacle() {
+  let width = 40;
+  let x = Math.random() * (canvas.width - width);
+  obstacles.push({
+    x: x,
+    y: -80,
+    width: width,
+    height: 80,
+    speed: 4
+  });
+}
+
+// Collision detection
+function isColliding(a, b) {
+  return a.x < b.x + b.width &&
+         a.x + a.width > b.x &&
+         a.y < b.y + b.height &&
+         a.y + a.height > b.y;
+}
+
+// Game loop
+function update() {
+  if (gameOver) return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Move car with A / D
+  if (keys["a"] && car.x > 0) car.x -= car.speed;
+  if (keys["d"] && car.x < canvas.width - car.width) car.x += car.speed;
+
+  // Draw car
+  ctx.fillStyle = "red";
+  ctx.fillRect(car.x, car.y, car.width, car.height);
+
+  // Obstacles
+  ctx.fillStyle = "black";
+  obstacles.forEach((obs, index) => {
+    obs.y += obs.speed;
+    ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+
+    if (isColliding(car, obs)) {
+      gameOver = true;
+      alert("Game Over! Score: " + score);
+      document.location.reload();
     }
 
-    // حفظ البيانات
-    function saveDownloadCounts(counts) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(counts));
+    if (obs.y > canvas.height) {
+      obstacles.splice(index, 1);
+      score++;
+      document.getElementById("score").innerText = "Score: " + score;
     }
+  });
 
-    // زيادة عداد التحميل للعبة
-    function incrementDownloadCount(gameId) {
-        const counts = loadDownloadCounts();
-        counts[gameId] = (counts[gameId] || 0) + 1;
-        saveDownloadCounts(counts);
-        return counts[gameId];
-    }
+  requestAnimationFrame(update);
+}
 
-    // الحصول على عدد التحميلات للعبة
-    function getDownloadCount(gameId) {
-        const counts = loadDownloadCounts();
-        return counts[gameId] || 0;
-    }
-
-    let currentPlatform = null;
-    const platformScreen = document.getElementById('platformScreen');
-    const gamesSection = document.getElementById('gamesSection');
-    const gamesGrid = document.getElementById('gamesGrid');
-    const badgeIconSpan = document.getElementById('badgeIcon');
-    const badgeTextSpan = document.getElementById('badgeText');
-    const backBtn = document.getElementById('backToPlatformBtn');
-
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
-    }
-
-    function showToast(message, isError = false) {
-        const toast = document.createElement('div');
-        toast.className = 'toast-notification';
-        toast.style.background = isError ? '#ef4444' : '#10b981';
-        toast.innerHTML = `<span>${isError ? '⚠️' : '✅'}</span><span>${message}</span>`;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
-
-    // معالجة التحميل
-    async function handleDownload(game, platform) {
-        const platformName = (platform === 'windows') ? 'Windows' : 'Android';
-        
-        const confirmMsg = `📥 هل تريد تحميل لعبة "${game.title}"؟\n📱 المنصة: ${platformName}\n💾 الحجم: ${game.size}\n\nسيتم تحديث عداد التحميلات تلقائياً.`;
-        
-        if (confirm(confirmMsg)) {
-            // زيادة العداد
-            const newCount = incrementDownloadCount(game.id);
-            
-            // تحديث العداد في الواجهة
-            updateCounterInUI(game.id, newCount);
-            
-            showToast(`✅ تم تحميل "${game.title}"! (إجمالي التحميلات: ${newCount})`, false);
-            
-            // بدء التحميل التجريبي
-            const fakeContent = `🎮 ملف تجريبي للعبة: ${game.title}
-📱 المنصة: ${platformName}
-💾 الحجم: ${game.size}
-📅 تاريخ التحميل: ${new Date().toLocaleString('ar-SA')}
-📊 عدد مرات التحميل لهذه اللعبة: ${newCount}
-
-هذا ملف تجريبي يمكن استبداله بالرابط الحقيقي للتحميل.`;
-
-            const blob = new Blob([fakeContent], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            let filename = game.fileName || `${game.title.replace(/\s/g, '_')}.${platform === 'windows' ? 'exe' : 'apk'}`;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-    }
-
-    // تحديث العداد في واجهة المستخدم
-    function updateCounterInUI(gameId, newCount) {
-        const counterSpan = document.getElementById(`counter-${gameId}`);
-        if (counterSpan) {
-            counterSpan.textContent = newCount;
-        }
-    }
-
-    function renderGames(platform) {
-        if (!platform) return;
-        const gamesList = gamesDatabase[platform];
-        if (!gamesList || gamesList.length === 0) {
-            gamesGrid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:#4a5568;">لا توجد ألعاب متاحة حاليًا 🎮</div>`;
-            return;
-        }
-
-        let cardsHTML = '';
-        gamesList.forEach(game => {
-            const downloadCount = getDownloadCount(game.id);
-            cardsHTML += `
-                <div class="game-card">
-                    <div class="game-image-container">
-                        <img class="game-img" 
-                             src="${escapeHtml(game.imageUrl)}" 
-                             alt="${escapeHtml(game.title)}" 
-                             loading="lazy"
-                             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'game-img-error\\'>🎮</div>';">
-                    </div>
-                    <div class="game-content">
-                        <div class="game-title">${escapeHtml(game.title)}</div>
-                        <div class="game-desc">${escapeHtml(game.description)}</div>
-                        <div class="game-meta">
-                            <span class="file-size">📦 ${game.size}</span>
-                            <div class="download-counter">
-                                📥 <span id="counter-${game.id}">${downloadCount}</span>
-                            </div>
-                            <button class="download-btn" data-game='${JSON.stringify(game).replace(/'/g, "&#39;")}'>
-                                ⬇️ تحميل
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-        gamesGrid.innerHTML = cardsHTML;
-
-        const downloadBtns = document.querySelectorAll('.download-btn');
-        downloadBtns.forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.stopPropagation();
-                const gameDataAttr = btn.getAttribute('data-game');
-                if (gameDataAttr) {
-                    try {
-                        const game = JSON.parse(gameDataAttr);
-                        await handleDownload(game, currentPlatform);
-                    } catch (err) {
-                        console.warn(err);
-                        alert("حدث خطأ في معلومات اللعبة");
-                    }
-                }
-            });
-        });
-    }
-
-    function updatePlatformBadge(platform) {
-        if (platform === 'windows') {
-            badgeIconSpan.textContent = '🪟';
-            badgeTextSpan.textContent = 'Windows • ألعاب البي سي';
-        } else {
-            badgeIconSpan.textContent = '🤖';
-            badgeTextSpan.textContent = 'Android • ألعاب الجوال';
-        }
-    }
-
-    function showGamesForPlatform(platform) {
-        if (!platform) return;
-        currentPlatform = platform;
-        updatePlatformBadge(platform);
-        renderGames(platform);
-        platformScreen.style.display = 'none';
-        gamesSection.style.display = 'block';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function backToPlatformSelection() {
-        currentPlatform = null;
-        platformScreen.style.display = 'flex';
-        gamesSection.style.display = 'none';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function initPlatformButtons() {
-        const winBtn = document.querySelector('[data-platform="windows"]');
-        const androidBtn = document.querySelector('[data-platform="android"]');
-        if (winBtn) winBtn.addEventListener('click', () => showGamesForPlatform('windows'));
-        if (androidBtn) androidBtn.addEventListener('click', () => showGamesForPlatform('android'));
-    }
-
-    function init() {
-        platformScreen.style.display = 'flex';
-        gamesSection.style.display = 'none';
-        currentPlatform = null;
-        initPlatformButtons();
-        
-        // عرض إحصائيات التحميلات في Console
-        const counts = loadDownloadCounts();
-        console.log("📊 إحصائيات التحميلات:", counts);
-    }
-
-    if (backBtn) backBtn.addEventListener('click', backToPlatformSelection);
-    init();
+setInterval(spawnObstacle, 1000);
+update();
 </script>
-</body>
-</html>
