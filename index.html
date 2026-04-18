@@ -13,23 +13,37 @@
 
         body {
             font-family: 'Tajawal', 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background: #1a1a2e;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            position: relative;
         }
 
+        /* نمط خلفية مريح للعين - داكن مع تدرج ناعم */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(46, 46, 80, 0.4) 0%, rgba(26, 26, 46, 0.95) 100%);
+            z-index: -1;
+        }
+
+        /* تأثير زجاجي ناعم */
         .container {
             max-width: 900px;
             width: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: rgba(22, 22, 40, 0.85);
+            backdrop-filter: blur(12px);
             border-radius: 32px;
             padding: 40px;
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .logo {
@@ -43,14 +57,15 @@
         }
 
         h1 {
-            color: white;
+            color: #ffffff;
             font-size: 2rem;
             text-align: center;
             margin-bottom: 10px;
+            letter-spacing: -0.5px;
         }
 
         .subtitle {
-            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.65);
             text-align: center;
             margin-bottom: 40px;
             font-size: 1rem;
@@ -64,16 +79,18 @@
         }
 
         .feature-card {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.03);
             border-radius: 20px;
             padding: 20px;
             text-align: center;
-            transition: transform 0.3s;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
         .feature-card:hover {
             transform: translateY(-5px);
-            background: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.07);
+            border-color: rgba(255,255,255,0.1);
         }
 
         .feature-icon {
@@ -88,12 +105,12 @@
         }
 
         .feature-card p {
-            color: rgba(255,255,255,0.7);
+            color: rgba(255,255,255,0.55);
             font-size: 0.8rem;
         }
 
         .download-section {
-            background: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.25);
             border-radius: 24px;
             padding: 30px;
             text-align: center;
@@ -101,19 +118,49 @@
 
         .version-badge {
             display: inline-block;
-            background: #ff0000;
+            background: #e53935;
             color: white;
             padding: 5px 15px;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        /* عداد التحميلات */
+        .counter-box {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,0,0,0.4);
+            padding: 8px 18px;
+            border-radius: 40px;
+            margin-bottom: 25px;
+        }
+
+        .counter-icon {
+            font-size: 1rem;
+        }
+
+        .counter-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4caf50;
+            direction: ltr;
+            display: inline-block;
+            min-width: 60px;
+        }
+
+        .counter-label {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.8rem;
         }
 
         .download-btn {
             display: inline-flex;
             align-items: center;
             gap: 12px;
-            background: linear-gradient(135deg, #ff0000, #cc0000);
+            background: linear-gradient(135deg, #e53935, #c62828);
             color: white;
             border: none;
             padding: 18px 42px;
@@ -124,34 +171,32 @@
             transition: all 0.3s;
             text-decoration: none;
             margin: 10px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 25px rgba(229, 57, 53, 0.3);
         }
 
         .download-btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-        }
-
-        .download-btn.secondary {
-            background: linear-gradient(135deg, #2c3e66, #1a2a4a);
+            box-shadow: 0 15px 35px rgba(229, 57, 53, 0.4);
+            background: linear-gradient(135deg, #f44336, #d32f2f);
         }
 
         .file-info {
             margin-top: 25px;
-            color: rgba(255,255,255,0.6);
-            font-size: 0.8rem;
+            color: rgba(255,255,255,0.45);
+            font-size: 0.75rem;
         }
 
         .requirements {
             margin-top: 30px;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.02);
             border-radius: 16px;
             padding: 15px;
         }
 
         .requirements h4 {
-            color: white;
+            color: rgba(255,255,255,0.8);
             margin-bottom: 10px;
+            font-size: 0.85rem;
         }
 
         .requirements ul {
@@ -163,8 +208,8 @@
         }
 
         .requirements li {
-            color: rgba(255,255,255,0.7);
-            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.75rem;
             display: flex;
             align-items: center;
             gap: 5px;
@@ -173,8 +218,8 @@
         footer {
             text-align: center;
             margin-top: 30px;
-            color: rgba(255,255,255,0.4);
-            font-size: 0.7rem;
+            color: rgba(255,255,255,0.25);
+            font-size: 0.65rem;
         }
 
         @media (max-width: 600px) {
@@ -187,6 +232,10 @@
             }
             h1 {
                 font-size: 1.5rem;
+            }
+            .counter-number {
+                font-size: 1.2rem;
+                min-width: 45px;
             }
         }
     </style>
@@ -224,13 +273,21 @@
 
         <div class="download-section">
             <div class="version-badge">الإصدار 1.0</div>
+            
+            <!-- عداد التحميلات -->
+            <div class="counter-box">
+                <span class="counter-icon">⬇️</span>
+                <span class="counter-number" id="downloadCounter">0</span>
+                <span class="counter-label">تحميل</span>
+            </div>
+            
             <div>
                 <a href="https://drive.usercontent.google.com/download?id=1mo5NxCvlKSFczzpmbi_ovVuh2a_vcaZ2&export=download&authuser=0&confirm=t&uuid=8de3575e-ff0d-4ac1-87b6-e654d1862175&at=ALBwUglx-iIWObIs7aFZDB_5D9xv%3A1776471671679" class="download-btn" id="downloadBtn">
                     ⬇️ تحميل التطبيق
                 </a>
             </div>
             <div class="file-info">
-                📦 Size: 160 mb : Windows 10/11
+                📦 الحجم: 160 ميجابايت | 🖥️ ويندوز 10/11
             </div>
         </div>
 
@@ -250,19 +307,57 @@
     </div>
 
     <script>
-        // رابط التحميل من Google Drive
-        // سيتم تحديثه تلقائياً عند وضع الرابط الصحيح
+        // ============================================
+        // عداد التحميلات - يخزن العدد في localStorage
+        // ============================================
         
-        let downloadLink = document.getElementById('downloadBtn');
+        let downloadCount = localStorage.getItem('ytDownloadCount');
         
-        // ملاحظة: استبدل 'YOUR_GOOGLE_DRIVE_LINK_HERE' برابط التحميل المباشر من درايف
-        
-        // إحصائيات بسيطة (اختيارية)
-        if(downloadLink && downloadLink.href.includes('YOUR_GOOGLE_DRIVE_LINK_HERE')) {
-            console.warn('⚠️ لم يتم تعيين رابط التحميل بعد. يرجى استبدال الرابط برابط Google Drive المباشر');
-            downloadLink.style.opacity = '0.5';
-            downloadLink.style.cursor = 'not-allowed';
+        if(downloadCount === null) {
+            downloadCount = 0;
+            localStorage.setItem('ytDownloadCount', downloadCount);
+        } else {
+            downloadCount = parseInt(downloadCount);
         }
+        
+        // عرض العداد
+        document.getElementById('downloadCounter').innerText = downloadCount;
+        
+        // إضافة حدث عند الضغط على زر التحميل
+        const downloadBtn = document.getElementById('downloadBtn');
+        
+        downloadBtn.addEventListener('click', function(e) {
+            // زيادة العداد
+            downloadCount++;
+            localStorage.setItem('ytDownloadCount', downloadCount);
+            document.getElementById('downloadCounter').innerText = downloadCount;
+            
+            // تسجيل حدث التحويل (اختياري - يمكن إرسال إحصائية لخدمة خارجية)
+            console.log(`تم التحميل! إجمالي التحميلات: ${downloadCount}`);
+            
+            // يمكنك إضافة كود Google Analytics هنا إذا أردت تتبع أكثر دقة
+        });
+        
+        // تحريك العداد بتأثير بسيط عند التحميل
+        const counterSpan = document.getElementById('downloadCounter');
+        
+        function animateCounter() {
+            counterSpan.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                counterSpan.style.transform = 'scale(1)';
+            }, 200);
+        }
+        
+        // مراقبة التغييرات في العداد لتطبيق التأثير
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if(mutation.type === 'characterData' || mutation.type === 'childList') {
+                    animateCounter();
+                }
+            });
+        });
+        
+        observer.observe(counterSpan, { childList: true, characterData: true, subtree: true });
     </script>
 </body>
 </html>
