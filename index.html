@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Downloader | Download YouTube Videos</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>YouTube Downloader</title>
     <style>
         * {
             margin: 0;
@@ -13,611 +12,354 @@
         }
 
         body {
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            background: #05050a;
+            background: #000000;
             min-height: 100vh;
-            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Courier New', 'MS Gothic', 'Fixedsys', monospace;
             position: relative;
         }
 
-        /* Animated 3D background */
-        .animated-bg {
+        /* 16-bit CRT scanlines effect */
+        body::before {
+            content: "";
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -2;
-            background: radial-gradient(ellipse at 20% 30%, #0a0a1a, #020208);
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 255, 0, 0.03) 0px,
+                rgba(0, 255, 0, 0.03) 2px,
+                transparent 2px,
+                transparent 4px
+            );
+            pointer-events: none;
+            z-index: 10;
         }
 
-        .animated-bg::before {
-            content: '';
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            top: -50%;
-            left: -50%;
-            background: radial-gradient(circle, rgba(255,0,0,0.08) 0%, transparent 70%);
-            animation: rotate 40s linear infinite;
-        }
-
-        .animated-bg::after {
-            content: '';
-            position: absolute;
-            width: 150%;
-            height: 150%;
-            top: -25%;
-            left: -25%;
-            background: radial-gradient(circle, rgba(0,100,255,0.05) 0%, transparent 70%);
-            animation: rotateReverse 35s linear infinite;
-        }
-
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        @keyframes rotateReverse {
-            from { transform: rotate(360deg); }
-            to { transform: rotate(0deg); }
-        }
-
-        /* Floating particles */
-        .particles {
+        /* 16-bit pixelated border effect */
+        body::after {
+            content: "";
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 4px solid #0f0;
             pointer-events: none;
-        }
-
-        .particle {
-            position: absolute;
-            background: rgba(255,255,255,0.3);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: float linear infinite;
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100vh) rotate(360deg);
-                opacity: 0;
-            }
+            z-index: 10;
+            box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.2);
         }
 
         .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Header */
-        .header {
             text-align: center;
-            margin-bottom: 60px;
-            animation: fadeInDown 1s ease;
+            z-index: 5;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
         }
 
-        .logo {
-            margin-bottom: 20px;
+        /* Pixelated header */
+        .pixel-header {
+            margin-bottom: 50px;
         }
 
-        .logo-icon {
-            font-size: 90px;
+        .pixel-icon {
+            font-size: 80px;
             display: inline-block;
-            animation: floatIcon 3s ease-in-out infinite;
-            filter: drop-shadow(0 10px 30px rgba(255,0,0,0.3));
-        }
-
-        @keyframes floatIcon {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            filter: drop-shadow(0 0 10px #0f0);
+            margin-bottom: 20px;
         }
 
         h1 {
-            font-size: 3.5rem;
-            background: linear-gradient(135deg, #ffffff, #ff6b6b, #ff4757);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            color: #0f0;
+            font-size: 2rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 5px #0f0;
             margin-bottom: 15px;
-            font-weight: 800;
-            letter-spacing: -1px;
+            border-bottom: 2px solid #0f0;
+            display: inline-block;
+            padding-bottom: 10px;
         }
 
         .subtitle {
-            font-size: 1.1rem;
-            color: rgba(255,255,255,0.6);
-            max-width: 600px;
-            margin: 0 auto;
-            line-height: 1.6;
+            color: #0a0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            margin-top: 15px;
+            letter-spacing: 1px;
         }
 
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* 16-bit info box */
+        .info-box {
+            background: #0a0a0a;
+            border: 3px solid #0f0;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: 8px 8px 0 #0f0;
+            image-rendering: crisp-edges;
         }
 
-        /* Feature Cards */
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-bottom: 60px;
-        }
-
-        .feature-card {
-            background: rgba(15, 15, 30, 0.6);
-            backdrop-filter: blur(12px);
-            border-radius: 28px;
-            padding: 30px 25px;
-            text-align: center;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid rgba(255,255,255,0.08);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-            transition: left 0.5s;
-        }
-
-        .feature-card:hover::before {
-            left: 100%;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-10px);
-            border-color: rgba(255,0,0,0.3);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
-
-        .feature-icon {
-            font-size: 50px;
-            margin-bottom: 20px;
-            display: inline-block;
-        }
-
-        .feature-card h3 {
-            font-size: 1.3rem;
-            color: white;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .feature-card p {
-            color: rgba(255,255,255,0.5);
+        .info-line {
+            color: #0f0;
+            font-family: 'Courier New', monospace;
             font-size: 0.9rem;
-            line-height: 1.5;
+            text-align: left;
+            padding: 8px 0;
+            border-bottom: 1px dotted #0f0;
+            display: flex;
+            justify-content: space-between;
         }
 
-        /* Download Section */
-        .download-hero {
-            background: linear-gradient(135deg, rgba(255,0,0,0.1), rgba(0,0,0,0.3));
-            backdrop-filter: blur(20px);
-            border-radius: 48px;
-            padding: 50px;
-            text-align: center;
-            margin-bottom: 60px;
-            border: 1px solid rgba(255,255,255,0.1);
-            position: relative;
-            overflow: hidden;
-            animation: fadeInUp 1s ease;
+        .info-line:last-child {
+            border-bottom: none;
         }
 
-        .download-hero::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,0,0,0.05), transparent);
-            animation: pulse 8s ease-in-out infinite;
+        .info-label {
+            font-weight: bold;
+            text-transform: uppercase;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 0.6; transform: scale(1.1); }
+        .info-value {
+            color: #0a0;
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .version {
-            display: inline-block;
-            background: rgba(255,255,255,0.1);
-            padding: 6px 16px;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.7);
-            margin-bottom: 25px;
-            font-family: monospace;
-        }
-
+        /* Download button - 16bit style */
         .download-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 15px;
-            background: linear-gradient(135deg, #ff4757, #ff0000);
-            color: white;
-            border: none;
-            padding: 22px 55px;
-            font-size: 1.4rem;
-            font-weight: 700;
-            border-radius: 80px;
-            cursor: pointer;
-            transition: all 0.3s;
+            display: inline-block;
+            background: #000;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
             text-decoration: none;
-            margin: 15px;
-            box-shadow: 0 15px 35px rgba(255,0,0,0.3);
-            position: relative;
-            overflow: hidden;
-            pointer-events: auto;
-        }
-
-        .download-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .download-btn:hover::before {
-            left: 100%;
+            padding: 18px 40px;
+            border: 3px solid #0f0;
+            margin: 20px 0;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: all 0.1s ease;
+            box-shadow: 6px 6px 0 #0f0;
+            image-rendering: crisp-edges;
         }
 
         .download-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 20px 45px rgba(255,0,0,0.4);
+            background: #0f0;
+            color: #000;
+            box-shadow: 3px 3px 0 #0f0;
+            transform: translate(3px, 3px);
         }
 
         .download-btn:active {
-            transform: scale(0.98);
+            transform: translate(6px, 6px);
+            box-shadow: 0px 0px 0 #0f0;
         }
 
-        .btn-icon {
-            font-size: 1.8rem;
+        /* File info */
+        .file-info {
+            color: #0a0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.7rem;
+            margin-top: 20px;
+            letter-spacing: 1px;
         }
 
-        .file-meta {
-            margin-top: 25px;
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            flex-wrap: wrap;
+        .file-info span {
+            color: #0f0;
         }
 
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: rgba(255,255,255,0.5);
-            font-size: 0.85rem;
-            background: rgba(255,255,255,0.05);
-            padding: 6px 15px;
-            border-radius: 50px;
+        /* Features list - pixel style */
+        .features {
+            text-align: left;
+            margin: 30px 0;
+            padding: 20px;
+            background: #0a0a0a;
+            border: 2px solid #0f0;
         }
 
-        .meta-icon {
+        .features h3 {
+            color: #0f0;
+            font-family: 'Courier New', monospace;
             font-size: 1rem;
-        }
-
-        /* Requirements */
-        .requirements {
-            background: rgba(10,10,20,0.5);
-            backdrop-filter: blur(12px);
-            border-radius: 32px;
-            padding: 35px;
-            border: 1px solid rgba(255,255,255,0.05);
-            margin-bottom: 40px;
-        }
-
-        .requirements h3 {
+            margin-bottom: 15px;
+            text-transform: uppercase;
             text-align: center;
-            font-size: 1.5rem;
-            color: white;
-            margin-bottom: 25px;
-            font-weight: 700;
+            letter-spacing: 2px;
         }
 
-        .req-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+        .feature-item {
+            color: #0a0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
         }
 
-        .req-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 20px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 16px;
-            transition: all 0.3s;
-        }
-
-        .req-item:hover {
-            background: rgba(255,255,255,0.08);
-            transform: translateX(5px);
-        }
-
-        .req-check {
-            font-size: 1.3rem;
-        }
-
-        .req-text {
-            color: rgba(255,255,255,0.7);
-            font-size: 0.9rem;
+        .feature-item::before {
+            content: ">";
+            color: #0f0;
+            position: absolute;
+            left: 0;
         }
 
         /* Footer */
         .footer {
-            text-align: center;
-            padding: 30px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            color: rgba(255,255,255,0.3);
-            font-size: 0.8rem;
+            margin-top: 40px;
+            color: #0a0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.6rem;
+            border-top: 1px solid #0f0;
+            padding-top: 20px;
         }
 
-        .footer a {
-            color: rgba(255,255,255,0.4);
-            text-decoration: none;
-            transition: color 0.3s;
+        /* Blinking cursor effect */
+        .blink {
+            animation: blink 1s step-end infinite;
         }
 
-        .footer a:hover {
-            color: #ff4757;
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
 
-        /* Progress Bar */
+        /* Progress bar - 16bit */
         .progress-container {
             margin-top: 20px;
             display: none;
         }
 
+        .progress-label {
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.7rem;
+            margin-bottom: 5px;
+            text-align: left;
+        }
+
         .progress-bar {
             width: 100%;
-            height: 4px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-            overflow: hidden;
+            height: 20px;
+            background: #0a0a0a;
+            border: 2px solid #0f0;
+            image-rendering: crisp-edges;
         }
 
         .progress-fill {
             width: 0%;
             height: 100%;
-            background: linear-gradient(90deg, #ff4757, #ff6b6b);
-            border-radius: 4px;
+            background: #0f0;
             transition: width 0.3s;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
             h1 {
-                font-size: 2rem;
+                font-size: 1.3rem;
             }
             
             .download-btn {
-                padding: 16px 35px;
-                font-size: 1.1rem;
+                font-size: 1rem;
+                padding: 12px 25px;
             }
             
-            .btn-icon {
-                font-size: 1.4rem;
-            }
-            
-            .download-hero {
-                padding: 30px 20px;
-            }
-            
-            .features {
-                gap: 15px;
-            }
-            
-            .feature-card {
-                padding: 20px;
+            .info-line {
+                font-size: 0.7rem;
+                flex-direction: column;
+                gap: 5px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="animated-bg"></div>
-    
-    <!-- Floating Particles -->
-    <div class="particles" id="particles"></div>
-
     <div class="container">
-        <div class="header">
-            <div class="logo">
-                <div class="logo-icon">🎬</div>
+        <div class="pixel-header">
+            <div class="pixel-icon">█▓▒░ ► ░▒▓█</div>
+            <h1>YOUTUBE DOWNLOADER</h1>
+            <div class="subtitle">[ v1.0 ]</div>
+        </div>
+
+        <div class="info-box">
+            <div class="info-line">
+                <span class="info-label">> STATUS</span>
+                <span class="info-value">[ ONLINE ]</span>
             </div>
-            <h1>YouTube Downloader</h1>
-            <p class="subtitle">
-                Download any YouTube video in high quality with blazing fast speed<br>
-                Simple interface, professional performance, completely free
-            </p>
+            <div class="info-line">
+                <span class="info-label">> PLATFORM</span>
+                <span class="info-value">WINDOWS 10/11</span>
+            </div>
+            <div class="info-line">
+                <span class="info-label">> SIZE</span>
+                <span class="info-value">160 MB</span>
+            </div>
+            <div class="info-line">
+                <span class="info-label">> TYPE</span>
+                <span class="info-value">PORTABLE</span>
+            </div>
+        </div>
+
+        <a href="#" class="download-btn" id="downloadBtn">
+            ⬇ DOWNLOAD NOW ⬇
+        </a>
+
+        <div class="file-info">
+            <span>┌─────────────────────────┐</span><br>
+            <span>│</span> MD5: 4F8A9B2C3D5E6F7A8B9C <span>│</span><br>
+            <span>└─────────────────────────┘</span>
+        </div>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-label">> DOWNLOADING...</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
         </div>
 
         <div class="features">
-            <div class="feature-card">
-                <div class="feature-icon">🎥</div>
-                <h3>Multiple Qualities</h3>
-                <p>4K Ultra HD, 1080p Full HD, 720p, 480p and lower</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🎵</div>
-                <h3>High Quality Audio</h3>
-                <p>Extract audio in MP3 format at 320kbps quality</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">⚡</div>
-                <h3>Blazing Fast</h3>
-                <p>Multi-threaded download, max internet speed utilization</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🛡️</div>
-                <h3>Safe & Clean</h3>
-                <p>Virus-free, ad-free, open source</p>
-            </div>
-        </div>
-
-        <div class="download-hero">
-            <div class="version">
-                <span>📦 Version 1.0</span>
-            </div>
-            <a href="#" class="download-btn" id="downloadBtn">
-                <span class="btn-icon">⬇️</span>
-                <span>Download Now</span>
-                <span class="btn-icon">🎬</span>
-            </a>
-            <div class="file-meta">
-                <div class="meta-item">
-                    <span class="meta-icon">💾</span>
-                    <span>160 MB</span>
-                </div>
-                <div class="meta-item">
-                    <span class="meta-icon">🖥️</span>
-                    <span>Windows 10/11</span>
-                </div>
-                <div class="meta-item">
-                    <span class="meta-icon">🔧</span>
-                    <span>Portable (No installation)</span>
-                </div>
-            </div>
-            <div class="progress-container" id="progressContainer">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-                <div style="font-size: 0.7rem; margin-top: 8px; color: rgba(255,255,255,0.4);">Downloading...</div>
-            </div>
-        </div>
-
-        <div class="requirements">
-            <h3>✨ Features</h3>
-            <div class="req-grid">
-                <div class="req-item">
-                    <span class="req-check">✅</span>
-                    <span class="req-text">No installation required (Portable)</span>
-                </div>
-                <div class="req-item">
-                    <span class="req-check">✅</span>
-                    <span class="req-text">Works offline after download</span>
-                </div>
-                <div class="req-item">
-                    <span class="req-check">✅</span>
-                    <span class="req-text">Compatible with Windows 10 & 11</span>
-                </div>
-                <div class="req-item">
-                    <span class="req-check">✅</span>
-                    <span class="req-text">Supports Shorts and regular links</span>
-                </div>
-                <div class="req-item">
-                    <span class="req-check">✅</span>
-                    <span class="req-text">Modern user interface</span>
-                </div>
-                <div class="req-item">
-                    <span class="req-check">✅</span>
-                    <span class="req-text">Free updates forever</span>
-                </div>
-            </div>
+            <h3>█ FEATURES █</h3>
+            <div class="feature-item">4K / 1080p / 720p / 480p</div>
+            <div class="feature-item">MP3 AUDIO EXTRACTION</div>
+            <div class="feature-item">MULTI-THREADED DOWNLOAD</div>
+            <div class="feature-item">NO INSTALLATION REQUIRED</div>
+            <div class="feature-item">SUPPORTS SHORTS & REGULAR</div>
         </div>
 
         <div class="footer">
-            <p>YouTube Downloader is not affiliated with YouTube or Google. All trademarks are property of their respective owners.</p>
-            <p style="margin-top: 10px;">© 2026 YouTube Downloader | Made with ❤️</p>
+            <p>[ NOT AFFILIATED WITH YOUTUBE OR GOOGLE ]</p>
+            <p class="blink">> READY FOR DOWNLOAD <span style="color:#0f0">_</span></p>
         </div>
     </div>
 
     <script>
-        // 🔴 IMPORTANT: Replace this URL with your actual Google Drive direct download link
-        // Get your link from: https://drive.usercontent.google.com/download?id=YOUR_FILE_ID&export=download
-        // Example: "https://drive.usercontent.google.com/download?id=1mo5NxCvlKSFczzpmbi_ovVuh2a_vcaZ2&export=download"
+        // 🔴 REPLACE THIS URL WITH YOUR ACTUAL GOOGLE DRIVE LINK
+        // Format: https://drive.usercontent.google.com/download?id=YOUR_FILE_ID&export=download
         const DOWNLOAD_URL = "https://drive.usercontent.google.com/download?id=YOUR_FILE_ID_HERE&export=download";
         
-        // Create floating particles
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            const particleCount = 50;
-            
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
-                const size = Math.random() * 4 + 1;
-                particle.style.width = size + 'px';
-                particle.style.height = size + 'px';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDuration = Math.random() * 10 + 5 + 's';
-                particle.style.animationDelay = Math.random() * 5 + 's';
-                particle.style.opacity = Math.random() * 0.3;
-                particlesContainer.appendChild(particle);
-            }
-        }
-        
-        createParticles();
-        
-        // Get elements
         const downloadBtn = document.getElementById('downloadBtn');
         const progressContainer = document.getElementById('progressContainer');
         const progressFill = document.getElementById('progressFill');
         
         // Check if URL is configured
         if (DOWNLOAD_URL === "https://drive.usercontent.google.com/download?id=YOUR_FILE_ID_HERE&export=download") {
-            console.warn('⚠️ Please set your actual Google Drive download URL in the DOWNLOAD_URL variable');
-            downloadBtn.style.opacity = '0.6';
-            downloadBtn.style.cursor = 'pointer';
-            downloadBtn.href = '#';
             downloadBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                alert('Download link not configured. Please contact the developer.');
+                alert('[ERROR] DOWNLOAD LINK NOT CONFIGURED\n\nContact developer to get the correct link.');
             });
         } else {
-            // Set the download link
             downloadBtn.href = DOWNLOAD_URL;
             
-            // Add click handler for visual progress effect
             downloadBtn.addEventListener('click', function(e) {
-                // Show progress bar
                 progressContainer.style.display = 'block';
                 
                 let progress = 0;
@@ -634,7 +376,6 @@
                     progressFill.style.width = progress + '%';
                 }, 200);
                 
-                // Hide progress bar after 5 seconds max
                 setTimeout(() => {
                     clearInterval(interval);
                     if (progressFill.style.width !== '100%') {
@@ -644,28 +385,6 @@
                 }, 5000);
             });
         }
-        
-        // Scroll reveal animation
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-        
-        document.querySelectorAll('.feature-card, .requirements').forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(30px)';
-            el.style.transition = 'all 0.6s ease';
-            observer.observe(el);
-        });
     </script>
 </body>
 </html>
