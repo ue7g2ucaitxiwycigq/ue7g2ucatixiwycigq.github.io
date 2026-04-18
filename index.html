@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Downloader Pro | حمل فيديوهات يوتيوب بجودة عالية</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>YouTube Downloader | Download YouTube Videos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,14 +13,14 @@
         }
 
         body {
-            font-family: 'Cairo', 'Segoe UI', sans-serif;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
             background: #05050a;
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
         }
 
-        /* خلفية متحركة ثلاثية الأبعاد */
+        /* Animated 3D background */
         .animated-bg {
             position: fixed;
             top: 0;
@@ -63,7 +63,7 @@
             to { transform: rotate(0deg); }
         }
 
-        /* جزيئات متحركة */
+        /* Floating particles */
         .particles {
             position: fixed;
             top: 0;
@@ -107,24 +107,11 @@
             z-index: 1;
         }
 
-        /* هيدر أنيق */
+        /* Header */
         .header {
             text-align: center;
             margin-bottom: 60px;
             animation: fadeInDown 1s ease;
-        }
-
-        .badge {
-            display: inline-block;
-            background: linear-gradient(135deg, rgba(255,0,0,0.2), rgba(255,0,0,0.05));
-            backdrop-filter: blur(10px);
-            padding: 8px 24px;
-            border-radius: 100px;
-            border: 1px solid rgba(255,0,0,0.3);
-            margin-bottom: 25px;
-            font-size: 0.85rem;
-            color: #ff6b6b;
-            font-weight: 500;
         }
 
         .logo {
@@ -173,7 +160,7 @@
             }
         }
 
-        /* بطاقات الميزات */
+        /* Feature Cards */
         .features {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -233,7 +220,7 @@
             line-height: 1.5;
         }
 
-        /* قسم التحميل الرئيسي */
+        /* Download Section */
         .download-hero {
             background: linear-gradient(135deg, rgba(255,0,0,0.1), rgba(0,0,0,0.3));
             backdrop-filter: blur(20px);
@@ -356,7 +343,7 @@
             font-size: 1rem;
         }
 
-        /* متطلبات النظام */
+        /* Requirements */
         .requirements {
             background: rgba(10,10,20,0.5);
             backdrop-filter: blur(12px);
@@ -404,7 +391,7 @@
             font-size: 0.9rem;
         }
 
-        /* فوتر */
+        /* Footer */
         .footer {
             text-align: center;
             padding: 30px;
@@ -423,7 +410,7 @@
             color: #ff4757;
         }
 
-        /* شريط تقدم التحميل (اختياري) */
+        /* Progress Bar */
         .progress-container {
             margin-top: 20px;
             display: none;
@@ -476,54 +463,51 @@
 <body>
     <div class="animated-bg"></div>
     
-    <!-- جزيئات متحركة -->
+    <!-- Floating Particles -->
     <div class="particles" id="particles"></div>
 
     <div class="container">
         <div class="header">
-            <div class="badge">
-                <span>🚀 RELEASED 2026</span>
-            </div>
             <div class="logo">
                 <div class="logo-icon">🎬</div>
             </div>
             <h1>YouTube Downloader</h1>
             <p class="subtitle">
-                قم بتحميل أي فيديو من يوتيوب بجودة عالية وبسرعة فائقة<br>
-                واجهة بسيطة، أداء احترافي، مجاني بالكامل
+                Download any YouTube video in high quality with blazing fast speed<br>
+                Simple interface, professional performance, completely free
             </p>
         </div>
 
         <div class="features">
             <div class="feature-card">
                 <div class="feature-icon">🎥</div>
-                <h3>جودات متعددة</h3>
-                <p>4K Ultra HD, 1080p Full HD, 720p, 480p وأقل</p>
+                <h3>Multiple Qualities</h3>
+                <p>4K Ultra HD, 1080p Full HD, 720p, 480p and lower</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🎵</div>
-                <h3>صوت عالي النقاء</h3>
-                <p>استخراج الصوت بصيغة MP3 بجودة 320kbps</p>
+                <h3>High Quality Audio</h3>
+                <p>Extract audio in MP3 format at 320kbps quality</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">⚡</div>
-                <h3>سرعة خارقة</h3>
-                <p>تحميل متعدد الخيوط، أقصى استغلال لسرعة النت</p>
+                <h3>Blazing Fast</h3>
+                <p>Multi-threaded download, max internet speed utilization</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🛡️</div>
-                <h3>آمن ونظيف</h3>
-                <p>خالي من الفيروسات والإعلانات، مصدر مفتوح</p>
+                <h3>Safe & Clean</h3>
+                <p>Virus-free, ad-free, open source</p>
             </div>
         </div>
 
         <div class="download-hero">
             <div class="version">
-                <span>📦 Version 1.0.0</span>
+                <span>📦 Version 2.0</span>
             </div>
-            <a href="https://drive.google.com/file/d/1mo5NxCvlKSFczzpmbi_ovVuh2a_vcaZ2/view?usp=sharing" class="download-btn" id="downloadBtn">
+            <a href="#" class="download-btn" id="downloadBtn">
                 <span class="btn-icon">⬇️</span>
-                <span>تحميل التطبيق الآن</span>
+                <span>Download Now</span>
                 <span class="btn-icon">🎬</span>
             </a>
             <div class="file-meta">
@@ -537,43 +521,43 @@
                 </div>
                 <div class="meta-item">
                     <span class="meta-icon">🔧</span>
-                    <span>Portable (لا يحتاج تثبيت)</span>
+                    <span>Portable (No installation)</span>
                 </div>
             </div>
             <div class="progress-container" id="progressContainer">
                 <div class="progress-bar">
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
-                <div style="font-size: 0.7rem; margin-top: 8px; color: rgba(255,255,255,0.4);">جاري التحميل...</div>
+                <div style="font-size: 0.7rem; margin-top: 8px; color: rgba(255,255,255,0.4);">Downloading...</div>
             </div>
         </div>
 
         <div class="requirements">
-            <h3>✨ مميزات التطبيق</h3>
+            <h3>✨ Features</h3>
             <div class="req-grid">
                 <div class="req-item">
                     <span class="req-check">✅</span>
-                    <span class="req-text">لا يحتاج إلى تثبيت (Portable)</span>
+                    <span class="req-text">No installation required (Portable)</span>
                 </div>
                 <div class="req-item">
                     <span class="req-check">✅</span>
-                    <span class="req-text">يعمل بدون إنترنت بعد التحميل</span>
+                    <span class="req-text">Works offline after download</span>
                 </div>
                 <div class="req-item">
                     <span class="req-check">✅</span>
-                    <span class="req-text">متوافق مع ويندوز 10 و 11</span>
+                    <span class="req-text">Compatible with Windows 10 & 11</span>
                 </div>
                 <div class="req-item">
                     <span class="req-check">✅</span>
-                    <span class="req-text">يدعم روابط Shorts والعادية</span>
+                    <span class="req-text">Supports Shorts and regular links</span>
                 </div>
                 <div class="req-item">
                     <span class="req-check">✅</span>
-                    <span class="req-text">واجهة عربية وإنجليزية</span>
+                    <span class="req-text">Modern user interface</span>
                 </div>
                 <div class="req-item">
                     <span class="req-check">✅</span>
-                    <span class="req-text">تحديثات مستمرة ومجانية</span>
+                    <span class="req-text">Free updates forever</span>
                 </div>
             </div>
         </div>
@@ -585,7 +569,11 @@
     </div>
 
     <script>
-        // إنشاء جزيئات متحركة
+        // IMPORTANT: Replace this URL with your actual Google Drive direct download link
+        // Get your link from: https://drive.usercontent.google.com/download?id=YOUR_FILE_ID&export=download
+        const DOWNLOAD_URL = "https://drive.usercontent.google.com/download?id=YOUR_FILE_ID_HERE&export=download";
+        
+        // Create floating particles
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
             const particleCount = 50;
@@ -606,13 +594,17 @@
         
         createParticles();
         
-        // شريط تقدم وهمي عند الضغط على زر التحميل (تأثير بصري)
+        // Set download link
         const downloadBtn = document.getElementById('downloadBtn');
         const progressContainer = document.getElementById('progressContainer');
         const progressFill = document.getElementById('progressFill');
         
+        // Update the href with your actual download URL
+        downloadBtn.href = DOWNLOAD_URL;
+        
+        // Visual progress effect when clicking download
         downloadBtn.addEventListener('click', function(e) {
-            // إظهار شريط التقدم
+            // Show progress bar
             progressContainer.style.display = 'block';
             
             let progress = 0;
@@ -629,7 +621,7 @@
                 progressFill.style.width = progress + '%';
             }, 200);
             
-            // إلغاء شريط التقدم بعد 5 ثواني كحد أقصى
+            // Hide progress bar after 5 seconds max
             setTimeout(() => {
                 clearInterval(interval);
                 if (progressFill.style.width !== '100%') {
@@ -639,7 +631,7 @@
             }, 5000);
         });
         
-        // تأثير ظهور العناصر عند التمرير
+        // Scroll reveal animation
         const observerOptions = {
             threshold: 0.1,
             rootMargin: '0px 0px -50px 0px'
@@ -660,6 +652,18 @@
             el.style.transition = 'all 0.6s ease';
             observer.observe(el);
         });
+        
+        // Warning if download URL not set
+        if (DOWNLOAD_URL === "https://drive.google.com/file/d/1mo5NxCvlKSFczzpmbi_ovVuh2a_vcaZ2/view?usp=sharing") {
+            console.warn('⚠️ Please set your actual Google Drive download URL in the DOWNLOAD_URL variable');
+            downloadBtn.style.opacity = '0.5';
+            downloadBtn.style.cursor = 'not-allowed';
+            downloadBtn.href = '#';
+            downloadBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Download link not configured. Please contact the developer.');
+            });
+        }
     </script>
 </body>
 </html>
