@@ -22,7 +22,6 @@
             position: relative;
         }
 
-        /* نمط خلفية مريح للعين - داكن مع تدرج ناعم */
         body::before {
             content: '';
             position: fixed;
@@ -34,7 +33,6 @@
             z-index: -1;
         }
 
-        /* تأثير زجاجي ناعم */
         .container {
             max-width: 900px;
             width: 100%;
@@ -127,7 +125,6 @@
             font-weight: 500;
         }
 
-        /* عداد التحميلات */
         .counter-box {
             display: inline-flex;
             align-items: center;
@@ -222,6 +219,20 @@
             font-size: 0.65rem;
         }
 
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -274,11 +285,11 @@
         <div class="download-section">
             <div class="version-badge">الإصدار 1.0</div>
             
-            <!-- عداد التحميلات -->
+            <!-- عداد مركزي -->
             <div class="counter-box">
-                <span class="counter-icon">⬇️</span>
+                <span class="counter-icon">🌍</span>
                 <span class="counter-number" id="downloadCounter">0</span>
-                <span class="counter-label">تحميل</span>
+                <span class="counter-label">تحميل (إجمالي)</span>
             </div>
             
             <div>
@@ -308,56 +319,110 @@
 
     <script>
         // ============================================
-        // عداد التحميلات - يخزن العدد في localStorage
+        // عداد مركزي باستخدام GitHub Gist API
         // ============================================
         
-        let downloadCount = localStorage.getItem('ytDownloadCount');
+        // ⚠️ استبدل هذا الرابط برابط GIST الخام خاصتك
+        const GIST_RAW_URL = 'https://gist.githubusercontent.com/YOUR_USERNAME/YOUR_GIST_ID/raw/counter.json';
         
-        if(downloadCount === null) {
-            downloadCount = 0;
-            localStorage.setItem('ytDownloadCount', downloadCount);
-        } else {
-            downloadCount = parseInt(downloadCount);
+        // رابط API لتحديث الملف (تحتاج token)
+        const GIST_API_URL = 'https://api.github.com/gists/YOUR_GIST_ID';
+        
+        // GitHub Token (أنشئه من Settings → Developer settings → Personal access tokens)
+        // صلاحياته: gist (تعديل الـ Gists)
+        const GITHUB_TOKEN = 'YOUR_GITHUB_TOKEN';
+        
+        let currentCount = 0;
+        
+        // جلب العداد الحالي من GitHub
+        async function fetchDownloadCount() {
+            try {
+                const response = await fetch(GIST_RAW_URL + '?t=' + Date.now());
+                const data = await response.json();
+                currentCount = data.downloads || 0;
+                document.getElementById('downloadCounter').innerText = currentCount;
+                return currentCount;
+            } catch (error) {
+                console.error('خطأ في جلب العداد:', error);
+                document.getElementById('downloadCounter').innerText = '?';
+                return null;
+            }
         }
         
-        // عرض العداد
-        document.getElementById('downloadCounter').innerText = downloadCount;
+        // تحديث العداد على GitHub
+        async function updateDownloadCount(newCount) {
+            try {
+                const content = JSON.stringify({ downloads: newCount, lastUpdate: new Date().toISOString() }, null, 2);
+                
+                const response = await fetch(GIST_API_URL, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/vnd.github.v3+json'
+                    },
+                    body: JSON.stringify({
+                        files: {
+                            'counter.json': {
+                                content: content
+                            }
+                        }
+                    })
+                });
+                
+                if (response.ok) {
+                    console.log('تم تحديث العداد بنجاح');
+                    return true;
+                } else {
+                    console.error('فشل التحديث:', await response.text());
+                    return false;
+                }
+            } catch (error) {
+                console.error('خطأ في تحديث العداد:', error);
+                return false;
+            }
+        }
+        
+        // زيادة العداد (عند الضغط على زر التحميل)
+        async function incrementCounter() {
+            // منع الضغط المتكرر
+            const btn = document.getElementById('downloadBtn');
+            if (btn.hasAttribute('data-updating')) return;
+            
+            btn.setAttribute('data-updating', 'true');
+            
+            // جلب العداد الحالي
+            const current = await fetchDownloadCount();
+            if (current !== null) {
+                const newCount = current + 1;
+                const updated = await updateDownloadCount(newCount);
+                if (updated) {
+                    document.getElementById('downloadCounter').innerText = newCount;
+                } else {
+                    // إذا فشل التحديث، نزيد محلياً فقط
+                    document.getElementById('downloadCounter').innerText = current + 1;
+                }
+            }
+            
+            setTimeout(() => {
+                btn.removeAttribute('data-updating');
+            }, 3000);
+        }
+        
+        // تحميل العداد عند فتح الصفحة
+        fetchDownloadCount();
         
         // إضافة حدث عند الضغط على زر التحميل
         const downloadBtn = document.getElementById('downloadBtn');
-        
         downloadBtn.addEventListener('click', function(e) {
-            // زيادة العداد
-            downloadCount++;
-            localStorage.setItem('ytDownloadCount', downloadCount);
-            document.getElementById('downloadCounter').innerText = downloadCount;
-            
-            // تسجيل حدث التحويل (اختياري - يمكن إرسال إحصائية لخدمة خارجية)
-            console.log(`تم التحميل! إجمالي التحميلات: ${downloadCount}`);
-            
-            // يمكنك إضافة كود Google Analytics هنا إذا أردت تتبع أكثر دقة
-        });
-        
-        // تحريك العداد بتأثير بسيط عند التحميل
-        const counterSpan = document.getElementById('downloadCounter');
-        
-        function animateCounter() {
-            counterSpan.style.transform = 'scale(1.2)';
+            // ننتظر قليلاً ثم نزيد العداد (بعد بدء التحميل)
             setTimeout(() => {
-                counterSpan.style.transform = 'scale(1)';
-            }, 200);
-        }
-        
-        // مراقبة التغييرات في العداد لتطبيق التأثير
-        const observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if(mutation.type === 'characterData' || mutation.type === 'childList') {
-                    animateCounter();
-                }
-            });
+                incrementCounter();
+            }, 500);
         });
         
-        observer.observe(counterSpan, { childList: true, characterData: true, subtree: true });
+        // تحديث العداد كل 30 ثانية (للمستخدمين الآخرين)
+        setInterval(fetchDownloadCount, 30000);
     </script>
 </body>
 </html>
