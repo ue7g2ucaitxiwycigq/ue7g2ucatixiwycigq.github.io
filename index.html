@@ -290,6 +290,7 @@
             box-shadow: 0 15px 35px rgba(255,0,0,0.3);
             position: relative;
             overflow: hidden;
+            pointer-events: auto;
         }
 
         .download-btn::before {
@@ -503,7 +504,7 @@
 
         <div class="download-hero">
             <div class="version">
-                <span>📦 Version 2.0</span>
+                <span>📦 Version 1.0</span>
             </div>
             <a href="#" class="download-btn" id="downloadBtn">
                 <span class="btn-icon">⬇️</span>
@@ -569,9 +570,10 @@
     </div>
 
     <script>
-        // IMPORTANT: Replace this URL with your actual Google Drive direct download link
+        // 🔴 IMPORTANT: Replace this URL with your actual Google Drive direct download link
         // Get your link from: https://drive.usercontent.google.com/download?id=YOUR_FILE_ID&export=download
-        const DOWNLOAD_URL = "https://drive.google.com/file/d/1mo5NxCvlKSFczzpmbi_ovVuh2a_vcaZ2/view?usp=sharing";
+        // Example: "https://drive.usercontent.google.com/download?id=1mo5NxCvlKSFczzpmbi_ovVuh2a_vcaZ2&export=download"
+        const DOWNLOAD_URL = "https://drive.usercontent.google.com/download?id=YOUR_FILE_ID_HERE&export=download";
         
         // Create floating particles
         function createParticles() {
@@ -594,42 +596,54 @@
         
         createParticles();
         
-        // Set download link
+        // Get elements
         const downloadBtn = document.getElementById('downloadBtn');
         const progressContainer = document.getElementById('progressContainer');
         const progressFill = document.getElementById('progressFill');
         
-        // Update the href with your actual download URL
-        downloadBtn.href = DOWNLOAD_URL;
-        
-        // Visual progress effect when clicking download
-        downloadBtn.addEventListener('click', function(e) {
-            // Show progress bar
-            progressContainer.style.display = 'block';
+        // Check if URL is configured
+        if (DOWNLOAD_URL === "https://drive.usercontent.google.com/download?id=YOUR_FILE_ID_HERE&export=download") {
+            console.warn('⚠️ Please set your actual Google Drive download URL in the DOWNLOAD_URL variable');
+            downloadBtn.style.opacity = '0.6';
+            downloadBtn.style.cursor = 'pointer';
+            downloadBtn.href = '#';
+            downloadBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Download link not configured. Please contact the developer.');
+            });
+        } else {
+            // Set the download link
+            downloadBtn.href = DOWNLOAD_URL;
             
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += Math.random() * 15;
-                if (progress >= 100) {
-                    progress = 100;
+            // Add click handler for visual progress effect
+            downloadBtn.addEventListener('click', function(e) {
+                // Show progress bar
+                progressContainer.style.display = 'block';
+                
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 15;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            progressContainer.style.display = 'none';
+                            progressFill.style.width = '0%';
+                        }, 2000);
+                    }
+                    progressFill.style.width = progress + '%';
+                }, 200);
+                
+                // Hide progress bar after 5 seconds max
+                setTimeout(() => {
                     clearInterval(interval);
-                    setTimeout(() => {
+                    if (progressFill.style.width !== '100%') {
                         progressContainer.style.display = 'none';
                         progressFill.style.width = '0%';
-                    }, 2000);
-                }
-                progressFill.style.width = progress + '%';
-            }, 200);
-            
-            // Hide progress bar after 5 seconds max
-            setTimeout(() => {
-                clearInterval(interval);
-                if (progressFill.style.width !== '100%') {
-                    progressContainer.style.display = 'none';
-                    progressFill.style.width = '0%';
-                }
-            }, 5000);
-        });
+                    }
+                }, 5000);
+            });
+        }
         
         // Scroll reveal animation
         const observerOptions = {
@@ -652,18 +666,6 @@
             el.style.transition = 'all 0.6s ease';
             observer.observe(el);
         });
-        
-        // Warning if download URL not set
-        if (DOWNLOAD_URL === "https://drive.google.com/file/d/1mo5NxCvlKSFczzpmbi_ovVuh2a_vcaZ2/view?usp=sharing") {
-            console.warn('⚠️ Please set your actual Google Drive download URL in the DOWNLOAD_URL variable');
-            downloadBtn.style.opacity = '0.5';
-            downloadBtn.style.cursor = 'not-allowed';
-            downloadBtn.href = '#';
-            downloadBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                alert('Download link not configured. Please contact the developer.');
-            });
-        }
     </script>
 </body>
 </html>
