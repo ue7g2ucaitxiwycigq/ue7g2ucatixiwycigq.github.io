@@ -1,81 +1,268 @@
-<script>
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Downloader | تحميل فيديوهات اليوتيوب</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-let car = {
-  x: 180,
-  y: 500,
-  width: 40,
-  height: 80,
-  speed: 5
-};
+        body {
+            font-family: 'Tajawal', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
-let obstacles = [];
-let score = 0;
-let gameOver = false;
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 32px;
+            padding: 40px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
 
-// Controls
-let keys = {};
-document.addEventListener("keydown", e => keys[e.key.toLowerCase()] = true);
-document.addEventListener("keyup", e => keys[e.key.toLowerCase()] = false);
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-// Create obstacles
-function spawnObstacle() {
-  let width = 40;
-  let x = Math.random() * (canvas.width - width);
-  obstacles.push({
-    x: x,
-    y: -80,
-    width: width,
-    height: 80,
-    speed: 4
-  });
-}
+        .logo-icon {
+            font-size: 80px;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+        }
 
-// Collision detection
-function isColliding(a, b) {
-  return a.x < b.x + b.width &&
-         a.x + a.width > b.x &&
-         a.y < b.y + b.height &&
-         a.y + a.height > b.y;
-}
+        h1 {
+            color: white;
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 10px;
+        }
 
-// Game loop
-function update() {
-  if (gameOver) return;
+        .subtitle {
+            color: rgba(255,255,255,0.8);
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1rem;
+        }
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
 
-  // Move car with A / D
-  if (keys["a"] && car.x > 0) car.x -= car.speed;
-  if (keys["d"] && car.x < canvas.width - car.width) car.x += car.speed;
+        .feature-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
 
-  // Draw car
-  ctx.fillStyle = "red";
-  ctx.fillRect(car.x, car.y, car.width, car.height);
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.15);
+        }
 
-  // Obstacles
-  ctx.fillStyle = "black";
-  obstacles.forEach((obs, index) => {
-    obs.y += obs.speed;
-    ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
 
-    if (isColliding(car, obs)) {
-      gameOver = true;
-      alert("Game Over! Score: " + score);
-      document.location.reload();
-    }
+        .feature-card h3 {
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
 
-    if (obs.y > canvas.height) {
-      obstacles.splice(index, 1);
-      score++;
-      document.getElementById("score").innerText = "Score: " + score;
-    }
-  });
+        .feature-card p {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.8rem;
+        }
 
-  requestAnimationFrame(update);
-}
+        .download-section {
+            background: rgba(0,0,0,0.3);
+            border-radius: 24px;
+            padding: 30px;
+            text-align: center;
+        }
 
-setInterval(spawnObstacle, 1000);
-update();
-</script>
+        .version-badge {
+            display: inline-block;
+            background: #ff0000;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #ff0000, #cc0000);
+            color: white;
+            border: none;
+            padding: 18px 42px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            margin: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .download-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        .download-btn.secondary {
+            background: linear-gradient(135deg, #2c3e66, #1a2a4a);
+        }
+
+        .file-info {
+            margin-top: 25px;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.8rem;
+        }
+
+        .requirements {
+            margin-top: 30px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 15px;
+        }
+
+        .requirements h4 {
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .requirements ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .requirements li {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: rgba(255,255,255,0.4);
+            font-size: 0.7rem;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            .download-btn {
+                padding: 12px 25px;
+                font-size: 1rem;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <div class="logo-icon">📥</div>
+        </div>
+        <h1>YouTube Downloader</h1>
+        <p class="subtitle">حمل فيديوهات اليوتيوب بأعلى جودة • واجهة بسيطة • مجاني بالكامل</p>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🎬</div>
+                <h3>جودات متعددة</h3>
+                <p>4K, 1080p, 720p, 480p</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎵</div>
+                <h3>صوت فقط</h3>
+                <p>تحميل MP3 عالي الجودة</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>سريع وآمن</h3>
+                <p>بدون إعلانات أو فيروسات</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💻</div>
+                <h3>يعمل على ويندوز</h3>
+                <p>لا يحتاج تثبيت</p>
+            </div>
+        </div>
+
+        <div class="download-section">
+            <div class="version-badge">الإصدار 2.0</div>
+            <div>
+                <a href="YOUR_GOOGLE_DRIVE_LINK_HERE" class="download-btn" id="downloadBtn">
+                    ⬇️ تحميل التطبيق
+                </a>
+            </div>
+            <div class="file-info">
+                📦 الحجم: 20 ميجابايت | 🖥️ نظام التشغيل: Windows 10/11
+            </div>
+        </div>
+
+        <div class="requirements">
+            <h4>✨ متطلبات التشغيل:</h4>
+            <ul>
+                <li>✓ لا يحتاج إلى تثبيت</li>
+                <li>✓ يعمل بدون إنترنت (بعد التحميل)</li>
+                <li>✓ متوافق مع ويندوز 10 و 11</li>
+                <li>✓ يدعم روابط Shorts والعادية</li>
+            </ul>
+        </div>
+
+        <footer>
+            <p>YouTube Downloader • تطبيق مجاني لتحميل الفيديوهات من يوتيوب</p>
+        </footer>
+    </div>
+
+    <script>
+        // رابط التحميل من Google Drive
+        // سيتم تحديثه تلقائياً عند وضع الرابط الصحيح
+        
+        let downloadLink = document.getElementById('downloadBtn');
+        
+        // ملاحظة: استبدل 'YOUR_GOOGLE_DRIVE_LINK_HERE' برابط التحميل المباشر من درايف
+        
+        // إحصائيات بسيطة (اختيارية)
+        if(downloadLink && downloadLink.href.includes('YOUR_GOOGLE_DRIVE_LINK_HERE')) {
+            console.warn('⚠️ لم يتم تعيين رابط التحميل بعد. يرجى استبدال الرابط برابط Google Drive المباشر');
+            downloadLink.style.opacity = '0.5';
+            downloadLink.style.cursor = 'not-allowed';
+        }
+    </script>
+</body>
+</html>
