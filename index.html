@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Downloader | تحميل فيديوهات اليوتيوب</title>
+    <title>YouTube Downloader Pro | حمل فيديوهات يوتيوب بجودة عالية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,417 +13,653 @@
         }
 
         body {
-            font-family: 'Tajawal', 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: #1a1a2e;
+            font-family: 'Cairo', 'Segoe UI', sans-serif;
+            background: #05050a;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            overflow-x: hidden;
             position: relative;
         }
 
-        body::before {
-            content: '';
+        /* خلفية متحركة ثلاثية الأبعاد */
+        .animated-bg {
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(46, 46, 80, 0.4) 0%, rgba(26, 26, 46, 0.95) 100%);
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: radial-gradient(ellipse at 20% 30%, #0a0a1a, #020208);
+        }
+
+        .animated-bg::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: radial-gradient(circle, rgba(255,0,0,0.08) 0%, transparent 70%);
+            animation: rotate 40s linear infinite;
+        }
+
+        .animated-bg::after {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            top: -25%;
+            left: -25%;
+            background: radial-gradient(circle, rgba(0,100,255,0.05) 0%, transparent 70%);
+            animation: rotateReverse 35s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes rotateReverse {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
+        }
+
+        /* جزيئات متحركة */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             z-index: -1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
         }
 
         .container {
-            max-width: 900px;
-            width: 100%;
-            background: rgba(22, 22, 40, 0.85);
-            backdrop-filter: blur(12px);
-            border-radius: 32px;
-            padding: 40px;
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
         }
 
-        .logo {
+        /* هيدر أنيق */
+        .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 60px;
+            animation: fadeInDown 1s ease;
         }
 
-        .logo-icon {
-            font-size: 80px;
-            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
-        }
-
-        h1 {
-            color: #ffffff;
-            font-size: 2rem;
-            text-align: center;
-            margin-bottom: 10px;
-            letter-spacing: -0.5px;
-        }
-
-        .subtitle {
-            color: rgba(255,255,255,0.65);
-            text-align: center;
-            margin-bottom: 40px;
-            font-size: 1rem;
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .feature-card {
-            background: rgba(255,255,255,0.03);
-            border-radius: 20px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255,255,255,0.07);
-            border-color: rgba(255,255,255,0.1);
-        }
-
-        .feature-icon {
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
-
-        .feature-card h3 {
-            color: white;
-            font-size: 1rem;
-            margin-bottom: 8px;
-        }
-
-        .feature-card p {
-            color: rgba(255,255,255,0.55);
-            font-size: 0.8rem;
-        }
-
-        .download-section {
-            background: rgba(0,0,0,0.25);
-            border-radius: 24px;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .version-badge {
+        .badge {
             display: inline-block;
-            background: #e53935;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            margin-bottom: 20px;
+            background: linear-gradient(135deg, rgba(255,0,0,0.2), rgba(255,0,0,0.05));
+            backdrop-filter: blur(10px);
+            padding: 8px 24px;
+            border-radius: 100px;
+            border: 1px solid rgba(255,0,0,0.3);
+            margin-bottom: 25px;
+            font-size: 0.85rem;
+            color: #ff6b6b;
             font-weight: 500;
         }
 
-        .counter-box {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(0,0,0,0.4);
-            padding: 8px 18px;
-            border-radius: 40px;
-            margin-bottom: 25px;
+        .logo {
+            margin-bottom: 20px;
         }
 
-        .counter-icon {
-            font-size: 1rem;
-        }
-
-        .counter-number {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #4caf50;
-            direction: ltr;
+        .logo-icon {
+            font-size: 90px;
             display: inline-block;
-            min-width: 60px;
+            animation: floatIcon 3s ease-in-out infinite;
+            filter: drop-shadow(0 10px 30px rgba(255,0,0,0.3));
         }
 
-        .counter-label {
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #ffffff, #ff6b6b, #ff4757);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 15px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
             color: rgba(255,255,255,0.6);
-            font-size: 0.8rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* بطاقات الميزات */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 60px;
+        }
+
+        .feature-card {
+            background: rgba(15, 15, 30, 0.6);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 30px 25px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255,255,255,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            transition: left 0.5s;
+        }
+
+        .feature-card:hover::before {
+            left: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(255,0,0,0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .feature-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            color: white;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* قسم التحميل الرئيسي */
+        .download-hero {
+            background: linear-gradient(135deg, rgba(255,0,0,0.1), rgba(0,0,0,0.3));
+            backdrop-filter: blur(20px);
+            border-radius: 48px;
+            padding: 50px;
+            text-align: center;
+            margin-bottom: 60px;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 1s ease;
+        }
+
+        .download-hero::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,0,0,0.05), transparent);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .version {
+            display: inline-block;
+            background: rgba(255,255,255,0.1);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 25px;
+            font-family: monospace;
         }
 
         .download-btn {
             display: inline-flex;
             align-items: center;
-            gap: 12px;
-            background: linear-gradient(135deg, #e53935, #c62828);
+            gap: 15px;
+            background: linear-gradient(135deg, #ff4757, #ff0000);
             color: white;
             border: none;
-            padding: 18px 42px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            border-radius: 50px;
+            padding: 22px 55px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            border-radius: 80px;
             cursor: pointer;
             transition: all 0.3s;
             text-decoration: none;
-            margin: 10px;
-            box-shadow: 0 10px 25px rgba(229, 57, 53, 0.3);
+            margin: 15px;
+            box-shadow: 0 15px 35px rgba(255,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .download-btn:hover::before {
+            left: 100%;
         }
 
         .download-btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 15px 35px rgba(229, 57, 53, 0.4);
-            background: linear-gradient(135deg, #f44336, #d32f2f);
+            box-shadow: 0 20px 45px rgba(255,0,0,0.4);
         }
 
-        .file-info {
+        .download-btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-icon {
+            font-size: 1.8rem;
+        }
+
+        .file-meta {
             margin-top: 25px;
-            color: rgba(255,255,255,0.45);
-            font-size: 0.75rem;
-        }
-
-        .requirements {
-            margin-top: 30px;
-            background: rgba(255,255,255,0.02);
-            border-radius: 16px;
-            padding: 15px;
-        }
-
-        .requirements h4 {
-            color: rgba(255,255,255,0.8);
-            margin-bottom: 10px;
-            font-size: 0.85rem;
-        }
-
-        .requirements ul {
-            list-style: none;
             display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
             justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
         }
 
-        .requirements li {
-            color: rgba(255,255,255,0.5);
-            font-size: 0.75rem;
+        .meta-item {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.85rem;
+            background: rgba(255,255,255,0.05);
+            padding: 6px 15px;
+            border-radius: 50px;
         }
 
-        footer {
+        .meta-icon {
+            font-size: 1rem;
+        }
+
+        /* متطلبات النظام */
+        .requirements {
+            background: rgba(10,10,20,0.5);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            padding: 35px;
+            border: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 40px;
+        }
+
+        .requirements h3 {
             text-align: center;
-            margin-top: 30px;
-            color: rgba(255,255,255,0.25);
-            font-size: 0.65rem;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 25px;
+            font-weight: 700;
         }
 
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 0.8s linear infinite;
+        .req-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .req-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            transition: all 0.3s;
         }
 
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-            .download-btn {
-                padding: 12px 25px;
-                font-size: 1rem;
-            }
+        .req-item:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateX(5px);
+        }
+
+        .req-check {
+            font-size: 1.3rem;
+        }
+
+        .req-text {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+        }
+
+        /* فوتر */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.3);
+            font-size: 0.8rem;
+        }
+
+        .footer a {
+            color: rgba(255,255,255,0.4);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer a:hover {
+            color: #ff4757;
+        }
+
+        /* شريط تقدم التحميل (اختياري) */
+        .progress-container {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #ff4757, #ff6b6b);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        @media (max-width: 768px) {
             h1 {
-                font-size: 1.5rem;
+                font-size: 2rem;
             }
-            .counter-number {
-                font-size: 1.2rem;
-                min-width: 45px;
+            
+            .download-btn {
+                padding: 16px 35px;
+                font-size: 1.1rem;
+            }
+            
+            .btn-icon {
+                font-size: 1.4rem;
+            }
+            
+            .download-hero {
+                padding: 30px 20px;
+            }
+            
+            .features {
+                gap: 15px;
+            }
+            
+            .feature-card {
+                padding: 20px;
             }
         }
     </style>
 </head>
 <body>
+    <div class="animated-bg"></div>
+    
+    <!-- جزيئات متحركة -->
+    <div class="particles" id="particles"></div>
+
     <div class="container">
-        <div class="logo">
-            <div class="logo-icon">📥</div>
+        <div class="header">
+            <div class="badge">
+                <span>🚀 RELEASED 2026</span>
+            </div>
+            <div class="logo">
+                <div class="logo-icon">🎬</div>
+            </div>
+            <h1>YouTube Downloader</h1>
+            <p class="subtitle">
+                قم بتحميل أي فيديو من يوتيوب بجودة عالية وبسرعة فائقة<br>
+                واجهة بسيطة، أداء احترافي، مجاني بالكامل
+            </p>
         </div>
-        <h1>YouTube Downloader</h1>
-        <p class="subtitle">حمل فيديوهات اليوتيوب بأعلى جودة • واجهة بسيطة • مجاني بالكامل</p>
 
         <div class="features">
             <div class="feature-card">
-                <div class="feature-icon">🎬</div>
+                <div class="feature-icon">🎥</div>
                 <h3>جودات متعددة</h3>
-                <p>4K, 1080p, 720p, 480p</p>
+                <p>4K Ultra HD, 1080p Full HD, 720p, 480p وأقل</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🎵</div>
-                <h3>صوت فقط</h3>
-                <p>تحميل MP3 عالي الجودة</p>
+                <h3>صوت عالي النقاء</h3>
+                <p>استخراج الصوت بصيغة MP3 بجودة 320kbps</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">⚡</div>
-                <h3>سريع وآمن</h3>
-                <p>بدون إعلانات أو فيروسات</p>
+                <h3>سرعة خارقة</h3>
+                <p>تحميل متعدد الخيوط، أقصى استغلال لسرعة النت</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">💻</div>
-                <h3>يعمل على ويندوز</h3>
-                <p>لا يحتاج تثبيت</p>
+                <div class="feature-icon">🛡️</div>
+                <h3>آمن ونظيف</h3>
+                <p>خالي من الفيروسات والإعلانات، مصدر مفتوح</p>
             </div>
         </div>
 
-        <div class="download-section">
-            <div class="version-badge">الإصدار 1.0</div>
-            
-            <!-- عداد مركزي -->
-            <div class="counter-box">
-                <span class="counter-icon">🌍</span>
-                <span class="counter-number" id="downloadCounter">0</span>
-                <span class="counter-label">تحميل (إجمالي)</span>
+        <div class="download-hero">
+            <div class="version">
+                <span>📦 Version 2.0.0</span>
             </div>
-            
-            <div>
-                <a href="https://drive.usercontent.google.com/download?id=1mo5NxCvlKSFczzpmbi_ovVuh2a_vcaZ2&export=download&authuser=0&confirm=t&uuid=8de3575e-ff0d-4ac1-87b6-e654d1862175&at=ALBwUglx-iIWObIs7aFZDB_5D9xv%3A1776471671679" class="download-btn" id="downloadBtn">
-                    ⬇️ تحميل التطبيق
-                </a>
+            <a href="https://drive.usercontent.google.com/download?id=1mo5NxCvlKSFczzpmbi_ovVuh2a_vcaZ2&export=download&authuser=0&confirm=t&uuid=8de3575e-ff0d-4ac1-87b6-e654d1862175&at=ALBwUglx-iIWObIs7aFZDB_5D9xv%3A1776471671679" class="download-btn" id="downloadBtn">
+                <span class="btn-icon">⬇️</span>
+                <span>تحميل التطبيق الآن</span>
+                <span class="btn-icon">🎬</span>
+            </a>
+            <div class="file-meta">
+                <div class="meta-item">
+                    <span class="meta-icon">💾</span>
+                    <span>160 MB</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-icon">🖥️</span>
+                    <span>Windows 10/11</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-icon">🔧</span>
+                    <span>Portable (لا يحتاج تثبيت)</span>
+                </div>
             </div>
-            <div class="file-info">
-                📦 الحجم: 160 ميجابايت | 🖥️ ويندوز 10/11
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div style="font-size: 0.7rem; margin-top: 8px; color: rgba(255,255,255,0.4);">جاري التحميل...</div>
             </div>
         </div>
 
         <div class="requirements">
-            <h4>✨ متطلبات التشغيل:</h4>
-            <ul>
-                <li>✓ لا يحتاج إلى تثبيت</li>
-                <li>✓ يعمل بدون إنترنت (بعد التحميل)</li>
-                <li>✓ متوافق مع ويندوز 10 و 11</li>
-                <li>✓ يدعم روابط Shorts والعادية</li>
-            </ul>
+            <h3>✨ مميزات التطبيق</h3>
+            <div class="req-grid">
+                <div class="req-item">
+                    <span class="req-check">✅</span>
+                    <span class="req-text">لا يحتاج إلى تثبيت (Portable)</span>
+                </div>
+                <div class="req-item">
+                    <span class="req-check">✅</span>
+                    <span class="req-text">يعمل بدون إنترنت بعد التحميل</span>
+                </div>
+                <div class="req-item">
+                    <span class="req-check">✅</span>
+                    <span class="req-text">متوافق مع ويندوز 10 و 11</span>
+                </div>
+                <div class="req-item">
+                    <span class="req-check">✅</span>
+                    <span class="req-text">يدعم روابط Shorts والعادية</span>
+                </div>
+                <div class="req-item">
+                    <span class="req-check">✅</span>
+                    <span class="req-text">واجهة عربية وإنجليزية</span>
+                </div>
+                <div class="req-item">
+                    <span class="req-check">✅</span>
+                    <span class="req-text">تحديثات مستمرة ومجانية</span>
+                </div>
+            </div>
         </div>
 
-        <footer>
-            <p>YouTube Downloader • تطبيق مجاني لتحميل الفيديوهات من يوتيوب</p>
-        </footer>
+        <div class="footer">
+            <p>YouTube Downloader is not affiliated with YouTube or Google. All trademarks are property of their respective owners.</p>
+            <p style="margin-top: 10px;">© 2026 YouTube Downloader | Made with ❤️</p>
+        </div>
     </div>
 
     <script>
-        // ============================================
-        // عداد مركزي باستخدام GitHub Gist API
-        // ============================================
-        
-        // ⚠️ استبدل هذا الرابط برابط GIST الخام خاصتك
-        const GIST_RAW_URL = 'https://gist.githubusercontent.com/YOUR_USERNAME/YOUR_GIST_ID/raw/counter.json';
-        
-        // رابط API لتحديث الملف (تحتاج token)
-        const GIST_API_URL = 'https://api.github.com/gists/YOUR_GIST_ID';
-        
-        // GitHub Token (أنشئه من Settings → Developer settings → Personal access tokens)
-        // صلاحياته: gist (تعديل الـ Gists)
-        const GITHUB_TOKEN = 'YOUR_GITHUB_TOKEN';
-        
-        let currentCount = 0;
-        
-        // جلب العداد الحالي من GitHub
-        async function fetchDownloadCount() {
-            try {
-                const response = await fetch(GIST_RAW_URL + '?t=' + Date.now());
-                const data = await response.json();
-                currentCount = data.downloads || 0;
-                document.getElementById('downloadCounter').innerText = currentCount;
-                return currentCount;
-            } catch (error) {
-                console.error('خطأ في جلب العداد:', error);
-                document.getElementById('downloadCounter').innerText = '?';
-                return null;
+        // إنشاء جزيئات متحركة
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                const size = Math.random() * 4 + 1;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = Math.random() * 10 + 5 + 's';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                particle.style.opacity = Math.random() * 0.3;
+                particlesContainer.appendChild(particle);
             }
         }
         
-        // تحديث العداد على GitHub
-        async function updateDownloadCount(newCount) {
-            try {
-                const content = JSON.stringify({ downloads: newCount, lastUpdate: new Date().toISOString() }, null, 2);
-                
-                const response = await fetch(GIST_API_URL, {
-                    method: 'PATCH',
-                    headers: {
-                        'Authorization': `token ${GITHUB_TOKEN}`,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/vnd.github.v3+json'
-                    },
-                    body: JSON.stringify({
-                        files: {
-                            'counter.json': {
-                                content: content
-                            }
-                        }
-                    })
-                });
-                
-                if (response.ok) {
-                    console.log('تم تحديث العداد بنجاح');
-                    return true;
-                } else {
-                    console.error('فشل التحديث:', await response.text());
-                    return false;
-                }
-            } catch (error) {
-                console.error('خطأ في تحديث العداد:', error);
-                return false;
-            }
-        }
+        createParticles();
         
-        // زيادة العداد (عند الضغط على زر التحميل)
-        async function incrementCounter() {
-            // منع الضغط المتكرر
-            const btn = document.getElementById('downloadBtn');
-            if (btn.hasAttribute('data-updating')) return;
-            
-            btn.setAttribute('data-updating', 'true');
-            
-            // جلب العداد الحالي
-            const current = await fetchDownloadCount();
-            if (current !== null) {
-                const newCount = current + 1;
-                const updated = await updateDownloadCount(newCount);
-                if (updated) {
-                    document.getElementById('downloadCounter').innerText = newCount;
-                } else {
-                    // إذا فشل التحديث، نزيد محلياً فقط
-                    document.getElementById('downloadCounter').innerText = current + 1;
-                }
-            }
-            
-            setTimeout(() => {
-                btn.removeAttribute('data-updating');
-            }, 3000);
-        }
-        
-        // تحميل العداد عند فتح الصفحة
-        fetchDownloadCount();
-        
-        // إضافة حدث عند الضغط على زر التحميل
+        // شريط تقدم وهمي عند الضغط على زر التحميل (تأثير بصري)
         const downloadBtn = document.getElementById('downloadBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        
         downloadBtn.addEventListener('click', function(e) {
-            // ننتظر قليلاً ثم نزيد العداد (بعد بدء التحميل)
+            // إظهار شريط التقدم
+            progressContainer.style.display = 'block';
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        progressContainer.style.display = 'none';
+                        progressFill.style.width = '0%';
+                    }, 2000);
+                }
+                progressFill.style.width = progress + '%';
+            }, 200);
+            
+            // إلغاء شريط التقدم بعد 5 ثواني كحد أقصى
             setTimeout(() => {
-                incrementCounter();
-            }, 500);
+                clearInterval(interval);
+                if (progressFill.style.width !== '100%') {
+                    progressContainer.style.display = 'none';
+                    progressFill.style.width = '0%';
+                }
+            }, 5000);
         });
         
-        // تحديث العداد كل 30 ثانية (للمستخدمين الآخرين)
-        setInterval(fetchDownloadCount, 30000);
+        // تأثير ظهور العناصر عند التمرير
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.feature-card, .requirements').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
     </script>
 </body>
 </html>
