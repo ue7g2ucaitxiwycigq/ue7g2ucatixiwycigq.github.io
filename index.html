@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Downloader</title>
+    <title>YouTube Downloader | 16-Bit Edition</title>
     <style>
         * {
             margin: 0;
@@ -40,7 +40,7 @@
             z-index: 10;
         }
 
-        /* 16-bit pixelated border effect */
+        /* 16-bit pixelated border effect - RGB colors */
         body::after {
             content: "";
             position: fixed;
@@ -48,10 +48,11 @@
             left: 10px;
             right: 10px;
             bottom: 10px;
-            border: 4px solid #0f0;
+            border: 4px solid;
+            border-image: linear-gradient(45deg, #ff0000, #00ff00, #0000ff, #ff0000) 1;
             pointer-events: none;
             z-index: 10;
-            box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.2);
+            box-shadow: inset 0 0 20px rgba(255,0,0,0.2);
         }
 
         .container {
@@ -62,7 +63,7 @@
             width: 100%;
         }
 
-        /* Pixelated header */
+        /* Pixelated header with RGB */
         .pixel-header {
             margin-bottom: 50px;
         }
@@ -71,49 +72,68 @@
             font-size: 80px;
             display: inline-block;
             image-rendering: pixelated;
-            image-rendering: crisp-edges;
-            filter: drop-shadow(0 0 10px #0f0);
+            filter: drop-shadow(0 0 10px #ff0000);
             margin-bottom: 20px;
+            animation: rgbPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes rgbPulse {
+            0%, 100% { filter: drop-shadow(0 0 10px #ff0000); text-shadow: 0 0 5px #ff0000; }
+            33% { filter: drop-shadow(0 0 10px #00ff00); text-shadow: 0 0 5px #00ff00; }
+            66% { filter: drop-shadow(0 0 10px #0000ff); text-shadow: 0 0 5px #0000ff; }
         }
 
         h1 {
-            color: #0f0;
+            background: linear-gradient(135deg, #ff0000, #00ff00, #0000ff, #ff0000);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
             font-size: 2rem;
             letter-spacing: 4px;
             text-transform: uppercase;
             font-family: 'Courier New', monospace;
-            text-shadow: 0 0 5px #0f0;
+            text-shadow: 0 0 10px rgba(255,0,0,0.5);
             margin-bottom: 15px;
-            border-bottom: 2px solid #0f0;
+            border-bottom: 2px solid;
+            border-image: linear-gradient(90deg, #ff0000, #00ff00, #0000ff) 1;
             display: inline-block;
             padding-bottom: 10px;
+            animation: textGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes textGlow {
+            0%, 100% { text-shadow: 0 0 10px rgba(255,0,0,0.5); }
+            33% { text-shadow: 0 0 10px rgba(0,255,0,0.5); }
+            66% { text-shadow: 0 0 10px rgba(0,0,255,0.5); }
         }
 
         .subtitle {
-            color: #0a0;
+            color: #00ff00;
             font-family: 'Courier New', monospace;
             font-size: 0.8rem;
             margin-top: 15px;
             letter-spacing: 1px;
+            text-shadow: 0 0 5px #00ff00;
         }
 
-        /* 16-bit info box */
+        /* 16-bit info box with RGB border */
         .info-box {
             background: #0a0a0a;
-            border: 3px solid #0f0;
+            border: 3px solid;
+            border-image: linear-gradient(135deg, #ff0000, #00ff00, #0000ff) 1;
             padding: 25px;
             margin: 30px 0;
-            box-shadow: 8px 8px 0 #0f0;
+            box-shadow: 8px 8px 0 #ff0000, 4px 4px 0 #00ff00, 0px 0px 0 #0000ff;
             image-rendering: crisp-edges;
         }
 
         .info-line {
-            color: #0f0;
+            color: #00ff00;
             font-family: 'Courier New', monospace;
             font-size: 0.9rem;
             text-align: left;
             padding: 8px 0;
-            border-bottom: 1px dotted #0f0;
+            border-bottom: 1px dotted #ff0000;
             display: flex;
             justify-content: space-between;
         }
@@ -125,47 +145,51 @@
         .info-label {
             font-weight: bold;
             text-transform: uppercase;
+            color: #ff0000;
         }
 
         .info-value {
-            color: #0a0;
+            color: #00aaff;
         }
 
-        /* Download button - 16bit style */
+        /* Download button - RGB 16bit style */
         .download-btn {
             display: inline-block;
             background: #000;
-            color: #0f0;
+            color: #00ff00;
             font-family: 'Courier New', monospace;
             font-size: 1.5rem;
             font-weight: bold;
             text-decoration: none;
             padding: 18px 40px;
-            border: 3px solid #0f0;
+            border: 3px solid;
+            border-image: linear-gradient(45deg, #ff0000, #00ff00, #0000ff) 1;
             margin: 20px 0;
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 3px;
             transition: all 0.1s ease;
-            box-shadow: 6px 6px 0 #0f0;
+            box-shadow: 6px 6px 0 #ff0000, 3px 3px 0 #00ff00;
             image-rendering: crisp-edges;
+            position: relative;
+            overflow: hidden;
         }
 
         .download-btn:hover {
-            background: #0f0;
+            background: linear-gradient(135deg, #ff0000, #00ff00, #0000ff);
             color: #000;
-            box-shadow: 3px 3px 0 #0f0;
+            box-shadow: 3px 3px 0 #ff0000, 1px 1px 0 #00ff00;
             transform: translate(3px, 3px);
         }
 
         .download-btn:active {
             transform: translate(6px, 6px);
-            box-shadow: 0px 0px 0 #0f0;
+            box-shadow: 0px 0px 0 #ff0000;
         }
 
         /* File info */
         .file-info {
-            color: #0a0;
+            color: #0000ff;
             font-family: 'Courier New', monospace;
             font-size: 0.7rem;
             margin-top: 20px;
@@ -173,20 +197,24 @@
         }
 
         .file-info span {
-            color: #0f0;
+            color: #ff0000;
         }
 
-        /* Features list - pixel style */
+        /* Features list - RGB pixel style */
         .features {
             text-align: left;
             margin: 30px 0;
             padding: 20px;
             background: #0a0a0a;
-            border: 2px solid #0f0;
+            border: 2px solid;
+            border-image: linear-gradient(90deg, #ff0000, #00ff00, #0000ff) 1;
         }
 
         .features h3 {
-            color: #0f0;
+            background: linear-gradient(90deg, #ff0000, #00ff00, #0000ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
             font-family: 'Courier New', monospace;
             font-size: 1rem;
             margin-bottom: 15px;
@@ -196,7 +224,7 @@
         }
 
         .feature-item {
-            color: #0a0;
+            color: #00ff00;
             font-family: 'Courier New', monospace;
             font-size: 0.75rem;
             padding: 5px 0;
@@ -204,9 +232,16 @@
             position: relative;
         }
 
-        .feature-item::before {
+        .feature-item:nth-child(odd)::before {
             content: ">";
-            color: #0f0;
+            color: #ff0000;
+            position: absolute;
+            left: 0;
+        }
+
+        .feature-item:nth-child(even)::before {
+            content: ">";
+            color: #0000ff;
             position: absolute;
             left: 0;
         }
@@ -214,10 +249,10 @@
         /* Footer */
         .footer {
             margin-top: 40px;
-            color: #0a0;
+            color: #ff0000;
             font-family: 'Courier New', monospace;
             font-size: 0.6rem;
-            border-top: 1px solid #0f0;
+            border-top: 1px solid #0000ff;
             padding-top: 20px;
         }
 
@@ -231,14 +266,14 @@
             50% { opacity: 0; }
         }
 
-        /* Progress bar - 16bit */
+        /* Progress bar - RGB 16bit */
         .progress-container {
             margin-top: 20px;
             display: none;
         }
 
         .progress-label {
-            color: #0f0;
+            color: #00ff00;
             font-family: 'Courier New', monospace;
             font-size: 0.7rem;
             margin-bottom: 5px;
@@ -249,15 +284,31 @@
             width: 100%;
             height: 20px;
             background: #0a0a0a;
-            border: 2px solid #0f0;
+            border: 2px solid;
+            border-image: linear-gradient(90deg, #ff0000, #00ff00, #0000ff) 1;
             image-rendering: crisp-edges;
         }
 
         .progress-fill {
             width: 0%;
             height: 100%;
-            background: #0f0;
+            background: linear-gradient(90deg, #ff0000, #00ff00, #0000ff);
             transition: width 0.3s;
+        }
+
+        /* RGB decorative elements */
+        .rgb-bar {
+            height: 4px;
+            background: linear-gradient(90deg, #ff0000, #00ff00, #0000ff, #ff0000);
+            margin: 20px 0;
+            width: 100%;
+            animation: rgbMove 3s linear infinite;
+            background-size: 200% 100%;
+        }
+
+        @keyframes rgbMove {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
         }
 
         @media (max-width: 600px) {
@@ -284,10 +335,12 @@
 </head>
 <body>
     <div class="container">
+        <div class="rgb-bar"></div>
+        
         <div class="pixel-header">
             <div class="pixel-icon">█▓▒░ ► ░▒▓█</div>
             <h1>YOUTUBE DOWNLOADER</h1>
-            <div class="subtitle">[ v1.0 ]</div>
+            <div class="subtitle">[ v1.0 | 16-BIT RGB EDITION ]</div>
         </div>
 
         <div class="info-box">
@@ -307,6 +360,10 @@
                 <span class="info-label">> TYPE</span>
                 <span class="info-value">PORTABLE</span>
             </div>
+            <div class="info-line">
+                <span class="info-label">> COLOR</span>
+                <span class="info-value">RGB MODE ACTIVE</span>
+            </div>
         </div>
 
         <a href="#" class="download-btn" id="downloadBtn">
@@ -314,9 +371,9 @@
         </a>
 
         <div class="file-info">
-            <span>┌─────────────────────────┐</span><br>
-            <span>│</span> MD5: 4F8A9B2C3D5E6F7A8B9C <span>│</span><br>
-            <span>└─────────────────────────┘</span>
+            <span>┌─────────────────────────────────┐</span><br>
+            <span>│</span> MD5: 4F8A9B2C3D5E6F7A8B9C0D1E2F3 <span>│</span><br>
+            <span>└─────────────────────────────────┘</span>
         </div>
 
         <div class="progress-container" id="progressContainer">
@@ -327,64 +384,59 @@
         </div>
 
         <div class="features">
-            <h3>█ FEATURES █</h3>
+            <h3>█ RGB FEATURES █</h3>
             <div class="feature-item">4K / 1080p / 720p / 480p</div>
             <div class="feature-item">MP3 AUDIO EXTRACTION</div>
             <div class="feature-item">MULTI-THREADED DOWNLOAD</div>
             <div class="feature-item">NO INSTALLATION REQUIRED</div>
             <div class="feature-item">SUPPORTS SHORTS & REGULAR</div>
+            <div class="feature-item">RGB VISUAL EFFECTS</div>
         </div>
+
+        <div class="rgb-bar"></div>
 
         <div class="footer">
             <p>[ NOT AFFILIATED WITH YOUTUBE OR GOOGLE ]</p>
-            <p class="blink">> READY FOR DOWNLOAD <span style="color:#0f0">_</span></p>
+            <p class="blink">> READY FOR DOWNLOAD / By: Houd <span style="color:#ff0000">_</span></p>
         </div>
     </div>
 
     <script>
-        // 🔴 REPLACE THIS URL WITH YOUR ACTUAL GOOGLE DRIVE LINK
-        // Format: https://drive.usercontent.google.com/download?id=YOUR_FILE_ID&export=download
-        const DOWNLOAD_URL = "https://drive.usercontent.google.com/download?id=YOUR_FILE_ID_HERE&export=download";
+        // Direct download link from Google Drive
+        const DOWNLOAD_URL = "https://drive.usercontent.google.com/download?id=1mo5NxCvlKSFczzpmbi_ovVuh2a_vcaZ2&export=download";
         
         const downloadBtn = document.getElementById('downloadBtn');
         const progressContainer = document.getElementById('progressContainer');
         const progressFill = document.getElementById('progressFill');
         
-        // Check if URL is configured
-        if (DOWNLOAD_URL === "https://drive.usercontent.google.com/download?id=YOUR_FILE_ID_HERE&export=download") {
-            downloadBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                alert('[ERROR] DOWNLOAD LINK NOT CONFIGURED\n\nContact developer to get the correct link.');
-            });
-        } else {
-            downloadBtn.href = DOWNLOAD_URL;
+        // Set the download link
+        downloadBtn.href = DOWNLOAD_URL;
+        
+        downloadBtn.addEventListener('click', function(e) {
+            progressContainer.style.display = 'block';
             
-            downloadBtn.addEventListener('click', function(e) {
-                progressContainer.style.display = 'block';
-                
-                let progress = 0;
-                const interval = setInterval(() => {
-                    progress += Math.random() * 15;
-                    if (progress >= 100) {
-                        progress = 100;
-                        clearInterval(interval);
-                        setTimeout(() => {
-                            progressContainer.style.display = 'none';
-                            progressFill.style.width = '0%';
-                        }, 2000);
-                    }
-                    progressFill.style.width = progress + '%';
-                }, 200);
-                
-                setTimeout(() => {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
                     clearInterval(interval);
-                    if (progressFill.style.width !== '100%') {
+                    setTimeout(() => {
                         progressContainer.style.display = 'none';
                         progressFill.style.width = '0%';
-                    }
-                }, 5000);
-            });
-        }
+                    }, 2000);
+                }
+                progressFill.style.width = progress + '%';
+            }, 200);
+            
+            setTimeout(() => {
+                clearInterval(interval);
+                if (progressFill.style.width !== '100%') {
+                    progressContainer.style.display = 'none';
+                    progressFill.style.width = '0%';
+                }
+            }, 5000);
+        });
     </script>
 </body>
 </html>
