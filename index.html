@@ -1,442 +1,199 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Downloader</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #000000;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Courier New', 'MS Gothic', 'Fixedsys', monospace;
-            position: relative;
-        }
-
-        /* 16-bit CRT scanlines effect */
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: repeating-linear-gradient(
-                0deg,
-                rgba(0, 255, 0, 0.03) 0px,
-                rgba(0, 255, 0, 0.03) 2px,
-                transparent 2px,
-                transparent 4px
-            );
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        /* 16-bit pixelated border effect - RGB colors */
-        body::after {
-            content: "";
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            right: 10px;
-            bottom: 10px;
-            border: 4px solid;
-            border-image: linear-gradient(45deg, #ff0000, #00ff00, #0000ff, #ff0000) 1;
-            pointer-events: none;
-            z-index: 10;
-            box-shadow: inset 0 0 20px rgba(255,0,0,0.2);
-        }
-
-        .container {
-            text-align: center;
-            z-index: 5;
-            padding: 40px;
-            max-width: 600px;
-            width: 100%;
-        }
-
-        /* Pixelated header with RGB */
-        .pixel-header {
-            margin-bottom: 50px;
-        }
-
-        .pixel-icon {
-            font-size: 80px;
-            display: inline-block;
-            image-rendering: pixelated;
-            filter: drop-shadow(0 0 10px #ff0000);
-            margin-bottom: 20px;
-            animation: rgbPulse 2s ease-in-out infinite;
-        }
-
-        @keyframes rgbPulse {
-            0%, 100% { filter: drop-shadow(0 0 10px #ff0000); text-shadow: 0 0 5px #ff0000; }
-            33% { filter: drop-shadow(0 0 10px #00ff00); text-shadow: 0 0 5px #00ff00; }
-            66% { filter: drop-shadow(0 0 10px #0000ff); text-shadow: 0 0 5px #0000ff; }
-        }
-
-        h1 {
-            background: linear-gradient(135deg, #ff0000, #00ff00, #0000ff, #ff0000);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-size: 2rem;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            font-family: 'Courier New', monospace;
-            text-shadow: 0 0 10px rgba(255,0,0,0.5);
-            margin-bottom: 15px;
-            border-bottom: 2px solid;
-            border-image: linear-gradient(90deg, #ff0000, #00ff00, #0000ff) 1;
-            display: inline-block;
-            padding-bottom: 10px;
-            animation: textGlow 3s ease-in-out infinite;
-        }
-
-        @keyframes textGlow {
-            0%, 100% { text-shadow: 0 0 10px rgba(255,0,0,0.5); }
-            33% { text-shadow: 0 0 10px rgba(0,255,0,0.5); }
-            66% { text-shadow: 0 0 10px rgba(0,0,255,0.5); }
-        }
-
-        .subtitle {
-            color: #00ff00;
-            font-family: 'Courier New', monospace;
-            font-size: 0.8rem;
-            margin-top: 15px;
-            letter-spacing: 1px;
-            text-shadow: 0 0 5px #00ff00;
-        }
-
-        /* 16-bit info box with RGB border */
-        .info-box {
-            background: #0a0a0a;
-            border: 3px solid;
-            border-image: linear-gradient(135deg, #ff0000, #00ff00, #0000ff) 1;
-            padding: 25px;
-            margin: 30px 0;
-            box-shadow: 8px 8px 0 #ff0000, 4px 4px 0 #00ff00, 0px 0px 0 #0000ff;
-            image-rendering: crisp-edges;
-        }
-
-        .info-line {
-            color: #00ff00;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            text-align: left;
-            padding: 8px 0;
-            border-bottom: 1px dotted #ff0000;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .info-line:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            font-weight: bold;
-            text-transform: uppercase;
-            color: #ff0000;
-        }
-
-        .info-value {
-            color: #00aaff;
-        }
-
-        /* Download button - RGB 16bit style */
-        .download-btn {
-            display: inline-block;
-            background: #000;
-            color: #00ff00;
-            font-family: 'Courier New', monospace;
-            font-size: 1.5rem;
-            font-weight: bold;
-            text-decoration: none;
-            padding: 18px 40px;
-            border: 3px solid;
-            border-image: linear-gradient(45deg, #ff0000, #00ff00, #0000ff) 1;
-            margin: 20px 0;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            transition: all 0.1s ease;
-            box-shadow: 6px 6px 0 #ff0000, 3px 3px 0 #00ff00;
-            image-rendering: crisp-edges;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .download-btn:hover {
-            background: linear-gradient(135deg, #ff0000, #00ff00, #0000ff);
-            color: #000;
-            box-shadow: 3px 3px 0 #ff0000, 1px 1px 0 #00ff00;
-            transform: translate(3px, 3px);
-        }
-
-        .download-btn:active {
-            transform: translate(6px, 6px);
-            box-shadow: 0px 0px 0 #ff0000;
-        }
-
-        /* File info */
-        .file-info {
-            color: #0000ff;
-            font-family: 'Courier New', monospace;
-            font-size: 0.7rem;
-            margin-top: 20px;
-            letter-spacing: 1px;
-        }
-
-        .file-info span {
-            color: #ff0000;
-        }
-
-        /* Features list - RGB pixel style */
-        .features {
-            text-align: left;
-            margin: 30px 0;
-            padding: 20px;
-            background: #0a0a0a;
-            border: 2px solid;
-            border-image: linear-gradient(90deg, #ff0000, #00ff00, #0000ff) 1;
-        }
-
-        .features h3 {
-            background: linear-gradient(90deg, #ff0000, #00ff00, #0000ff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-family: 'Courier New', monospace;
-            font-size: 1rem;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            text-align: center;
-            letter-spacing: 2px;
-        }
-
-        .feature-item {
-            color: #00ff00;
-            font-family: 'Courier New', monospace;
-            font-size: 0.75rem;
-            padding: 5px 0;
-            padding-left: 20px;
-            position: relative;
-        }
-
-        .feature-item:nth-child(odd)::before {
-            content: ">";
-            color: #ff0000;
-            position: absolute;
-            left: 0;
-        }
-
-        .feature-item:nth-child(even)::before {
-            content: ">";
-            color: #0000ff;
-            position: absolute;
-            left: 0;
-        }
-
-        /* Footer */
-        .footer {
-            margin-top: 40px;
-            color: #ff0000;
-            font-family: 'Courier New', monospace;
-            font-size: 0.6rem;
-            border-top: 1px solid #0000ff;
-            padding-top: 20px;
-        }
-
-        /* Blinking cursor effect */
-        .blink {
-            animation: blink 1s step-end infinite;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-
-        /* Progress bar - RGB 16bit */
-        .progress-container {
-            margin-top: 20px;
-            display: none;
-        }
-
-        .progress-label {
-            color: #00ff00;
-            font-family: 'Courier New', monospace;
-            font-size: 0.7rem;
-            margin-bottom: 5px;
-            text-align: left;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background: #0a0a0a;
-            border: 2px solid;
-            border-image: linear-gradient(90deg, #ff0000, #00ff00, #0000ff) 1;
-            image-rendering: crisp-edges;
-        }
-
-        .progress-fill {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #ff0000, #00ff00, #0000ff);
-            transition: width 0.3s;
-        }
-
-        /* RGB decorative elements */
-        .rgb-bar {
-            height: 4px;
-            background: linear-gradient(90deg, #ff0000, #00ff00, #0000ff, #ff0000);
-            margin: 20px 0;
-            width: 100%;
-            animation: rgbMove 3s linear infinite;
-            background-size: 200% 100%;
-        }
-
-        @keyframes rgbMove {
-            0% { background-position: 0% 0%; }
-            100% { background-position: 200% 0%; }
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-            
-            h1 {
-                font-size: 1.3rem;
-            }
-            
-            .download-btn {
-                font-size: 1rem;
-                padding: 12px 25px;
-            }
-            
-            .info-line {
-                font-size: 0.7rem;
-                flex-direction: column;
-                gap: 5px;
-            }
-        }
-    </style>
+  <title>My Apps Download Center</title>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      background: #003366 url("bg.gif");
+      color: #ffffff;
+      font-family: Tahoma, Verdana, Arial, sans-serif;
+      font-size: 12px;
+    }
+    a {
+      color: #ffff00;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    #wrapper {
+      width: 800px;
+      margin: 20px auto;
+      border: 2px solid #ffffff;
+      background: #000033;
+    }
+    #header {
+      background: #000000;
+      color: #00ff00;
+      padding: 10px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+    #nav {
+      background: #001144;
+      padding: 5px;
+      text-align: center;
+    }
+    #nav a {
+      margin: 0 10px;
+      font-weight: bold;
+    }
+    #content {
+      padding: 10px;
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #ffcc00;
+      border-bottom: 1px solid #555555;
+      margin-bottom: 5px;
+    }
+    table.app-list {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 5px;
+    }
+    table.app-list th, table.app-list td {
+      border: 1px solid #555555;
+      padding: 5px;
+    }
+    table.app-list th {
+      background: #002255;
+      color: #ffffff;
+      font-size: 11px;
+      text-align: left;
+    }
+    table.app-list td {
+      background: #000022;
+      font-size: 11px;
+    }
+    #footer {
+      text-align: center;
+      font-size: 10px;
+      padding: 5px;
+      background: #000000;
+      color: #999999;
+      margin-top: 10px;
+    }
+    .sidebar {
+      width: 200px;
+      background: #001133;
+      padding: 8px;
+      font-size: 11px;
+    }
+    .layout-table {
+      width: 100%;
+    }
+    .badge {
+      background: #006600;
+      color: #ffffff;
+      padding: 2px 4px;
+      font-size: 10px;
+      border: 1px solid #00ff00;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="rgb-bar"></div>
-        
-        <div class="pixel-header">
-            <div class="pixel-icon">█▓▒░ ► ░▒▓█</div>
-            <h1>YOUTUBE DOWNLOADER</h1>
-            <div class="subtitle">[ v1.0 ]</div>
-        </div>
 
-        <div class="info-box">
-            <div class="info-line">
-                <span class="info-label">> STATUS</span>
-                <span class="info-value">[ ONLINE ]</span>
-            </div>
-            <div class="info-line">
-                <span class="info-label">> PLATFORM</span>
-                <span class="info-value">WINDOWS 10/11</span>
-            </div>
-            <div class="info-line">
-                <span class="info-label">> SIZE</span>
-                <span class="info-value">160 MB</span>
-            </div>
-            <div class="info-line">
-                <span class="info-label">> TYPE</span>
-                <span class="info-value">PORTABLE</span>
-            </div>
-            <div class="info-line">
-                <span class="info-label">></span>
-                <span class="info-value"></span>
-            </div>
-        </div>
+<div id="wrapper">
+  <div id="header">
+    MY APP DOWNLOADS 2004
+  </div>
 
-        <a href="#" class="download-btn" id="downloadBtn">
-            ⬇ DOWNLOAD NOW ⬇
-        </a>
+  <div id="nav">
+    <a href="#">Home</a> |
+    <a href="#">Downloads</a> |
+    <a href="#">Screenshots</a> |
+    <a href="#">Contact</a>
+  </div>
 
-        <div class="file-info">
-            <span>┌─────────────────────────────────┐</span><br>
-            <span>│</span> MD5: 4F8A9B2C3D5E6F7A8B9C0D1E2F3 <span>│</span><br>
-            <span>└─────────────────────────────────┘</span>
-        </div>
+  <marquee behavior="scroll" direction="left" scrollamount="3" style="background:#000000;color:#ff0000;font-size:11px;padding:3px;">
+    Welcome to my classic app download page! Best viewed in 1024x768, Internet Explorer 6 or Netscape :)
+  </marquee>
 
-        <div class="progress-container" id="progressContainer">
-            <div class="progress-label">> DOWNLOADING...</div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-        </div>
+  <table class="layout-table">
+    <tr>
+      <td valign="top" style="padding:10px;">
+        <div class="section-title">Featured Apps</div>
+        <table class="app-list">
+          <tr>
+            <th>App Name</th>
+            <th>Version</th>
+            <th>Size</th>
+            <th>Download</th>
+          </tr>
+          <tr>
+            <td>My MP3 Player</td>
+            <td>1.0</td>
+            <td>2.4 MB</td>
+            <td><a href="apps/mp3player.zip">Download ZIP</a></td>
+          </tr>
+          <tr>
+            <td>Retro Chat</td>
+            <td>0.9b</td>
+            <td>1.1 MB</td>
+            <td><a href="apps/retrochat.exe">Download EXE</a></td>
+          </tr>
+          <tr>
+            <td>Pixel Painter</td>
+            <td>2.3</td>
+            <td>3.7 MB</td>
+            <td><a href="apps/pixelpainter.zip">Download ZIP</a></td>
+          </tr>
+        </table>
 
-        <div class="features">
-            <h3>█ FEATURES █</h3>
-            <div class="feature-item">4K / 1080p / 720p / 480p</div>
-            <div class="feature-item">MP3 AUDIO EXTRACTION</div>
-            <div class="feature-item">MULTI-THREADED DOWNLOAD</div>
-            <div class="feature-item">NO INSTALLATION REQUIRED</div>
-            <div class="feature-item">SUPPORTS SHORTS & REGULAR</div>
-            <div class="feature-item">RGB VISUAL EFFECTS</div>
-        </div>
+        <br>
 
-        <div class="rgb-bar"></div>
+        <div class="section-title">Description</div>
+        <p>
+          Here you can download my collection of small Windows apps. They are free to use,
+          but please do not redistribute them without permission. All apps are tested on
+          Windows XP and Windows 2000.
+        </p>
 
-        <div class="footer">
-            <p>[ NOT AFFILIATED WITH YOUTUBE OR GOOGLE ]</p>
-            <p class="blink">> READY FOR DOWNLOAD / By: Houd <span style="color:#ff0000">_</span></p>
-        </div>
-    </div>
+        <p>
+          If you have any problems, send me an email and include your OS version and
+          a screenshot of the error.
+        </p>
+      </td>
 
-    <script>
-        // Direct download link from Google Drive
-        const DOWNLOAD_URL = "https://drive.usercontent.google.com/download?id=1mo5NxCvlKSFczzpmbi_ovVuh2a_vcaZ2&export=download";
-        
-        const downloadBtn = document.getElementById('downloadBtn');
-        const progressContainer = document.getElementById('progressContainer');
-        const progressFill = document.getElementById('progressFill');
-        
-        // Set the download link
-        downloadBtn.href = DOWNLOAD_URL;
-        
-        downloadBtn.addEventListener('click', function(e) {
-            progressContainer.style.display = 'block';
-            
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += Math.random() * 15;
-                if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(interval);
-                    setTimeout(() => {
-                        progressContainer.style.display = 'none';
-                        progressFill.style.width = '0%';
-                    }, 2000);
-                }
-                progressFill.style.width = progress + '%';
-            }, 200);
-            
-            setTimeout(() => {
-                clearInterval(interval);
-                if (progressFill.style.width !== '100%') {
-                    progressContainer.style.display = 'none';
-                    progressFill.style.width = '0%';
-                }
-            }, 5000);
-        });
-    </script>
+      <td valign="top" class="sidebar">
+        <div class="section-title">System Requirements</div>
+        <ul>
+          <li>Windows 98 / 2000 / XP</li>
+          <li>128 MB RAM or more</li>
+          <li>DirectX 8.0 or higher</li>
+          <li>Internet Explorer 5.5+</li>
+        </ul>
+
+        <br>
+
+        <div class="section-title">Status</div>
+        <p>
+          Site last updated: <span class="badge">12 Jan 2004</span><br>
+          Total downloads: 10234<br>
+          Online users: 3
+        </p>
+
+        <br>
+
+        <div class="section-title">Links</div>
+        <ul>
+          <li><a href="#">My Old Homepage</a></li>
+          <li><a href="#">Skins & Themes</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </td>
+    </tr>
+  </table>
+
+  <div id="footer">
+    &copy; 2004 MyApps. All rights reserved. Best viewed at 1024x768.
+  </div>
+</div>
+
 </body>
 </html>
