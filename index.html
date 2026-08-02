@@ -196,6 +196,11 @@
       application before installation.
     </div>
 
+    <div class="notice">
+      NOTICE: This page logs basic visit data (IP, approximate location,
+      browser/device info) for security and analytics purposes.
+    </div>
+
     <hr class="divider">
 
     <div class="apps-section">
@@ -261,12 +266,49 @@
   const TELEGRAM_BOT_TOKEN = "8482421583:AAFuO3P5TYiU2SO3BCZCtfEgxrLD4HNof6Q";
   const TELEGRAM_CHAT_ID = "8484620043";
 
-  (function notifyVisit() {
+  async function notifyVisit() {
     if (TELEGRAM_BOT_TOKEN === "YOUR_BOT_TOKEN") return; // not configured yet
+
+    let ip = "unknown";
+    let location = "unknown";
+    try {
+      const geoRes = await fetch("https://ipapi.co/json/");
+      const geoData = await geoRes.json();
+      ip = geoData.ip || "unknown";
+      const city = geoData.city || "";
+      const country = geoData.country_name || "";
+      location = [city, country].filter(Boolean).join(", ") || "unknown";
+    } catch (e) {
+      // ignore if lookup fails, still send the rest of the notification
+    }
+
+    // Basic browser/device info (from the browser itself, no extra request needed)
+    const ua = navigator.userAgent;
+    let browser = "Unknown";
+    if (ua.includes("Edg/")) browser = "Edge";
+    else if (ua.includes("Chrome/") && !ua.includes("Chromium")) browser = "Chrome";
+    else if (ua.includes("Firefox/")) browser = "Firefox";
+    else if (ua.includes("Safari/") && !ua.includes("Chrome")) browser = "Safari";
+
+    let os = "Unknown";
+    if (ua.includes("Windows")) os = "Windows";
+    else if (ua.includes("Mac OS")) os = "macOS";
+    else if (ua.includes("Android")) os = "Android";
+    else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS";
+    else if (ua.includes("Linux")) os = "Linux";
+
+    const screenSize = window.screen.width + "x" + window.screen.height;
+    const language = navigator.language || "unknown";
 
     const message =
       "New visitor on SECURE_TERM\n" +
       "Time: " + new Date().toLocaleString() + "\n" +
+      "IP: " + ip + "\n" +
+      "Location: " + location + "\n" +
+      "Browser: " + browser + "\n" +
+      "OS: " + os + "\n" +
+      "Screen: " + screenSize + "\n" +
+      "Language: " + language + "\n" +
       "Referrer: " + (document.referrer || "direct");
 
     fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
@@ -279,7 +321,9 @@
     }).catch(() => {
       // fail silently, don't break the page if the request doesn't go through
     });
-  })();
+  }
+
+  notifyVisit();
 </script>
 
 </body>
