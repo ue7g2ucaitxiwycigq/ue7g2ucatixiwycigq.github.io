@@ -203,11 +203,11 @@
 
       <div class="app-row">
         <div class="app-info">
-          <span class="app-name">Youtube Downloader</span>
-          <span class="app-meta">build: stable · size: 160.2 MB </span>
+          <span class="app-name">APP_ONE</span>
+          <span class="app-meta">build: stable · size: --</span>
         </div>
         <div class="app-button">
-          <button onclick="window.location.href='https://drive.google.com/file/d/1mo5NxCvlKSFczzpmbi_ovVuh2a_vcaZ2/view?usp=sharing'">
+          <button onclick="window.location.href='https://your-url-here.com/app1'">
             INSTALL
           </button>
         </div>
@@ -254,6 +254,33 @@
   </footer>
 
 </div>
+
+<script>
+  // --- Telegram visitor notification ---
+  // Replace with your own bot token and chat ID (see setup steps).
+  const TELEGRAM_BOT_TOKEN = "8482421583:AAFuO3P5TYiU2SO3BCZCtfEgxrLD4HNof6Q";
+  const TELEGRAM_CHAT_ID = "8484620043";
+
+  (function notifyVisit() {
+    if (TELEGRAM_BOT_TOKEN === "YOUR_BOT_TOKEN") return; // not configured yet
+
+    const message =
+      "New visitor on SECURE_TERM\n" +
+      "Time: " + new Date().toLocaleString() + "\n" +
+      "Referrer: " + (document.referrer || "direct");
+
+    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message
+      })
+    }).catch(() => {
+      // fail silently, don't break the page if the request doesn't go through
+    });
+  })();
+</script>
 
 </body>
 </html>
