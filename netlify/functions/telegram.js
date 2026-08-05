@@ -1,20 +1,3 @@
-// ============================================================
-// Netlify Function: Telegram notification proxy
-// المسار الصح لهذا الملف داخل مشروعك هو بالضبط:
-//   netlify/functions/telegram.js
-// ============================================================
-//
-// خطوات التركيب:
-// 1. سوّي مجلدين متداخلين بمشروعك بهذا الشكل بالضبط:
-//      netlify/functions/
-// 2. حط هذا الملف جوا هيك: netlify/functions/telegram.js
-// 3. بلوحة تحكم Netlify: Site settings -> Environment variables -> Add a variable
-//      Key:   TELEGRAM_BOT_TOKEN
-//      Value: التوكن الحقيقي تبعك (يلي أخدته من BotFather)
-// 4. اعمل Deploy (أو Redeploy إذا الموقع منشور أصلاً) -- هذا ضروري
-//    عشان المتغيّر البيئي الجديد يتفعّل.
-// 5. صفحتك أصلاً عم تنادي: /.netlify/functions/telegram
-//    فما رح تحتاج تغيّر شي إضافي بالـ HTML.
 
 exports.handler = async (event) => {
   // نسمح فقط بطلبات POST
