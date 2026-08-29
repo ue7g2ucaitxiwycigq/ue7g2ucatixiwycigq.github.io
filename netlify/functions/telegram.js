@@ -1,71 +1,74 @@
+// netlify/functions/telegram.js
+const fetch = require('node-fetch');
+
+// احتفظ بالتوكن في متغيرات البيئة
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 
 exports.handler = async (event) => {
-  // نسمح فقط بطلبات POST
-  if (event.httpMethod !== "POST") {
+  // التحقق من الطريقة
+  if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
-      body: JSON.stringify({ error: "Method Not Allowed" })
+      body: JSON.stringify({ error: 'Method not allowed' })
     };
   }
 
-  // تأكد إن التوكن موجود قبل ما نكمل
-  const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+  // التحقق من وجود التوكن
   if (!BOT_TOKEN) {
+    console.error('TELEGRAM_BOT_TOKEN not set in environment variables');
     return {
       statusCode: 500,
+      body: JSON.stringify({ error: 'Bot token not configured' })
+    };
+  }
+
+  try {
+    // قراءة البيانات
+    const { chat_id, text } = JSON.parse(event.body);
+
+    if (!chat_id || !text) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Missing chat_id or text' })
+      };
+    }
+
+    // إرسال الرسالة إلى تلغرام
+    const telegramUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+    
+    const response = await fetch(telegramUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
-        error: "TELEGRAM_BOT_TOKEN is not set in environment variables"
+        chat_id: chat_id,
+        text: text,
+        parse_mode: 'Markdown', // لدعم التنسيق
+        disable_web_page_preview: true
       })
-    };
-  }
-
-  // تأكد إن البيانات المرسلة صحيحة (JSON سليم)
-  let body;
-  try {
-    body = JSON.parse(event.body);
-  } catch (err) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "Invalid JSON body" })
-    };
-  }
-
-  const { chat_id, text } = body;
-  if (!chat_id || !text) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "chat_id and text are required" })
-    };
-  }
-
-  try {
-    const response = await fetch(
-      `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chat_id, text })
-      }
-    );
+    });
 
     const data = await response.json();
 
     if (!data.ok) {
-      // Telegram نفسه رجع خطأ (مثلاً توكن غلط أو chat_id غلط)
+      console.error('Telegram API error:', data);
       return {
-        statusCode: 502,
-        body: JSON.stringify({ error: "Telegram API error", details: data })
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Failed to send message to Telegram', details: data })
       };
     }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ success: true })
+      body: JSON.stringify({ success: true, result: data })
     };
-  } catch (err) {
+
+  } catch (error) {
+    console.error('Error:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Failed to reach Telegram", details: String(err) })
+      body: JSON.stringify({ error: 'Internal server error', details: error.message })
     };
   }
 };
