@@ -15,61 +15,47 @@
       align-items: center;
       justify-content: center;
       background: #050505;
-      color: #fff;
-      font-family: Arial, Helvetica, sans-serif;
+      color: white;
+      font-family: Arial, sans-serif;
     }
-    .container {
+    .box {
       width: 90%;
       max-width: 520px;
-      text-align: center;
       padding: 45px 30px;
+      text-align: center;
       background: #101010;
       border: 1px solid #292929;
       border-radius: 18px;
-      box-shadow: 0 0 40px rgba(255,255,255,0.05);
-    }
-    .icon {
-      font-size: 55px;
-      margin-bottom: 10px;
     }
     h1 {
-      margin: 0;
       font-size: 42px;
       letter-spacing: 2px;
     }
-    .subtitle {
+    p {
       color: #999;
-      margin: 18px 0;
       line-height: 1.6;
     }
     .notice {
-      padding: 14px;
       margin-top: 20px;
+      padding: 15px;
       background: #181818;
       border-radius: 10px;
       color: #aaa;
       font-size: 14px;
-      line-height: 1.5;
     }
     button {
       margin-top: 25px;
       padding: 14px 28px;
-      border: none;
+      border: 0;
       border-radius: 9px;
       background: white;
       color: black;
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
-      transition: 0.2s;
-    }
-    button:hover {
-      transform: scale(1.04);
     }
     button:disabled {
       opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
     }
     #result {
       margin-top: 25px;
@@ -77,61 +63,53 @@
       font-weight: bold;
       word-break: break-all;
     }
-    .success {
-      color: #7cff9b;
-    }
-    .error {
-      color: #ff6b6b;
-    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="icon">👀</div>
+  <div class="box">
+    <div style="font-size:55px;">👀</div>
     <h1>I GOT YOUR IP</h1>
-    <p class="subtitle">
+    <p>
       This website can detect your public IP address.
     </p>
     <div class="notice">
-      By clicking the button below, you agree to allow the website
-      to process your public IP address and send a notification
-      to the website owner.
+      By clicking the button below, you agree to allow this
+      website to process your public IP address and notify
+      the website owner.
     </div>
-    <button id="continueBtn" onclick="getIP()">
+    <button id="btn" onclick="getIP()">
       I Agree & Continue
     </button>
     <div id="result"></div>
   </div>
   <script>
     async function getIP() {
-      const button = document.getElementById("continueBtn");
+      const button = document.getElementById("btn");
       const result = document.getElementById("result");
       button.disabled = true;
-      result.className = "";
       result.textContent = "Getting your IP...";
       try {
-        const response = await fetch("/.netlify/functions/ip");
-        if (!response.ok) {
-          throw new Error("Request failed");
+        const ipResponse = await fetch("/ip");
+        if (!ipResponse.ok) {
+          throw new Error("IP request failed");
         }
-        const data = await response.json();
-        result.className = "success";
-        result.textContent = "Your IP: " + data.ip;
-        // Notify Telegram function
-        await fetch("/.netlify/functions/telegram", {
+        const ipData = await ipResponse.json();
+        result.textContent = "Your IP: " + ipData.ip;
+        // Send notification to Telegram
+        const telegramResponse = await fetch("/telegram", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            message:
-              "👀 New visitor\n\n" +
-              "IP: " + data.ip
+            ip: ipData.ip
           })
         });
+        if (!telegramResponse.ok) {
+          console.error("Telegram notification failed");
+        }
       } catch (error) {
         console.error(error);
-        result.className = "error";
         result.textContent = "Something went wrong.";
         button.disabled = false;
       }
