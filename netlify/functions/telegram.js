@@ -2,7 +2,6 @@
 const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
-  // 1. التحقق من الطريقة
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -10,22 +9,16 @@ exports.handler = async (event) => {
     };
   }
 
-  // 2. جلب التوكن من متغيرات البيئة (آمن تماماً)
   const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
   
-  // 3. التحقق من وجود التوكن
   if (!BOT_TOKEN) {
-    console.error('❌ TELEGRAM_BOT_TOKEN not found in environment variables');
     return {
       statusCode: 500,
-      body: JSON.stringify({ 
-        error: 'Bot token not configured. Please set TELEGRAM_BOT_TOKEN in Netlify environment variables.' 
-      })
+      body: JSON.stringify({ error: 'Bot token not configured' })
     };
   }
 
   try {
-    // 4. قراءة البيانات من الطلب
     const { chat_id, text } = JSON.parse(event.body);
 
     if (!chat_id || !text) {
@@ -35,7 +28,6 @@ exports.handler = async (event) => {
       };
     }
 
-    // 5. إرسال الرسالة إلى تلغرام
     const telegramUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
     
     const response = await fetch(telegramUrl, {
@@ -53,36 +45,22 @@ exports.handler = async (event) => {
 
     const data = await response.json();
 
-    // 6. التحقق من نجاح الإرسال
     if (!data.ok) {
-      console.error('❌ Telegram API error:', data);
       return {
         statusCode: 500,
-        body: JSON.stringify({ 
-          error: 'Failed to send message to Telegram', 
-          details: data 
-        })
+        body: JSON.stringify({ error: 'Telegram API error', details: data })
       };
     }
 
-    // 7. نجاح العملية
-    console.log('✅ Message sent successfully to chat:', chat_id);
     return {
       statusCode: 200,
-      body: JSON.stringify({ 
-        success: true, 
-        result: data 
-      })
+      body: JSON.stringify({ success: true })
     };
 
   } catch (error) {
-    console.error('❌ Error in function:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ 
-        error: 'Internal server error', 
-        details: error.message 
-      })
+      body: JSON.stringify({ error: 'Internal server error', details: error.message })
     };
   }
 };
