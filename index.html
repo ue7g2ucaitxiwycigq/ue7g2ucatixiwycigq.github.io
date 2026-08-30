@@ -1,119 +1,332 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>I Got Your IP</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #050505;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-    .box {
-      width: 90%;
-      max-width: 520px;
-      padding: 45px 30px;
-      text-align: center;
-      background: #101010;
-      border: 1px solid #292929;
-      border-radius: 18px;
-    }
-    h1 {
-      font-size: 42px;
-      letter-spacing: 2px;
-    }
-    p {
-      color: #999;
-      line-height: 1.6;
-    }
-    .notice {
-      margin-top: 20px;
-      padding: 15px;
-      background: #181818;
-      border-radius: 10px;
-      color: #aaa;
-      font-size: 14px;
-    }
-    button {
-      margin-top: 25px;
-      padding: 14px 28px;
-      border: 0;
-      border-radius: 9px;
-      background: white;
-      color: black;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    button:disabled {
-      opacity: 0.5;
-    }
-    #result {
-      margin-top: 25px;
-      font-size: 20px;
-      font-weight: bold;
-      word-break: break-all;
-    }
-  </style>
-</head>
-<body>
-  <div class="box">
-    <div style="font-size:55px;">👀</div>
-    <h1>I GOT YOUR IP</h1>
-    <p>
-      This website can detect your public IP address.
-    </p>
-    <div class="notice">
-      By clicking the button below, you agree to allow this
-      website to process your public IP address and notify
-      the website owner.
-    </div>
-    <button id="btn" onclick="getIP()">
-      I Agree & Continue
-    </button>
-    <div id="result"></div>
-  </div>
-  <script>
-    async function getIP() {
-      const button = document.getElementById("btn");
-      const result = document.getElementById("result");
-      button.disabled = true;
-      result.textContent = "Getting your IP...";
-      try {
-        const ipResponse = await fetch("/ip");
-        if (!ipResponse.ok) {
-          throw new Error("IP request failed");
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    // الصفحة الرئيسية
+    if (request.method === "GET" && url.pathname === "/") {
+      return new Response(PAGE, {
+        headers: {
+          "Content-Type": "text/html;charset=UTF-8"
         }
-        const ipData = await ipResponse.json();
-        result.textContent = "Your IP: " + ipData.ip;
-        // Send notification to Telegram
-        const telegramResponse = await fetch("/telegram", {
+      });
+    }
+    // الحصول على IP
+    if (request.method === "GET" && url.pathname === "/ip") {
+      const ip =
+        request.headers.get("CF-Connecting-IP") ||
+        "Unavailable";
+      return Response.json({
+        ip: ip
+      });
+    }
+    // إرسال المعلومات إلى Telegram
+    if (
+      request.method === "POST" &&
+      url.pathname === "/telegram"
+    ) {
+      try {
+        const data = await request.json();
+        const token = env.TELEGRAM_BOT_TOKEN;
+        const chatId = env.TELEGRAM_CHAT_ID;
+        if (!token || !chatId) {
+          return Response.json(
+            {
+              error: "Telegram secrets missing"
+            },
+            {
+              status: 500
+            }
+          );
+        }
+        const message = `
+👀 NEW VISITOR
+━━━━━━━━━━━━━━━━
+🌐 IP
+${data.ip || "Unavailable"}
+🖥️ SCREEN
+${data.screen?.width || "?"} × ${data.screen?.height || "?"}
+📐 VIEWPORT
+${data.viewport?.width || "?"} × ${data.viewport?.height || "?"}
+🔍 PIXEL RATIO
+${data.screen?.pixelRatio || "?"}
+🎨 COLOR DEPTH
+${data.screen?.colorDepth || "?"}
+⚙️ CPU CORES
+${data.system?.cpuCores || "Unavailable"}
+🧠 DEVICE MEMORY
+${data.system?.deviceMemoryGB || "Unavailable"} GB
+🎮 GPU
+${data.gpu || "Unavailable"}
+🌍 LANGUAGE
+${data.browser?.language || "Unavailable"}
+🕐 TIMEZONE
+${data.timezone || "Unavailable"}
+📱 PLATFORM
+${data.system?.platform || "Unavailable"}
+👆 TOUCH POINTS
+${data.device?.touchPoints ?? "Unavailable"}
+🌐 NETWORK
+Type: ${data.network?.type || "Unavailable"}
+Downlink: ${data.network?.downlink || "Unavailable"} Mbps
+RTT: ${data.network?.rtt || "Unavailable"} ms
+🍪 COOKIES
+${data.device?.cookiesEnabled ? "Enabled" : "Disabled"}
+📡 ONLINE
+${data.device?.online ? "Yes" : "No"}
+🧭 USER AGENT
+${data.browser?.userAgent || "Unavailable"}
+━━━━━━━━━━━━━━━━
+⏱️ ${data.timestamp || ""}
+`;
+        const telegramURL =
+          `https://api.telegram.org/bot${token}/sendMessage`;
+        const response = await fetch(telegramURL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            ip: ipData.ip
+            chat_id: chatId,
+            text: message
           })
         });
-        if (!telegramResponse.ok) {
-          console.error("Telegram notification failed");
+        const result = await response.json();
+        if (!response.ok) {
+          return Response.json(
+            {
+              error: "Telegram API error",
+              details: result
+            },
+            {
+              status: 500
+            }
+          );
         }
+        return Response.json({
+          success: true
+        });
       } catch (error) {
-        console.error(error);
-        result.textContent = "Something went wrong.";
-        button.disabled = false;
+        return Response.json(
+          {
+            error: error.message
+          },
+          {
+            status: 500
+          }
+        );
       }
     }
-  </script>
+    return new Response("Not Found", {
+      status: 404
+    });
+  }
+};
+const PAGE = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1">
+<title>I Got Your IP</title>
+<style>
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #050505;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+.box {
+  width: 90%;
+  max-width: 520px;
+  padding: 40px 30px;
+  text-align: center;
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 18px;
+}
+.icon {
+  font-size: 55px;
+}
+h1 {
+  font-size: 40px;
+  letter-spacing: 2px;
+}
+p {
+  color: #999;
+  line-height: 1.6;
+}
+.notice {
+  margin-top: 20px;
+  padding: 15px;
+  background: #181818;
+  border-radius: 10px;
+  color: #aaa;
+  font-size: 14px;
+}
+button {
+  margin-top: 25px;
+  padding: 14px 28px;
+  border: 0;
+  border-radius: 9px;
+  background: white;
+  color: black;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+button:disabled {
+  opacity: .5;
+}
+#result {
+  margin-top: 25px;
+  font-size: 18px;
+  word-break: break-word;
+}
+</style>
+</head>
+<body>
+<div class="box">
+<div class="icon">👀</div>
+<h1>I GOT YOUR IP</h1>
+<p>
+This website can detect your public IP address
+and browser-provided device information.
+</p>
+<div class="notice">
+By clicking the button below, you agree to allow
+the website to process this information and send
+a notification to the website owner.
+</div>
+<button id="btn" onclick="collectInfo()">
+I Agree & Continue
+</button>
+<div id="result"></div>
+</div>
+<script>
+async function collectInfo() {
+  const btn =
+    document.getElementById("btn");
+  const result =
+    document.getElementById("result");
+  btn.disabled = true;
+  result.textContent =
+    "Collecting device information...";
+  // GPU information
+  let gpu = "Unavailable";
+  try {
+    const canvas =
+      document.createElement("canvas");
+    const gl =
+      canvas.getContext("webgl") ||
+      canvas.getContext("experimental-webgl");
+    if (gl) {
+      const debugInfo =
+        gl.getExtension(
+          "WEBGL_debug_renderer_info"
+        );
+      if (debugInfo) {
+        gpu = gl.getParameter(
+          debugInfo.UNMASKED_RENDERER_WEBGL
+        );
+      } else {
+        gpu = gl.getParameter(
+          gl.RENDERER
+        );
+      }
+    }
+  } catch (e) {
+    gpu = "Unavailable";
+  }
+  const connection =
+    navigator.connection ||
+    navigator.mozConnection ||
+    navigator.webkitConnection;
+  const info = {
+    screen: {
+      width: screen.width,
+      height: screen.height,
+      colorDepth: screen.colorDepth,
+      pixelRatio: window.devicePixelRatio
+    },
+    viewport: {
+      width: window.innerWidth,
+      height: window.innerHeight
+    },
+    browser: {
+      userAgent: navigator.userAgent,
+      language: navigator.language,
+      languages: navigator.languages
+    },
+    system: {
+      platform: navigator.platform,
+      cpuCores:
+        navigator.hardwareConcurrency ||
+        "Unavailable",
+      deviceMemoryGB:
+        navigator.deviceMemory ||
+        "Unavailable"
+    },
+    gpu: gpu,
+    device: {
+      touchPoints:
+        navigator.maxTouchPoints,
+      cookiesEnabled:
+        navigator.cookieEnabled,
+      online:
+        navigator.onLine
+    },
+    network: connection ? {
+      type:
+        connection.effectiveType ||
+        "Unavailable",
+      downlink:
+        connection.downlink ||
+        "Unavailable",
+      rtt:
+        connection.rtt ||
+        "Unavailable"
+    } : "Unavailable",
+    timezone:
+      Intl.DateTimeFormat()
+        .resolvedOptions()
+        .timeZone,
+    timestamp:
+      new Date().toISOString()
+  };
+  // Get IP
+  const ipResponse =
+    await fetch("/ip");
+  if (!ipResponse.ok) {
+    throw new Error("Could not get IP");
+  }
+  const ipData =
+    await ipResponse.json();
+  info.ip =
+    ipData.ip;
+  // Send to Telegram
+  const telegramResponse =
+    await fetch("/telegram", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(info)
+    });
+  if (!telegramResponse.ok) {
+    throw new Error(
+      "Telegram request failed"
+    );
+  }
+  result.textContent =
+    "Your information was collected successfully.\\n\\n" +
+    "IP: " + info.ip;
+}
+</script>
 </body>
-</html>
+</html>`;
