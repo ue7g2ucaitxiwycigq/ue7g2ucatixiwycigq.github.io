@@ -1394,10 +1394,6 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         <span id="submit-btn-text">Authenticate & Enter</span>
       </button>
-
-      <div class="auth-footer">
-        <button class="text-link" id="demo-fill-btn">Fill Test User</button>
-      </div>
     </div>
   </div>
 
@@ -1764,7 +1760,6 @@ const authFeedback = el("auth-feedback");
 const authSubmitBtn = el("auth-submit-btn");
 const submitBtnText = el("submit-btn-text");
 const eyeToggleBtn = el("eye-toggle-btn");
-const demoFillBtn = el("demo-fill-btn");
 
 const myAvatar = el("my-avatar");
 const myUsernameDisplay = el("my-username-display");
@@ -1951,11 +1946,6 @@ eyeToggleBtn.onclick = () => {
   }
 };
 
-demoFillBtn.onclick = () => {
-  usernameInput.value = "Agent_007";
-  passwordInput.value = "vaulta_purple_red";
-};
-
 authSubmitBtn.onclick = () => {
   const u = usernameInput.value.trim();
   const p = passwordInput.value.trim();
@@ -2078,6 +2068,25 @@ function handleServerEvent(data) {
     case "call_reject":
       handleIncomingCallEnd(data);
       break;
+
+    case "app_reset": {
+      conversations = {};
+      historyLoaded.clear();
+      renderMessages();
+      renderSidebarUserList();
+      const toast = el("security-toast");
+      const toastText = el("security-toast-text");
+      if (toast && toastText) {
+        toastText.textContent = data.message || "10-minute security reset: all chats and media wiped.";
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 4000);
+      }
+      if (data.resetUsers) {
+        alert("10-minute reset: accounts have been wiped. Please register or log in again.");
+        resetToAuth();
+      }
+      break;
+    }
 
     case "delete_user_success":
       alert("Account was destroyed permanently.");
