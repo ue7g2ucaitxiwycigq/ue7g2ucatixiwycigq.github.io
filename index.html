@@ -1,331 +1,692 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Vaulta</title>
 
-  <title>Confirm</title>
+<!-- Lets the browser offer "Add to Home Screen" so it opens like an app -->
+<meta name="theme-color" content="#1a1a1a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<style>
+  :root {
+    --bg-1: #1a1a1a;
+    --bg-2: #1e1e1e;
+    --bg-3: #242424;
+    --bg-4: #2d2d2d;
+    --bg-5: #3a3a3a;
+    --online: #3ba55d;
+    --offline: #8a8a8a;
+    --bubble-me: #2b5bd7;
+    --bubble-other: #3a3a3a;
+    --accent-red: #8b3a3a;
+    --accent-red-hover: #a94444;
+    --error: #eb5757;
+    --muted: #a0a0a0;
+  }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
+  * { box-sizing: border-box; }
 
-      display: flex;
-      justify-content: center;
-      align-items: center;
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: var(--bg-2);
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+  }
 
-      background: #050505;
-      font-family: Arial, sans-serif;
-    }
+  #app { height: 100vh; height: 100dvh; display: flex; }
 
-    button {
-      padding: 14px 32px;
+  /* ---------------- Login screen ---------------- */
+  #login-screen {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    background: var(--bg-2);
+  }
+  .login-card {
+    background: var(--bg-3); border-radius: 16px; padding: 36px 32px;
+    width: 320px; max-width: 90vw;
+  }
+  .login-card h1 { text-align: center; font-size: 26px; margin: 0 0 6px; }
+  .conn-status { text-align: center; font-size: 13px; margin-bottom: 18px; color: #f2c94c; }
+  .field-label { font-size: 13px; margin: 10px 0 4px; color: var(--muted); }
+  input[type=text], input[type=password] {
+    width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #444;
+    background: #1a1a1a; color: #fff; font-size: 14px; outline: none;
+  }
+  input[type=text]:focus, input[type=password]:focus { border-color: #2b5bd7; }
+  .error-text { color: var(--error); font-size: 13px; min-height: 18px; margin-top: 8px; text-align: center; }
+  .btn-row { display: flex; gap: 10px; margin-top: 18px; }
+  button {
+    cursor: pointer; border: none; border-radius: 8px; padding: 10px 14px;
+    font-size: 14px; color: #fff; background: var(--bg-5); transition: background 0.15s;
+  }
+  button:hover { background: #4a4a4a; }
+  .btn-primary { background: #2b5bd7; flex: 1; }
+  .btn-primary:hover { background: #3a6ae0; }
+  .btn-secondary { background: var(--bg-5); flex: 1; }
+  .btn-danger { background: var(--accent-red); }
+  .btn-danger:hover { background: var(--accent-red-hover); }
 
-      border: none;
-      border-radius: 8px;
+  /* ---------------- Main app layout ---------------- */
+  #main-screen { display: none; flex: 1; height: 100%; }
+  #main-screen.active { display: flex; }
 
-      background: white;
-      color: black;
+  #sidebar {
+    width: 280px; min-width: 280px; background: var(--bg-3);
+    display: flex; flex-direction: column; border-right: 1px solid #000;
+  }
+  #sidebar-top {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px; font-weight: bold; font-size: 15px;
+  }
+  #online-count { padding: 0 14px 8px; font-size: 12px; color: var(--muted); }
+  #user-list { flex: 1; overflow-y: auto; padding: 6px; }
+  .user-row {
+    display: flex; align-items: center; gap: 10px; padding: 10px;
+    border-radius: 8px; background: var(--bg-4); margin-bottom: 6px; cursor: pointer;
+  }
+  .user-row:hover { background: #363636; }
+  .dot { font-size: 14px; }
+  .dot.online { color: var(--online); }
+  .dot.offline { color: var(--offline); }
+  #sidebar-bottom { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
 
-      font-size: 17px;
-      font-weight: bold;
+  #chat-area { flex: 1; display: flex; flex-direction: column; background: var(--bg-1); min-width: 0; }
+  #chat-header {
+    padding: 14px 16px 4px; font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 10px;
+  }
+  #back-btn { display: none; width: 34px; height: 34px; padding: 0; font-size: 16px; }
+  #conn-banner { padding: 0 16px 8px; font-size: 12px; color: var(--error); font-weight: bold; display: none; }
 
-      cursor: pointer;
-    }
+  #messages {
+    flex: 1; overflow-y: auto; padding: 10px 16px; display: flex; flex-direction: column; gap: 8px;
+  }
+  .msg-row { display: flex; }
+  .msg-row.me { justify-content: flex-end; }
+  .msg-row.other { justify-content: flex-start; }
+  .bubble {
+    max-width: 70%; padding: 10px 12px; border-radius: 14px; font-size: 14px; word-wrap: break-word;
+  }
+  .bubble.me { background: var(--bubble-me); }
+  .bubble.other { background: var(--bubble-other); }
+  .bubble img { max-width: 260px; max-height: 260px; border-radius: 8px; display: block; margin-bottom: 4px; }
+  .bubble audio { width: 220px; }
+  .bubble .time { font-size: 10px; color: #d0d0d0; text-align: right; margin-top: 4px; }
+  .save-link { font-size: 11px; color: #cfd8ff; text-decoration: underline; cursor: pointer; display: inline-block; margin-top: 4px; }
 
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+  #progress-wrap { display: none; padding: 0 16px 6px; }
+  #progress-label { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
+  #progress-track { height: 6px; border-radius: 3px; background: #333; overflow: hidden; }
+  #progress-fill { height: 100%; width: 0%; background: #2b5bd7; transition: width 0.15s; }
 
-    #result {
-      position: absolute;
-      margin-top: 110px;
+  #input-bar { display: flex; gap: 6px; padding: 10px; }
+  #text-input {
+    flex: 1; padding: 10px 12px; border-radius: 20px; border: none; background: var(--bg-4);
+    color: #fff; font-size: 14px; outline: none;
+  }
+  .icon-btn { width: 42px; height: 42px; border-radius: 50%; padding: 0; font-size: 16px; background: var(--bg-5); }
+  #mic-btn.recording { background: var(--accent-red); }
+  #stop-btn { background: #5a1f1f; }
+  #stop-btn:disabled, #mic-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-      color: white;
-      font-size: 16px;
-    }
-  </style>
+  #empty-state { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--muted); }
+
+  /* ---------------- Add-person modal ---------------- */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    align-items: center; justify-content: center; z-index: 50;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-box { background: var(--bg-3); border-radius: 14px; width: 320px; max-width: 90vw; max-height: 80vh; display: flex; flex-direction: column; }
+  .modal-header { padding: 16px; font-weight: bold; text-align: center; border-bottom: 1px solid #333; }
+  .modal-search { padding: 10px 16px; }
+  .modal-list { flex: 1; overflow-y: auto; padding: 6px 16px 16px; }
+  .modal-close { text-align: center; padding: 10px; border-top: 1px solid #333; cursor: pointer; color: var(--muted); }
+
+  @media (max-width: 720px) {
+    #sidebar { position: absolute; inset: 0; z-index: 20; width: 100%; min-width: 0; }
+    #sidebar.hide-mobile { display: none; }
+    #main-screen.active { position: relative; }
+    #back-btn { display: inline-flex; align-items: center; justify-content: center; }
+  }
+</style>
 </head>
-
 <body>
 
-  <button id="confirmBtn" onclick="confirmShare()">
-    Confirm
-  </button>
-
-  <div id="result"></div>
-
-  <script>
-
-    // ضع هنا رابط الـWorker الخاص بك
-    const WORKER_URL =
-      "https://YOUR-WORKER.YOUR-SUBDOMAIN.workers.dev";
-
-
-    async function confirmShare() {
-
-      const button =
-        document.getElementById("confirmBtn");
-
-      const result =
-        document.getElementById("result");
-
-      button.disabled = true;
-
-      result.textContent =
-        "Processing...";
-
-
-      try {
-
-        // =========================
-        // GPU
-        // =========================
-
-        let gpu = "Unavailable";
-
-        try {
-
-          const canvas =
-            document.createElement("canvas");
-
-          const gl =
-            canvas.getContext("webgl") ||
-            canvas.getContext("experimental-webgl");
-
-          if (gl) {
-
-            const debugInfo =
-              gl.getExtension(
-                "WEBGL_debug_renderer_info"
-              );
-
-            if (debugInfo) {
-
-              gpu = gl.getParameter(
-                debugInfo.UNMASKED_RENDERER_WEBGL
-              );
-
-            } else {
-
-              gpu = gl.getParameter(
-                gl.RENDERER
-              );
-
-            }
-          }
-
-        } catch (e) {
-
-          gpu = "Unavailable";
-
-        }
-
-
-        // =========================
-        // NETWORK
-        // =========================
-
-        const connection =
-          navigator.connection ||
-          navigator.mozConnection ||
-          navigator.webkitConnection;
-
-
-        // =========================
-        // DEVICE INFORMATION
-        // =========================
-
-        const info = {
-
-          screen: {
-
-            width:
-              screen.width,
-
-            height:
-              screen.height,
-
-            colorDepth:
-              screen.colorDepth,
-
-            pixelRatio:
-              window.devicePixelRatio
-
-          },
-
-
-          viewport: {
-
-            width:
-              window.innerWidth,
-
-            height:
-              window.innerHeight
-
-          },
-
-
-          browser: {
-
-            userAgent:
-              navigator.userAgent,
-
-            language:
-              navigator.language,
-
-            languages:
-              navigator.languages
-
-          },
-
-
-          system: {
-
-            platform:
-              navigator.platform,
-
-            cpuCores:
-              navigator.hardwareConcurrency ||
-              "Unavailable",
-
-            deviceMemoryGB:
-              navigator.deviceMemory ||
-              "Unavailable"
-
-          },
-
-
-          gpu:
-            gpu,
-
-
-          device: {
-
-            touchPoints:
-              navigator.maxTouchPoints,
-
-            cookiesEnabled:
-              navigator.cookieEnabled,
-
-            online:
-              navigator.onLine
-
-          },
-
-
-          network: connection ? {
-
-            type:
-              connection.effectiveType ||
-              "Unavailable",
-
-            downlink:
-              connection.downlink ||
-              "Unavailable",
-
-            rtt:
-              connection.rtt ||
-              "Unavailable"
-
-          } : "Unavailable",
-
-
-          timezone:
-            Intl.DateTimeFormat()
-              .resolvedOptions()
-              .timeZone,
-
-
-          timestamp:
-            new Date().toISOString()
-
-        };
-
-
-        // =========================
-        // GET IP FROM WORKER
-        // =========================
-
-        const ipResponse =
-          await fetch(
-            WORKER_URL + "/ip"
-          );
-
-
-        if (!ipResponse.ok) {
-
-          throw new Error(
-            "IP request failed"
-          );
-
-        }
-
-
-        const ipData =
-          await ipResponse.json();
-
-
-        info.ip =
-          ipData.ip;
-
-
-        // =========================
-        // SEND DATA TO WORKER
-        // =========================
-
-        const telegramResponse =
-          await fetch(
-            WORKER_URL + "/telegram",
-            {
-
-              method: "POST",
-
-              headers: {
-                "Content-Type":
-                  "application/json"
-              },
-
-              body:
-                JSON.stringify(info)
-
-            }
-          );
-
-
-        if (!telegramResponse.ok) {
-
-          throw new Error(
-            "Telegram request failed"
-          );
-
-        }
-
-
-        result.textContent =
-          "Confirmed ✓";
-
-
-      } catch (error) {
-
-        console.error(error);
-
-        result.textContent =
-          "Something went wrong.";
-
-        button.disabled = false;
-
+<div id="app">
+
+  <!-- ================= Login screen ================= -->
+  <div id="login-screen">
+    <div class="login-card">
+      <h1>Vaulta</h1>
+      <div class="conn-status" id="conn-status">Connecting...</div>
+
+      <div class="field-label">Username</div>
+      <input type="text" id="username-input" autocomplete="username">
+
+      <div class="field-label">Password</div>
+      <input type="password" id="password-input" autocomplete="current-password">
+
+      <div class="error-text" id="login-error"></div>
+
+      <div class="btn-row">
+        <button class="btn-primary" id="login-btn">Login</button>
+        <button class="btn-secondary" id="register-btn">Create Account</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= Main screen ================= -->
+  <div id="main-screen">
+    <div id="sidebar">
+      <div id="sidebar-top">
+        <span id="me-label">👤</span>
+        <button class="icon-btn" id="add-person-btn">+</button>
+      </div>
+      <div id="online-count">Online now: 0</div>
+      <div id="user-list"></div>
+      <div id="sidebar-bottom">
+        <button class="btn-danger" id="logout-btn">Logout</button>
+        <button id="delete-account-btn">Delete My Account</button>
+      </div>
+    </div>
+
+    <div id="chat-area">
+      <div id="chat-header">
+        <button class="icon-btn" id="back-btn">&lt;</button>
+        <span id="chat-header-text">Select a conversation from the list</span>
+      </div>
+      <div id="conn-banner">⚠ Disconnected from server</div>
+
+      <div id="messages"></div>
+      <div id="empty-state" style="display:none;">Select a conversation to start chatting</div>
+
+      <div id="progress-wrap">
+        <div id="progress-label"></div>
+        <div id="progress-track"><div id="progress-fill"></div></div>
+      </div>
+
+      <div id="input-bar">
+        <input type="text" id="text-input" placeholder="Type your message...">
+        <input type="file" id="photo-input" accept="image/*" style="display:none;">
+        <button class="icon-btn" id="attach-btn">📎</button>
+        <button class="icon-btn" id="mic-btn">🎤</button>
+        <button class="icon-btn" id="stop-btn" disabled>⏹</button>
+        <button id="send-btn">Send</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================= Add-person modal ================= -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal-box">
+    <div class="modal-header">Add Conversation</div>
+    <div class="modal-search"><input type="text" id="search-input" placeholder="Search for a user..."></div>
+    <div class="modal-list" id="modal-user-list"></div>
+    <div class="modal-close" id="modal-close-btn">Cancel</div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  Configuration
+// ============================================================
+const SERVER_URL = "wss://server-dk54.onrender.com"; // keep in sync with client.py
+const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15 MB
+
+// ============================================================
+//  State
+// ============================================================
+let ws = null;
+let connected = false;
+let username = null;
+let usersStatus = {};          // { username: bool(online) }
+let conversations = {};        // { username: [messages] }
+let historyLoaded = new Set(); // usernames whose history has been requested
+let currentChatUser = null;
+let mediaRecorder = null;
+let recordedChunks = [];
+
+// ============================================================
+//  DOM references
+// ============================================================
+const el = (id) => document.getElementById(id);
+const loginScreen = el("login-screen");
+const mainScreen = el("main-screen");
+const connStatus = el("conn-status");
+const loginError = el("login-error");
+const usernameInput = el("username-input");
+const passwordInput = el("password-input");
+const meLabel = el("me-label");
+const onlineCountEl = el("online-count");
+const userListEl = el("user-list");
+const chatHeaderText = el("chat-header-text");
+const connBanner = el("conn-banner");
+const messagesEl = el("messages");
+const emptyStateEl = el("empty-state");
+const textInput = el("text-input");
+const photoInput = el("photo-input");
+const progressWrap = el("progress-wrap");
+const progressLabel = el("progress-label");
+const progressFill = el("progress-fill");
+const micBtn = el("mic-btn");
+const stopBtn = el("stop-btn");
+const backBtn = el("back-btn");
+const addModal = el("add-modal");
+const modalUserList = el("modal-user-list");
+const searchInput = el("search-input");
+
+// ============================================================
+//  Connection
+// ============================================================
+function connect() {
+  ws = new WebSocket(SERVER_URL);
+
+  ws.onopen = () => {
+    connected = true;
+    connStatus.textContent = "Connected to server";
+    connStatus.style.color = "#3ba55d";
+    connBanner.style.display = "none";
+  };
+
+  ws.onmessage = (event) => {
+    try {
+      const data = JSON.parse(event.data);
+      handleEvent(data);
+    } catch (e) { /* ignore malformed frames */ }
+  };
+
+  ws.onerror = () => {
+    connected = false;
+  };
+
+  ws.onclose = () => {
+    connected = false;
+    connStatus.textContent = "Offline";
+    connStatus.style.color = "#eb5757";
+    if (mainScreen.classList.contains("active")) {
+      connBanner.style.display = "block";
+    }
+  };
+}
+connect(); // connect exactly once on page load - no infinite auto-reconnect
+
+function send(obj) {
+  if (ws && connected) {
+    try { ws.send(JSON.stringify(obj)); return true; }
+    catch (e) { return false; }
+  }
+  return false;
+}
+
+// ============================================================
+//  Login / Register
+// ============================================================
+el("login-btn").onclick = () => {
+  const u = usernameInput.value.trim(), p = passwordInput.value.trim();
+  if (!u || !p) { loginError.textContent = "Please enter both username and password"; return; }
+  if (!connected) { loginError.textContent = "No connection to the server"; return; }
+  send({ type: "login", username: u, password: p });
+};
+
+el("register-btn").onclick = () => {
+  const u = usernameInput.value.trim(), p = passwordInput.value.trim();
+  if (!u || !p) { loginError.textContent = "Please enter both username and password"; return; }
+  if (!connected) { loginError.textContent = "No connection to the server"; return; }
+  send({ type: "register", username: u, password: p });
+};
+
+// ============================================================
+//  Sidebar / contacts
+// ============================================================
+function refreshUserList() {
+  userListEl.innerHTML = "";
+  const names = Object.keys(usersStatus).filter(u => u !== username).sort();
+  for (const uname of names) {
+    const isOnline = usersStatus[uname];
+    const row = document.createElement("div");
+    row.className = "user-row";
+    row.innerHTML = `<span class="dot ${isOnline ? "online" : "offline"}">●</span><span>${escapeHtml(uname)}</span>`;
+    row.onclick = () => openChat(uname);
+    userListEl.appendChild(row);
+  }
+}
+
+function escapeHtml(str) {
+  const d = document.createElement("div");
+  d.innerText = str;
+  return d.innerHTML;
+}
+
+// ============================================================
+//  Conversation handling
+// ============================================================
+function openChat(uname) {
+  currentChatUser = uname;
+  const status = usersStatus[uname] ? "Online" : "Offline";
+  chatHeaderText.textContent = `${uname}  —  ${status}`;
+  emptyStateEl.style.display = "none";
+
+  if (!conversations[uname]) conversations[uname] = [];
+
+  if (!historyLoaded.has(uname)) {
+    historyLoaded.add(uname);
+    send({ type: "get_history", with: uname });
+  }
+
+  renderMessages();
+  if (window.innerWidth <= 720) {
+    el("sidebar").classList.add("hide-mobile");
+  }
+}
+
+backBtn.onclick = () => {
+  el("sidebar").classList.remove("hide-mobile");
+};
+
+function renderMessages() {
+  messagesEl.innerHTML = "";
+  if (!currentChatUser) return;
+  const msgs = conversations[currentChatUser] || [];
+  for (const m of msgs) appendBubble(m);
+  scrollToBottom();
+}
+
+function appendBubble(m) {
+  const isMe = m.from === username;
+  const row = document.createElement("div");
+  row.className = "msg-row " + (isMe ? "me" : "other");
+
+  const bubble = document.createElement("div");
+  bubble.className = "bubble " + (isMe ? "me" : "other");
+
+  const msgType = m.message_type || "text";
+  if (msgType === "image" && m.file_data) {
+    const img = document.createElement("img");
+    img.src = `data:${m.mime_type || "image/png"};base64,${m.file_data}`;
+    bubble.appendChild(img);
+    if (m.message) {
+      const cap = document.createElement("div");
+      cap.textContent = m.message;
+      bubble.appendChild(cap);
+    }
+    bubble.appendChild(makeSaveLink(m, img.src, m.file_name || "photo.png"));
+  } else if (msgType === "voice" && m.file_data) {
+    const audio = document.createElement("audio");
+    audio.controls = true;
+    audio.src = `data:${m.mime_type || "audio/webm"};base64,${m.file_data}`;
+    bubble.appendChild(audio);
+    bubble.appendChild(makeSaveLink(m, audio.src, m.file_name || "voice.webm"));
+  } else {
+    const text = document.createElement("div");
+    text.textContent = m.message || "";
+    bubble.appendChild(text);
+  }
+
+  const time = document.createElement("div");
+  time.className = "time";
+  if (m.timestamp) {
+    const d = new Date(m.timestamp);
+    time.textContent = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  }
+  bubble.appendChild(time);
+
+  row.appendChild(bubble);
+  messagesEl.appendChild(row);
+}
+
+function makeSaveLink(m, dataUrl, filename) {
+  const link = document.createElement("a");
+  link.className = "save-link";
+  link.textContent = "💾 Save";
+  link.href = dataUrl;
+  link.download = filename;
+  return link;
+}
+
+function scrollToBottom() {
+  setTimeout(() => { messagesEl.scrollTop = messagesEl.scrollHeight; }, 30);
+}
+
+// ============================================================
+//  Sending text
+// ============================================================
+function sendText() {
+  const text = textInput.value.trim();
+  if (!text || !currentChatUser) return;
+  const sent = send({ type: "private_message", to: currentChatUser, message_type: "text", message: text });
+  if (sent) textInput.value = "";
+}
+el("send-btn").onclick = sendText;
+textInput.addEventListener("keydown", (e) => { if (e.key === "Enter") sendText(); });
+
+// ============================================================
+//  Progress bar helpers
+// ============================================================
+function showProgress(label) {
+  progressLabel.textContent = label;
+  progressFill.style.width = "0%";
+  progressWrap.style.display = "block";
+}
+function updateProgress(percent, label) {
+  progressFill.style.width = percent + "%";
+  if (label) progressLabel.textContent = label;
+}
+function hideProgress() {
+  setTimeout(() => { progressWrap.style.display = "none"; }, 400);
+}
+
+// ============================================================
+//  Sending media (photo / voice) with a progress bar
+// ============================================================
+function sendMedia(messageType, blob, fileName, mimeType) {
+  if (!currentChatUser) { alert("Select a conversation first"); return; }
+  if (!connected) { alert("Not connected to the server. Please reload the page."); return; }
+  if (blob.size > MAX_FILE_SIZE) { alert("File is too large (15 MB maximum)"); return; }
+
+  const label = messageType === "image" ? "Sending photo..." : "Sending voice message...";
+  showProgress(label);
+
+  const reader = new FileReader();
+  reader.onprogress = (evt) => {
+    if (evt.lengthComputable) {
+      const percent = Math.round((evt.loaded / evt.total) * 90); // reading phase = first 90%
+      updateProgress(percent, `${label} ${percent}%`);
+    }
+  };
+  reader.onload = () => {
+    updateProgress(95, `${label} 95%`);
+    const base64Data = reader.result.split(",")[1];
+    const sent = send({
+      type: "private_message", to: currentChatUser, message_type: messageType,
+      message: null, file_data: base64Data, file_name: fileName, mime_type: mimeType,
+    });
+    if (!sent) {
+      hideProgress();
+      alert("Send failed - the connection to the server was lost");
+      return;
+    }
+    updateProgress(100, `${label} 100%`);
+    hideProgress();
+  };
+  reader.onerror = () => {
+    hideProgress();
+    alert("Failed to read the file");
+  };
+  reader.readAsDataURL(blob);
+}
+
+// ---- Photo attach ----
+el("attach-btn").onclick = () => photoInput.click();
+photoInput.onchange = () => {
+  const file = photoInput.files[0];
+  if (!file) return;
+  sendMedia("image", file, file.name, file.type || "image/png");
+  photoInput.value = "";
+};
+
+// ---- Voice recording (dedicated Start / Stop buttons) ----
+micBtn.onclick = async () => {
+  if (!currentChatUser) { alert("Select a conversation first before recording a voice message"); return; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    recordedChunks = [];
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
+    mediaRecorder.onstop = () => {
+      stream.getTracks().forEach(t => t.stop());
+      const blob = new Blob(recordedChunks, { type: "audio/webm" });
+      sendMedia("voice", blob, `voice_${Date.now()}.webm`, "audio/webm");
+    };
+    mediaRecorder.start();
+    micBtn.classList.add("recording");
+    micBtn.disabled = true;
+    stopBtn.disabled = false;
+  } catch (e) {
+    alert("Could not access the microphone: " + e.message);
+  }
+};
+
+stopBtn.onclick = () => {
+  if (mediaRecorder && mediaRecorder.state !== "inactive") {
+    mediaRecorder.stop();
+  }
+  micBtn.classList.remove("recording");
+  micBtn.disabled = false;
+  stopBtn.disabled = true;
+};
+
+// ============================================================
+//  Add-person modal
+// ============================================================
+el("add-person-btn").onclick = () => {
+  addModal.classList.add("active");
+  searchInput.value = "";
+  renderModalList();
+  searchInput.focus();
+};
+el("modal-close-btn").onclick = () => addModal.classList.remove("active");
+searchInput.oninput = renderModalList;
+
+function renderModalList() {
+  modalUserList.innerHTML = "";
+  const q = searchInput.value.trim().toLowerCase();
+  const names = Object.keys(usersStatus).filter(u => u !== username).sort();
+  for (const uname of names) {
+    if (q && !uname.toLowerCase().includes(q)) continue;
+    const isOnline = usersStatus[uname];
+    const row = document.createElement("div");
+    row.className = "user-row";
+    row.innerHTML = `<span class="dot ${isOnline ? "online" : "offline"}">●</span><span>${escapeHtml(uname)}</span>`;
+    row.onclick = () => { addModal.classList.remove("active"); openChat(uname); };
+    modalUserList.appendChild(row);
+  }
+}
+
+// ============================================================
+//  Logout / delete account
+// ============================================================
+el("logout-btn").onclick = () => {
+  send({ type: "logout" });
+  if (ws) ws.close();
+  resetToLogin();
+};
+
+el("delete-account-btn").onclick = () => {
+  if (!confirm(`Are you sure you want to permanently delete your account (${username})?\nThis action cannot be undone.`)) return;
+  send({ type: "delete_user" });
+};
+
+function resetToLogin() {
+  username = null;
+  usersStatus = {};
+  conversations = {};
+  historyLoaded = new Set();
+  currentChatUser = null;
+  mainScreen.classList.remove("active");
+  loginScreen.style.display = "flex";
+  connect();
+}
+
+// ============================================================
+//  Server event handling
+// ============================================================
+function handleEvent(data) {
+  switch (data.type) {
+
+    case "register_success":
+      loginError.style.color = "#3ba55d";
+      loginError.textContent = "Account created! You can now log in.";
+      break;
+
+    case "register_error":
+      loginError.style.color = "#eb5757";
+      loginError.textContent = data.message || "Failed to create account";
+      break;
+
+    case "login_success":
+      username = data.username;
+      meLabel.textContent = "👤 " + username;
+      loginScreen.style.display = "none";
+      mainScreen.classList.add("active");
+      break;
+
+    case "login_error":
+      loginError.style.color = "#eb5757";
+      loginError.textContent = data.message || "Login failed";
+      break;
+
+    case "user_list": {
+      usersStatus = {};
+      for (const u of data.users || []) usersStatus[u.username] = u.online;
+      onlineCountEl.textContent = "Online now: " + (data.online_count || 0);
+      refreshUserList();
+      if (currentChatUser) {
+        const status = usersStatus[currentChatUser] ? "Online" : "Offline";
+        chatHeaderText.textContent = `${currentChatUser}  —  ${status}`;
       }
-
+      break;
     }
 
-  </script>
+    case "history": {
+      const withUser = data.with;
+      const historyMessages = data.messages || [];
+      const existing = conversations[withUser] || [];
+      const existingKeys = new Set(historyMessages.map(m => m.from + "|" + m.timestamp));
+      const merged = historyMessages.concat(existing.filter(m => !existingKeys.has(m.from + "|" + m.timestamp)));
+      merged.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+      conversations[withUser] = merged;
+      if (currentChatUser === withUser) renderMessages();
+      break;
+    }
 
+    case "private_message": {
+      const other = data.to === username ? data.from : data.to;
+      if (!conversations[other]) conversations[other] = [];
+      conversations[other].push(data);
+      if (currentChatUser === other) { appendBubble(data); scrollToBottom(); }
+      break;
+    }
+
+    case "delete_user_success":
+      alert("Your account has been deleted successfully.");
+      resetToLogin();
+      break;
+
+    case "delete_user_error":
+      alert(data.message || "Failed to delete account");
+      break;
+
+    case "error":
+      console.error("[SERVER ERROR]", data.message);
+      break;
+  }
+}
+</script>
 </body>
 </html>
