@@ -1569,9 +1569,34 @@
         </div>
       </div>
 
-      <div class="auth-tabs">
-        <button class="auth-tab-btn active" id="tab-login-btn">Account Login</button>
-        <button class="auth-tab-btn" id="tab-register-btn">Create Account</button>
+      <!-- Account Cost & Activation Notice -->
+      <div class="pricing-notice-banner" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(14, 165, 233, 0.1)); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 14px; padding: 14px 16px; margin-bottom: 18px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="display:inline-flex; align-items:center; justify-content:center; padding:2px 8px; border-radius:6px; background:linear-gradient(135deg, #10b981, #059669); color:#fff; font-size:11px; font-weight:800; letter-spacing:0.04em;">$2 FEE</span>
+            <strong style="color:#f8fafc; font-size:12px; font-weight:700;">Account Activation</strong>
+          </div>
+          <span style="font-size:11px; color:#10b981; font-weight:600;">Authorized Access</span>
+        </div>
+        <div style="color:#94a3b8; font-size:11px; line-height:1.5; margin-bottom:10px;">
+          Each account requires a <strong>$2 activation fee</strong>. To activate your account or receive your login credentials, contact the administrator:
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(0,0,0,0.45); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:7px 10px;">
+          <a href="mailto:houddamergy@gmail.com?subject=Account%20Activation%20Request%20($2)%20-%20Vaulta&body=Hello,%20I%20want%20to%20activate%20an%20account%20for%20Vaulta%20Messenger%20($2).%20My%20desired%20username%20is:" style="color:#38bdf8; font-family:'JetBrains Mono',monospace; font-size:11px; text-decoration:none; font-weight:600; display:flex; align-items:center; gap:6px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            <span>houddamergy@gmail.com</span>
+          </a>
+          <button type="button" id="copy-email-btn" style="background:rgba(255,255,255,0.08); border:none; border-radius:4px; color:#f1f5f9; font-size:10px; font-weight:600; padding:3px 8px; cursor:pointer; transition:all 0.15s ease;">Copy</button>
+        </div>
+      </div>
+
+      <!-- Client Login Title -->
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.08);">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:6px; background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.3); color:#38bdf8; font-size:11px;">🔑</span>
+          <span style="font-size:13px; font-weight:700; color:#f1f5f9; letter-spacing:0.02em;">Client Account Login</span>
+        </div>
+        <span style="font-size:10px; font-family:'JetBrains Mono',monospace; color:#64748b;">Pre-Authorized Only</span>
       </div>
 
       <div class="input-group">
@@ -1597,12 +1622,13 @@
 
       <button class="submit-btn" id="auth-submit-btn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <span id="submit-btn-text">Authenticate & Enter</span>
+        <span id="submit-btn-text">Log In to Account</span>
       </button>
 
-      <div style="margin-top:14px; text-align:center;">
-        <button type="button" class="admin-portal-link" id="auth-open-admin-btn">
-          🛡️ Admin Moderation Portal
+      <div style="margin-top:14px; display:flex; flex-direction:column; gap:8px;">
+        <button type="button" class="admin-portal-link" id="auth-open-admin-btn" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:10px; background:rgba(225,29,72,0.12); border:1px solid rgba(225,29,72,0.3); border-radius:10px; color:#fb7185; font-size:12px; font-weight:600; cursor:pointer;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Admin Login & Moderation Portal</span>
         </button>
       </div>
     </div>
@@ -1936,10 +1962,53 @@
         </div>
       </div>
 
-      <div style="display:flex; justify-content:space-between; align-items:center; margin:14px 0 10px;">
-        <span style="font-size:12px; font-weight:700; color:#e2e8f0; text-transform:uppercase; letter-spacing:0.04em;">User Accounts</span>
-        <button type="button" id="admin-refresh-btn" class="admin-act-btn" style="background:rgba(255,255,255,0.06); color:#cbd5e1;">
-          ↻ Refresh List
+      <!-- Provision New Paid Account Section -->
+      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:12px 14px; margin:14px 0;">
+        <div style="font-size:12px; font-weight:700; color:#38bdf8; margin-bottom:4px; display:flex; align-items:center; justify-content:space-between;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span>✨</span>
+            <span>Provision Paid User Account ($2)</span>
+          </div>
+          <span style="font-size:10px; font-weight:600; color:#10b981; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); border-radius:4px; padding:2px 6px;">$2 Received</span>
+        </div>
+        <div style="font-size:11px; color:#94a3b8; margin-bottom:10px;">
+          Directly create an account and generate credentials for the user upon payment receipt.
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr auto; gap:8px; align-items:center;">
+          <input type="text" id="admin-new-user-name" placeholder="User handle..." style="background:rgba(0,0,0,0.45); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:7px 10px; color:#fff; font-size:11px; outline:none; font-family:'JetBrains Mono',monospace;">
+          <input type="text" id="admin-new-user-pass" placeholder="Initial password..." style="background:rgba(0,0,0,0.45); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:7px 10px; color:#fff; font-size:11px; outline:none; font-family:'JetBrains Mono',monospace;">
+          <button type="button" id="admin-create-user-btn" class="submit-btn" style="padding:7px 12px; font-size:11px; white-space:nowrap; height:100%; display:flex; align-items:center; gap:4px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Provision</span>
+          </button>
+        </div>
+        <div id="admin-create-feedback" style="font-size:11px; margin-top:6px; min-height:16px;"></div>
+      </div>
+
+      <!-- Broadcast Announcement Section -->
+      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:12px 14px; margin-bottom:14px;">
+        <div style="font-size:12px; font-weight:700; color:#fbbf24; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+          <span>📢</span>
+          <span>Transmit System Announcement</span>
+        </div>
+        <div style="font-size:11px; color:#94a3b8; margin-bottom:8px;">
+          Broadcast an urgent notification or account maintenance memo to all active users.
+        </div>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="admin-broadcast-text" placeholder="Type system alert message..." style="flex:1; background:rgba(0,0,0,0.45); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:7px 10px; color:#fff; font-size:11px; outline:none;">
+          <button type="button" id="admin-broadcast-btn" class="admin-act-btn" style="background:rgba(251,191,36,0.15); border-color:rgba(251,191,36,0.3); color:#fbbf24; padding:7px 12px; font-size:11px; font-weight:600; white-space:nowrap;">
+            Transmit
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin:14px 0 10px;">
+        <div class="search-container" style="flex:1; margin-bottom:0;">
+          <svg class="search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="search-input" id="admin-users-search" placeholder="Search user accounts..." style="padding:6px 8px 6px 30px; font-size:11px;">
+        </div>
+        <button type="button" id="admin-refresh-btn" class="admin-act-btn" style="background:rgba(255,255,255,0.06); color:#cbd5e1; white-space:nowrap;">
+          ↻ Refresh
         </button>
       </div>
 
@@ -2052,8 +2121,6 @@ const mainScreen = el("main-screen");
 const sidebar = el("sidebar");
 const connDot = el("conn-dot");
 const connLabel = el("conn-label");
-const tabLoginBtn = el("tab-login-btn");
-const tabRegisterBtn = el("tab-register-btn");
 const usernameInput = el("username-input");
 const passwordInput = el("password-input");
 const authFeedback = el("auth-feedback");
@@ -2150,8 +2217,6 @@ const RTC_CONFIG = {
 // ============================================================
 //  CONNECTION LOGIC
 // ============================================================
-let activeAuthTab = "login";
-
 function connect() {
   if (ws) {
     try { ws.close(); } catch(e){}
@@ -2220,24 +2285,8 @@ reconnectBtn.onclick = () => {
 };
 
 // ============================================================
-//  AUTH TABS & ACTIONS
+//  AUTH ACTIONS
 // ============================================================
-tabLoginBtn.onclick = () => {
-  activeAuthTab = "login";
-  tabLoginBtn.classList.add("active");
-  tabRegisterBtn.classList.remove("active");
-  submitBtnText.textContent = "Authenticate & Enter";
-  authFeedback.textContent = "";
-};
-
-tabRegisterBtn.onclick = () => {
-  activeAuthTab = "register";
-  tabRegisterBtn.classList.add("active");
-  tabLoginBtn.classList.remove("active");
-  submitBtnText.textContent = "Create Encrypted Account";
-  authFeedback.textContent = "";
-};
-
 eyeToggleBtn.onclick = () => {
   if (passwordInput.type === "password") {
     passwordInput.type = "text";
@@ -2255,13 +2304,13 @@ authSubmitBtn.onclick = () => {
   }
 
   if (!connected) {
-    showAuthFeedback("Server is connecting or waking up from sleep. Please wait...", true);
+    showAuthFeedback("Connecting to server. Please wait...", true);
     connect();
     return;
   }
 
   send({
-    type: activeAuthTab,
+    type: "login",
     username: u,
     password: p
   });
@@ -2291,12 +2340,11 @@ function resetToAuth() {
 function handleServerEvent(data) {
   switch (data.type) {
     case "register_success":
-      showAuthFeedback("Account created! You can now log in.", false);
-      tabLoginBtn.click();
+      showAuthFeedback("Account provisioned! You can now log in.", false);
       break;
 
     case "register_error":
-      showAuthFeedback(data.message || "Failed to create account", true);
+      showAuthFeedback(data.message || "Registration disabled", true);
       break;
 
     case "login_success":
@@ -2445,7 +2493,16 @@ function handleServerEvent(data) {
       if (toast && toastText) {
         toastText.textContent = data.message || "Admin action executed successfully.";
         toast.classList.add("show");
-        setTimeout(() => toast.classList.remove("show"), 3000);
+        setTimeout(() => toast.classList.remove("show"), 3500);
+      }
+      const createFeedback = el("admin-create-feedback");
+      if (createFeedback && data.action === "create_user") {
+        createFeedback.textContent = data.message;
+        createFeedback.style.color = "#34d399";
+        const nInput = el("admin-new-user-name");
+        const pInput = el("admin-new-user-pass");
+        if (nInput) nInput.value = "";
+        if (pInput) pInput.value = "";
       }
       break;
     }
@@ -2454,6 +2511,17 @@ function handleServerEvent(data) {
       adminUsersData = data.users || [];
       adminBansData = data.bans || {};
       renderAdminUsersTable();
+      break;
+    }
+
+    case "admin_announcement": {
+      const toast = el("security-toast");
+      const toastText = el("security-toast-text");
+      if (toast && toastText) {
+        toastText.textContent = `📢 Announcement: ${data.message}`;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 6000);
+      }
       break;
     }
   }
@@ -3448,12 +3516,17 @@ function renderAdminUsersTable() {
   if (adminOnlineUsers) adminOnlineUsers.textContent = online;
   if (adminBannedUsers) adminBannedUsers.textContent = banned;
 
-  if (total === 0) {
-    adminUsersContainer.innerHTML = `<div style="text-align:center; padding:24px; color:#64748b; font-size:12px;">No registered user accounts found.</div>`;
+  const query = adminUsersSearch ? adminUsersSearch.value.trim().toLowerCase() : "";
+  const filteredUsers = query
+    ? adminUsersData.filter(u => u.username.toLowerCase().includes(query))
+    : adminUsersData;
+
+  if (filteredUsers.length === 0) {
+    adminUsersContainer.innerHTML = `<div style="text-align:center; padding:24px; color:#64748b; font-size:12px;">${query ? 'No matching accounts found for query.' : 'No registered user accounts found.'}</div>`;
     return;
   }
 
-  adminUsersData.forEach(u => {
+  filteredUsers.forEach(u => {
     const card = document.createElement("div");
     card.className = "admin-user-card" + (u.isBanned ? " is-banned" : "");
 
@@ -3529,6 +3602,66 @@ function renderAdminUsersTable() {
     card.appendChild(actions);
     adminUsersContainer.appendChild(card);
   });
+}
+
+const copyEmailBtn = el("copy-email-btn");
+if (copyEmailBtn) {
+  copyEmailBtn.onclick = () => {
+    navigator.clipboard.writeText("houddamergy@gmail.com").then(() => {
+      copyEmailBtn.textContent = "Copied!";
+      setTimeout(() => { copyEmailBtn.textContent = "Copy"; }, 2000);
+    }).catch(() => {
+      copyEmailBtn.textContent = "Copied!";
+    });
+  };
+}
+
+const adminUsersSearch = el("admin-users-search");
+if (adminUsersSearch) {
+  adminUsersSearch.oninput = () => renderAdminUsersTable();
+}
+
+const adminNewUserName = el("admin-new-user-name");
+const adminNewUserPass = el("admin-new-user-pass");
+const adminCreateUserBtn = el("admin-create-user-btn");
+const adminCreateFeedback = el("admin-create-feedback");
+
+if (adminCreateUserBtn) {
+  adminCreateUserBtn.onclick = () => {
+    const uname = adminNewUserName.value.trim();
+    const pass = adminNewUserPass.value.trim();
+    if (!uname || !pass) {
+      if (adminCreateFeedback) {
+        adminCreateFeedback.textContent = "Username and initial password are required.";
+        adminCreateFeedback.style.color = "#fb7185";
+      }
+      return;
+    }
+    if (adminCreateFeedback) {
+      adminCreateFeedback.textContent = "Provisioning account ($2)...";
+      adminCreateFeedback.style.color = "#94a3b8";
+    }
+    send({
+      type: "admin_create_user",
+      new_username: uname,
+      new_password: pass
+    });
+  };
+}
+
+const adminBroadcastText = el("admin-broadcast-text");
+const adminBroadcastBtn = el("admin-broadcast-btn");
+
+if (adminBroadcastBtn) {
+  adminBroadcastBtn.onclick = () => {
+    const text = adminBroadcastText.value.trim();
+    if (!text) return;
+    send({
+      type: "admin_broadcast",
+      announcement: text
+    });
+    adminBroadcastText.value = "";
+  };
 }
 
 if (authOpenAdminBtn) authOpenAdminBtn.onclick = openAdminModal;
