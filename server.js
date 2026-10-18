@@ -34,7 +34,7 @@ try {
   console.error('[EMAIL] ❌ nodemailer is not installed. Run: npm install nodemailer');
 }
 
-const PORT = Number(process.env.PORT) || 6430;
+const PORT = Number(process.env.PORT) || 3000;
 // Paste your ngrok token between the quotes if you cannot set environment variables:
 const NGROK_AUTHTOKEN = process.env.NGROK_AUTHTOKEN || '3Ixu21mhhy2OgFLONHzcLtSShOe_7iy2odvLUovQDvmGgmxQN';
 
